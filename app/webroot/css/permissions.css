@@ -1,0 +1,239 @@
+.main_permission{
+	margin:0 0 0 30px;
+	font-size: 14px;
+}
+.main_permission a {
+	color: #235579;
+}
+.subtitle{
+	color:#245579;
+	font-size:20px;
+	font-weight:bold;	
+}
+.next_sub{
+	color:#3175a8;
+	font-weight:bold;
+}
+.name{
+	margin:15px 0 0 22px;
+	color:#235479;
+}
+.name label {
+	width: 70px;
+	display: inline-block;
+}
+.sub_name{
+	float:left;
+}
+.sub_name a{
+	margin-left:32px;
+}
+.edit{
+	display:inline-block;
+	margin-left: 5px;
+	font-size: 10px;
+	color: #6292b7
+}
+.revamp_content{
+	margin-top:20px;
+	width: 450px;
+}
+.permission_holders_tags {
+	margin: 10px 0 0 95px;
+}
+.permission_tag{
+	background-color: #24547a;
+	overflow: hidden;
+	border-radius: 10px;
+	height: 20px;
+	font-size: 10px;
+	margin-right: 10px;
+	margin-bottom: 5px;
+	float:left;
+}
+.name_tag{
+	line-height: 19px;
+	text-align: right;
+	margin-left: 10px;
+	color: #fff;
+	display: inline-block;
+	font-size: 12px;
+	margin-right: 5px;
+}
+.cross_tag {
+	background-color: #5184a4;
+	float: right;
+	color: #ffffff;
+	line-height: 20px;
+	width: 20px;
+	text-align: center;
+	display: inline-block;
+	cursor: pointer;
+}
+.cross_tag:hover {
+	font-weight: bold;
+}
+.permission_add {
+	width: 60px;
+	float: left;
+	height: 20px;
+	line-height: 20px;
+	font-size: 12px;
+	color: #235479;
+}
+.cancel_task {
+	color: #ff0000 !important; 
+}
+.permission_add a {
+	color: #24547A;
+}
+/* CSS for modals */
+.the_add_modal {
+	width: 310px;
+	font-size: 14px;
+	background-color: #e1eef8;
+	border-radius: 2px;
+	border: 1px solid #e6e9ed;
+	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.11);
+	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.11);
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.11);
+	-o-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.11);
+	padding: 15px;
+	display: none;
+}
+.the_add_modal input.member_search {
+	width: 280px;
+	border: 1px solid #e0dbdf;
+	color: #bfbdb8;
+	font-size: 14px;
+	height: 28px;
+	line-height: 14px;
+	padding: 0 5px;
+	barckground: transparent url(../images/input-bg-repeat.png) repeat-x 0 0;
+}
+.the_add_modal .member_info {
+	display: inline-block;
+	line-height: 18px;
+}
+.the_add_modal span {
+	display: block;
+}
+.the_add_modal .member_name {
+	color: #7ca3be
+}
+.the_add_modal .member_name a {
+	color: #235579
+}
+.the_add_modal .member_thumb {
+	padding: 1px;
+	border: 1px solid #babfc2;
+	vertical-align: top;
+}
+.the_add_modal li.each_member {
+	height: 60px;
+	margin-top: 10px;
+}
+.the_add_modal .tasks, .the_add_modal .budget_spent {
+	font-size: 12px;
+	color: #5388ad;
+}
+/* visibility selection modal */
+.the_visibility_modal {
+	width: 310px;
+	font-size: 14px;
+	background-color: #e1eef8;
+	border-radius: 2px;
+	border: 1px solid #e6e9ed;
+	-webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.11);
+	-moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.11);
+	box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.11);
+	-o-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.11);
+	padding: 10px;
+	display: none;
+}
+#directory_dd {
+	width:100%;
+	height: 40px;
+	background: transparent url(../images/dd-bg.png) repeat-x 0 0;
+	border: 1px solid #d0d3d6;
+	border-radius: 2px;
+}
+#directory_dd_container a {
+	color: #726f65
+}
+#directory_dd_options {
+	border: solid 1px #CCC;
+	border-top: none;
+	list-style: none;
+	box-shadow: 0px 1px 5px #DDD;
+	position: absolute;
+	z-index: 2000;
+	margin: 0;
+	padding: 0;
+	background: white;
+	overflow: auto;
+	width: 310px;
+	display: none;
+}
+.dd_option {
+	padding: 10px;
+	display: block;
+	border-bottom: solid 1px #DDD;
+	overflow: hidden;
+	text-decoration: none;
+	color: #333;
+	cursor: pointer;
+	-webkit-transition: all 0.25s ease-in-out;
+	-moz-transition: all 0.25s ease-in-out;
+	-o-transition: all 0.25s ease-in-out;
+	-ms-transition: all 0.25s ease-in-out;
+}
+.dd_option:hover {
+	background: #F3F3F3;
+	color: black;
+}
+.dd_select:hover, .dd_option:hover {
+	text-decoration: none;
+}
+.dd_select {
+	overflow: hidden;
+	display: block;
+	padding: 10px;
+	color: #5c595a;
+	font-size: 16px;
+	cursor: pointer;
+}
+.dd_pointer {
+	width: 0;
+	height: 0;
+	right: 10px;
+	top: 50%;
+	margin-top: -3px;
+}
+.dd_pointer_down {
+	border: solid 5px transparent;
+	border-top: solid 5px black;
+}
+.dd_pointer_up{
+	border: solid 5px transparent !important;
+	border-bottom: solid 5px black !important;
+	margin-top: -8px;
+}
+.members_list li{
+	margin-top:10px;
+}
+.member_photo{
+	float:left;
+	clear:both;
+	padding:1px;
+	border:1px solid #BABABA;
+	width:46px;
+	height:51px;
+	overflow:hidden;
+	text-align:center;
+}
+.member_info{
+	display:inline-block;
+	margin-left:8px;
+	color:#5DA1D1;
+}

@@ -1,0 +1,10 @@
+<xml>
+		<speech source="assets/speech/thought_bl.png" original="assets/speech/quotes1.png"/>
+		<speech source="assets/speech/thought_br.png" original="assets/speech/quotes2.png"/> 
+		<speech source="assets/speech/talk_bl.png" original="assets/speech/round.png"/> 
+		<speech source="assets/speech/talk_br.png" original="assets/speech/round1.png"/> 
+		<speech source="assets/speech/talk_tr.png" original="assets/speech/round3.png"/> 
+		<speech source="assets/speech/talk_tl.png" original="assets/speech/round4.png"/> 
+		<speech source="assets/speech/burst.png" original="assets/speech/star.png"/> 
+		<speech source="assets/speech/oval.png" original="assets/speech/circle.png"/> 
+</xml>	

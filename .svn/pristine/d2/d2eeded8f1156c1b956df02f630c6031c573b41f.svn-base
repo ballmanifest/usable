@@ -1,0 +1,46 @@
+.form_detail_section {
+	float: left;
+}
+.form_detail_section div.input {
+	height: 40px;
+}
+.form_detail_section label {
+	font-size: 12px;
+	width: 150px;
+	display: inline-block;
+	font-weight: bold
+}
+.form_detail_section input[type="text"], .form_detail_section input[type="password"], .form_detail_section select {
+	border: 1px solid #CCC;
+	height: 20px;
+	width: 204px;
+	position: absolute
+}
+.form_detail_section select {
+	height : 23px
+}
+.section_header {
+	color: #333;
+	margin-bottom: 15px
+}
+.account-wrapper{
+	padding:15px;
+}
+#wrapper_to_container_elements{
+	padding:0 !important;
+}
+div.submit input[type="submit"] {
+	background:-moz-linear-gradient(center top , #6EBFFA 0%, #39A2EC 54%, #0980D6 100%) repeat scroll 0 0 transparent;
+	color: #fff;
+	text-align:center;
+	font-size: 14px;
+	font-weight:bold;
+	float: left;
+	border:1px solid #A0A0A0;
+	border-radius:3px;
+	padding:5px;
+}
+#UserIndexForm{
+	width:764px;
+	margin:auto;
+}

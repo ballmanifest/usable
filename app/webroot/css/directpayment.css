@@ -1,0 +1,142 @@
+fieldset {
+            overflow: auto;
+            border: 0;
+            margin: 0;
+            padding: 0; }
+.heading_secton{
+			color:#fff;
+			background:#9bb9db;
+		}
+.heading_secton h3{
+			padding:10px;
+			font-size:15px;
+			margin:0;
+		}
+.main_purchase_form{
+			margin:0 10px 10px 10px;
+			border:1px solid #9bb9db;
+			min-height:950px;
+			background:#eff8ff;
+		}
+.purchase_wrapper{
+			padding:50px;
+		}
+.naming_customer, .card_type{
+			float:left;
+			margin-left:10px;
+			font-weight:bold;
+			font-size:14px;
+		}
+.naming_customer fieldset div, locate_customer fieldset div{
+			clear:both;
+		}
+.locate_customer, .card_security_code{
+			display:inline-block;
+			margin-left:50px;
+			font-weight:bold;
+			font-size:14px;
+		}
+.card_detail_container{
+			margin-top:50px;
+		}
+.label_for_input{float:left; margin-right:20px; width:115px;}
+.input_value{display:inline-block;}
+.payment_header{
+			font-size:20px;
+			font-weight:bold;
+			color:#8c8c8c;
+			margin-bottom:20px;
+		}
+.order_date{
+			width:80px;
+			border:1px solid #000;
+			-moz-border-radius:4px;
+			-webkit-border-radius:4px;
+			border-radius:4px;
+		}
+.visa_card{
+			background:url('http://filocitydev.com/img/visa.png') no-repeat;
+			height:25px;
+			width:50px;
+			float:left;
+			margin-right:10px;
+		}
+.master_card{
+			background:url('http://filocitydev.com/img/master.png') no-repeat;
+			height:25px;
+			width:50px;
+			display:inline-block;
+			margin-right:5px;
+		}
+.american_express{
+			background:url('http://filocitydev.com/img/american.png') no-repeat;
+			height:25px;
+			width:50px;
+			display:inline-block;
+			margin-right:10px;
+		}
+.discover{
+			background:url('http://filocitydev.com/img/discover.png') no-repeat;
+			height:25px;
+			width:50px;
+			display:inline-block;
+		}
+.copyright{
+			width:85px;
+			margin:40px 0 0 20px;
+		}
+.thawte{
+			background:url('http://filocitydev.com/img/thawte.png') no-repeat;
+			height:50px;
+			width:60px;
+		}
+.card_sample{
+			width:265px;
+			margin:0 0 5px 133px;
+		}
+fieldset div {
+            clear: both; }
+
+fieldset.centered div {
+            text-align: center; }
+
+label {
+            color: #183b55;
+            display: block;
+            margin-bottom: 5px; }
+label img {
+            display: block;
+            margin-bottom: 5px; }
+		
+input.text {
+            border: 1px solid #bfbab4;
+            margin: 0 4px 8px 0;
+            padding: 6px;
+            color: #1e1e1e;
+			width:250px;
+            -webkit-box-shadow: inset 0px 5px 5px #eee;
+            -moz-box-shadow: inset 0px 5px 5px #eee;
+            box-shadow: inset 0px 5px 5px #eee; }
+select.text {
+            border: 1px solid #bfbab4;
+            margin: 0 4px 8px 0;
+            padding: 6px;
+            color: #1e1e1e;
+			width:265px;
+            -webkit-box-shadow: inset 0px 5px 5px #eee;
+            -moz-box-shadow: inset 0px 5px 5px #eee;
+            box-shadow: inset 0px 5px 5px #eee; }	
+.submit {
+            display: block;
+            background-color: #83abcf;
+            border: 1px solid #766056;
+			font-weight:bold;
+            color: #fff;
+			float:right;
+            margin-right:7px;
+			margin-top:50px;
+            padding: 8px 16px;
+            font-size: 14px;
+            -webkit-box-shadow: inset 3px -3px 3px rgba(0,0,0,.5), inset 0 3px 3px rgba(255,255,255,.5), inset -3px 0 3px rgba(255,255,255,.75);
+            -moz-box-shadow: inset 3px -3px 3px rgba(0,0,0,.5), inset 0 3px 3px rgba(255,255,255,.5), inset -3px 0 3px rgba(255,255,255,.75);
+            box-shadow: inset 3px -3px 3px rgba(0,0,0,.5), inset 0 3px 3px rgba(255,255,255,.5), inset -3px 0 3px rgba(255,255,255,.75); }

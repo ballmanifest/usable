@@ -1,0 +1,133 @@
+﻿body
+{
+	font-family: "Verdana";
+	font-size: 8pt;
+	background-color: white;
+	margin-left: 15px;
+	margin-right: 15px;
+}
+
+table.list
+{
+    border-style: solid;
+    border-width: 1px;
+    font-family: "Verdana";
+    font-size: 8pt;
+    margin-left: 15px;
+    margin-right: 15px;
+    border-collapse: collapse;
+}
+
+table.list td
+{
+    border-style: solid;
+    border-width: 1px;
+    padding: 7px 10px 7px 10px;
+}
+
+table.list th
+{
+    border-style: solid;
+    border-width: 1px;
+    padding: 7px 10px 7px 10px;
+}
+
+a:link
+{
+	color: #336699;
+	font-weight: normal;
+	font-size: 8pt;
+}
+a:visited
+{
+	color: #336699;
+	font-weight: normal;
+	font-size: 8pt;
+}
+a:active
+{
+	color: #336699;
+	font-weight: normal;
+	font-size: 8pt;
+}
+.question
+{
+	font-weight: bold;
+	color: #345092;
+}
+.topic
+{
+	text-align: center;
+	background-color: #EEEEEE;
+	font-weight: bold;
+	color: #336699;
+	vertical-align: middle;
+	font-size: larger;
+}
+.topicLeft
+{
+	text-align: left;
+	background-color: #EEEEEE;
+	font-weight: bold;
+	color: #336699;
+	vertical-align: middle;
+	font-size: larger;
+}
+
+li
+{
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.caption
+{
+	color: #336699;
+	font-size: 24px;
+}
+
+.yellow
+{
+	color: #FF9900;
+	font-weight: bold;
+	font-size: 24px;
+}
+.gray
+{
+	font-family: Arial, Helvetica, sans-serif;
+	color: #999999;
+	font-size: 24px;
+}
+
+.ulimg
+{
+	vertical-align: middle;
+	margin-right: 5px;
+}
+
+
+
+.imgwithborder
+{
+	border-style: solid;
+	border-width: 1px;
+	border-color: #D4D0C8;
+}
+
+
+
+* html .listing {
+   width: 96%;
+   padding-left: 1%;
+   padding-right: 5px;
+   padding-top: 2px;
+   padding-bottom: 17px;
+   overflow-x: auto;	
+   background-color: #F2F2F2;
+}
+
+* html .signature {
+	font-size: 120%;
+	font-weight: bold;
+	font-family: "Courier New", Courier, mono;
+}

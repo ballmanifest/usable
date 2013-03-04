@@ -1,0 +1,140 @@
+.sign_in {
+	font-size: 18px;
+	color: #1d4b6e;
+	margin-top: 10px;
+}
+#submit_login {
+	width:65px;
+	background-color: #3199e4;
+	color: #fff;
+	font-weight: bold;
+	border-radius: 3px;
+	border: none;
+	margin-left: 285px;
+	cursor: pointer
+}
+#submit_login:hover {
+	background-color: #2e8ed3
+}
+.login_wrapper {
+	left: 50%;
+    margin-left: 40px;
+    top: 50px;
+    width: 415px;
+	border-radius: 3px;
+}
+.login_background {
+	border: 10px solid #b2d8f3;
+	background:#fff url(../img/lock.png) no-repeat 280px 125px;
+	border-radius: 3px;
+	padding: 10px 20px;
+}
+.login_wrapper input {
+	border:1px solid #cccccc;
+	border-radius:2px;
+	height:26px;
+	background-color:#fff;
+	width: 230px;
+}
+.filocity_logo {
+	float:left;
+	width:240px;
+	height:80%;
+	margin-top:6%;
+	margin-left:20px;
+	border-right:1px solid #dddddd;
+}
+.filocity_logo #login_logo_image {
+	margin-top:82px;
+}
+#sign_up {
+	float:right;
+	margin-top:10px;
+	margin-right: 40px;
+}
+#link_signup {
+	color: #3C2899;
+    font-family: Arial,Verdana;
+    font-size: 15px;
+    font-weight: bold;
+    left: 315px;
+    text-decoration: none;
+    top: 30px;
+}
+#forgot_password {
+	font-family:Arial, Verdana;
+	font-size:13px;
+	color:#3c2899;
+	font-style: italic;
+	text-decoration:none;
+	display:inline-block;
+	top: 140px;
+	left: 135px;
+	
+}
+.login_wrapper input[type=checkbox] {
+	border-left:1px solid #bfbfbf;
+	border-top:1px solid #bfbfbf;
+	border-bottom:1px solid #d8d8d8;
+	border-right:1px solid #d8d8d8;
+	border-radius:5px;
+	height:23px;
+	background-color:#fff;
+	width:11px;
+	height:11px;
+	margin-top:5px;
+	margin-right:9px;
+	margin-bottom:11px;
+}
+#UserCheckbox {
+    background-color: #fafafa;
+    border: 1px solid #ccc;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+	margin: 3px 5px 0 0;
+}
+div.input label {
+	margin: 15px 0 5px;
+	display: block;
+}
+div.input.checkbox {
+	margin-top: 10px
+}
+div.input.checkbox label {
+	display: inline-block;
+    line-height: 17px;
+    margin: 0;
+    vertical-align: top;
+}
+#UserCheckbox:active, .regular-checkbox:checked:active {
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+#UserCheckbox:checked {
+    background-color: #e9ecee;
+    border: 1px solid #adb8c0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05), inset 15px 10px -12px rgba(255,255,255,0.1);
+    color: #99a1a7;
+}
+#UserCheckbox:checked:after {
+    content: '\2714';
+    font-size: 11px;
+    position: absolute;
+    top: -1px;
+    left: 1px;
+    color: #99a1a7;
+}
+.login_modal_close {
+    background-color: #000000;
+    border: 3px solid #FFFFFF;
+    border-radius: 20px 20px 20px 20px;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: bold;
+    height: 20px;
+    line-height: 18px;
+    right: -12px;
+    text-align: center;
+    text-decoration: none;
+    text-indent: 0;
+    top: -12px;
+    width: 20px;
+}

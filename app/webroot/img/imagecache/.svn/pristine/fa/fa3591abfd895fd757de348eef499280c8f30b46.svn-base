@@ -1,0 +1,925 @@
+<?php
+App::uses('AppModel', 'Model');
+App::import("Vendor", 'anet_php_sdk' . DS . 'FilocityDPM');
+
+class User extends AppModel {
+
+	public $displayField = 'title';
+	
+	public $virtualFields = array(
+		'name' => 'CONCAT(User.first_name, " ", User.last_name)'
+	);
+	
+	public $validate = array(
+		'first_name' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Required',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'last_name' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Required',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+			'minlength' => array(
+				'rule' => array('minLength', 2),
+				'message' => 'The last name must be at least 2 characters long.'
+			)
+		),
+		'email' => array(
+			'email' => array(
+				'rule' => array('email'),
+				'message' => 'Required',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+			'isUnique' => array(
+				'rule' => array('isUnique'),
+				'message' => 'That email is already in use.'
+			)
+		),
+		'password' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Required',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'confirm_password' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Required',
+				'allowEmpty' => false,
+				'required' => false,
+				//'last' => false, // Stop validation after this rule
+				'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'department' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Please input a department.',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'mail_address_1' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Required',
+				'allowEmpty' => false,
+				'required' => false,
+				//'last' => false, // Stop validation after this rule
+				'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'state_id' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				//'message' => 'Your custom message here',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'zip' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Required',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'country_id' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				//'message' => 'Your custom message here',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'position' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Please input a position.',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'city' => array(
+			'notempty' => array(
+				'rule' => array('notempty'),
+				'message' => 'Required',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'has_personal_address' => array(
+			'boolean' => array(
+				'rule' => array('boolean'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'is_agreed' => array(
+			'boolean' => array(
+				'rule' => array('boolean'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'is_corporate_account' => array(
+			'boolean' => array(
+				'rule' => array('boolean'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'status' => array(
+			'boolean' => array(
+				'rule' => array('boolean'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'role' => array(
+			'numeric' => array(
+				'rule' => array('numeric'),
+				//'message' => 'Your custom message here',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'trial_end' => array(
+			'date' => array(
+				'rule' => array('date'),
+				//'message' => 'Your custom message here',
+				//'allowEmpty' => false,
+				//'required' => false,
+				//'last' => false, // Stop validation after this rule
+				'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		),
+		'company_id' => array(
+			'numeric' => array(
+				'rule' => array('numeric'),
+				'message' => 'Required',
+				'allowEmpty' => false,
+				'required' => true,
+				//'last' => false, // Stop validation after this rule
+				//'on' => 'create', // Limit validation to 'create' or 'update' operations
+			),
+		)
+	);
+
+	public $belongsTo = array(
+		'State' => array(
+			'className' => 'State',
+			'foreignKey' => 'state_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+		'Country' => array(
+			'className' => 'Country',
+			'foreignKey' => 'country_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+		'Company' => array(
+			'className' => 'Company',
+			'foreignKey' => 'company_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		)
+	);
+
+	public $hasMany = array(
+		'Alarm' => array(
+			'className' => 'Alarm',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'CalendarAdd' => array(
+			'className' => 'CalendarAdd',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'CalendarEvent' => array(
+			'className' => 'CalendarEvent',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Calendar' => array(
+			'className' => 'Calendar',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Comment' => array(
+			'className' => 'Comment',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Contact' => array(
+			'className' => 'Contact',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Document' => array(
+			'className' => 'Document',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Folder' => array(
+			'className' => 'Folder',
+			'foreignKey' => 'user_id',
+		),
+		'Group' => array(
+			'className' => 'Group',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Log' => array(
+			'className' => 'Log',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Notice' => array(
+			'className' => 'Notice',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Project' => array(
+			'className' => 'Project',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'PurchaseLog' => array(
+			'className' => 'PurchaseLog',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Share' => array(
+			'className' => 'Share',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Task' => array(
+			'className' => 'Task',
+			'foreignKey' => 'user_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'UsersGroup' => array(
+			'className' => 'UsersGroup',
+			'foreignKey' => 'user_id',
+			'dependent' => true,
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+		'Subscription' => array(
+			'className' => 'Subscription',
+			'foreignKey' => 'user_id',
+			'dependent' => true,
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		)
+	);
+
+	public $hasAndBelongsToMany = array(
+		'Project' => array(
+			'className' => 'Project',
+			'joinTable' => 'projects_users',
+			'foreignKey' => 'user_id',
+			'associationForeignKey' => 'project_id',
+			'unique' => 'keepExisting',
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'finderQuery' => '',
+			'deleteQuery' => '',
+			'insertQuery' => ''
+		)
+	);
+	
+	public function beforeSave($options = array()) {
+		if( !empty($this->data['User']['password']) ) {
+			$this->data['User']['password'] = AuthComponent::password($this->data['User']['password']);
+		}
+        return true;
+    }
+	
+	public function curuser_detail($auth_id = null) {
+		$data = array();
+		if( !empty($auth_id) ) {
+			$this->Behaviors->attach('Containable');
+			$data = $this->find('first',
+									array(
+										'conditions' => array('User.id' => $auth_id),
+										'contain' => array(
+											'Log' => array(
+													'fields' => array('Log.created'),
+													'order' => array('Log.created' => 'DESC'),
+													'limit' => 1
+											),
+											'Company' => array(
+												'Package'
+											),
+											'Document' => array(
+												'fields' => array('SUM(Document.size) / (1024 * 1024 ) AS total_used'), // calculate size in GB
+												'conditions' => array('Document.user_id' => $auth_id)
+											)
+										)
+									)
+								);
+		} 
+
+		return $data;
+	}
+	
+	public function active_members($company_id = null) {
+		$data = null;
+		if( !empty($company_id) ) {
+			$data = $this->Company->find('count', array('Company.id' => $company_id));
+		}
+		return $data;
+	}
+	
+	public function last_loggers($company_id = null) {
+		$loggers = array();
+		if( !empty($company_id) ) {
+			$list = $this->find('list', array('conditions' => array('User.company_id' => $company_id)));
+			$loggers = $this->Log->find('count', 
+										array(
+											'conditions' => array (
+												'Log.user_id' => $list,
+												'Log.created BETWEEN DATE_SUB(NOW(), INTERVAL 72 HOUR) AND NOW()'
+											),
+											'order' => array('Log.created' => 'DESC')
+										)
+									);
+		}
+		return $loggers;
+	}
+	
+	public function recent_activities($auth_id = null) {
+		$notices = array();
+		if( !empty($auth_id) ) {
+			$notices = $this->Notice->find('all', 
+											array(
+												'fields' => array('Notice.id', 'Notice.short_message', 'Notice.notice_type', 'DATE(Notice.created) AS date'),
+												'conditions' => array('Notice.user_id' => $auth_id),
+												'recursive' => -2,
+												'order' => array('Notice.created' => 'DESC')
+											)
+										);
+		}
+		return $notices;
+	}
+	
+	
+	
+	public function recent_documents($auth_id = null) {
+		$files = array();
+		if( !empty($auth_id) ) {
+			$files = $this->Document->find('all', 
+											array(
+												'fields' => array('Document.name', 'Document.file','Document.ext','Document.created', 'Document.modified'),
+												'conditions' => array('User.id' => $auth_id),
+												'order' => array('Document.created' => 'DESC'),
+												'limit' => 5,
+												'recusive' => -2
+											)
+										);
+		}
+		return $files;
+	}
+	
+	
+	public function user_tasks($auth_id = null) {
+		$tasks = array();
+		if( !empty($auth_id) ) {
+			$tasks = $this->Task->find('all', 
+										array(
+										  'conditions' => array('Task.user_id' => $auth_id),
+										  'recursive' => -1,
+										  'order' => array('Task.created' => 'DESC')
+										)
+									);
+		}
+		return $tasks;
+	}
+	
+	
+	public function user_subtasks($auth_id = null, $task_ids = array()) {
+		$subtasks = array();
+		if( !empty($auth_id) && !empty($task_ids) ) {
+			$subtasks = $this->Task->Subtask->find('all',
+													array(
+														'conditions' => array('Subtask.task_id' => $task_ids),
+														'recursive' => -1,
+														'order' => array('Subtask.created' => 'DESC'),
+													)
+												);
+		}
+		return $subtasks;
+	}
+	
+	public function task_subtasks($task_ids = array()) {
+		$subtasks = array();
+		if( !empty($task_ids) ) {
+			$subtasks = $this->Task->Subtask->find('all',
+													array(
+														'conditions' => array('Subtask.task_id' => $task_ids),
+														'recursive' => -1,
+														'order' => array('Subtask.created' => 'DESC'),
+													)
+												);
+		}
+		return $subtasks;
+	}
+	
+	public function user_projects($auth_id = null) {
+		$projects = array();
+		$projects = $this->Project->find('all', 
+											array(
+												'conditions' => array('Project.user_id' => $auth_id),
+												'recursive' => -1
+											)
+										);
+		return $projects;
+	}
+	
+	public function project_members($project_idx = array()) {
+		$projectMembers = array();
+		$projectMembers = $this->ProjectsUser->find('all',
+													array(
+														'conditions' => array('ProjectsUser.project_id' => $project_idx)
+													)
+												);
+		return $projectMembers;
+	}
+
+	public function project_member_tasks($project_id = array(),$user_id = null) {
+		$tasks = array();
+		if( !empty($project_id) ) {
+			$tasks = $this->Task->find('all', 
+										array(
+										  'conditions' => array('Task.project_id' => $project_id,'Task.ownerid' => $user_id),
+										  'recursive' => -1,
+										  'order' => array('Task.created' => 'DESC')
+										)
+									);
+		}
+		return $tasks;
+	}
+	
+	public function project_details($project_id = array()) {
+		$projectDetails = array();
+		if( !empty($project_id) ) {
+			$projectDetails = $this->Project->project_details($project_id);
+		} 
+		return $projectDetails;
+	}
+	
+	public function project_members_details($user_idx = array()) {
+		$membersDetail = array();
+		$membersDetail = $this->find('all',
+										array(
+											'fields' => array('User.id', 'User.first_name', 'User.last_name'),
+											'conditions' => array('User.id' => $user_idx),
+											'recusive' => -1
+										)
+									);
+		return $membersDetail;
+	}
+	
+	public function active_projects($auth_id = null) {
+		$activeProjects = array();
+		if( !empty($auth_id) ) {
+			$activeProjects = $this->Project->active_projects($auth_id);
+		} 
+		return $activeProjects;
+	}
+	
+	public function task_types() {
+		return $this->Task->task_types();
+	}
+	
+	public function task_statuses() {
+		return $this->Task->task_statuses();
+	}
+
+	public function create_company_and_my_space($auth_id = null, $company_id = null, $is_member=false) {
+		$create_company_and_my_space_idx = array();
+		$create_company_and_my_space_idx = $this->Folder->create_company_and_my_space($auth_id, $company_id,$is_member);
+		return $create_company_and_my_space_idx;
+	}
+	
+	
+	public function get_comments($project_idx = array()) {
+		$comments = array();
+		if( $project_idx ) {
+			$comments = $this->Project->Comment->get_comments($project_idx);
+		}
+		return $comments;
+	}
+	
+	public function task_comments_count($task_ids) {
+		return $this->Task->Comment->task_comments_count($task_ids);
+	}
+	
+	public function members_list($company_id) {
+		$members_list = array();
+		$members_list = $this->find('all',
+										array(
+											'fields' => array('User.id', 'User.first_name', 'User.last_name', 'User.position'),
+											'recursive' => -1,
+											'conditions' => array(
+												'company_id' => $company_id
+											)
+										)
+									);
+		return $members_list;
+	}
+	
+	public function get_account_users($company_id, $sort=null, $conditions=array()) {
+		$members_list = array();
+		$members_list = $this->find('all',
+										array(
+											'fields' => array('User.id', 'User.first_name', 'User.last_name', 'User.email'),
+											'recursive' => -1,
+											'conditions' => array_merge(array('User.company_id' => $company_id, 'User.id <>' => CakeSession::read('Auth.User.id')),$conditions),
+											'order' => $sort
+										)
+									);
+		return $members_list;
+	}
+	
+	public function getAllPackages() {
+		$packages = $this->Company->Package->getPackages();
+		return $packages;
+	}
+	
+	public function get_user_info($user_id, $company_id){
+		$user = $this->find('all',
+										array(
+											'fields' => array(
+												'User.*'
+											),
+											'recursive' => -1,
+											'conditions' => array(
+												'User.id'=>$user_id,
+												'User.company_id' => $company_id
+											)
+										)
+									);
+		return $user;
+	}
+	
+	public function get_company_members($company_id=null, $clue='', $auth_id=null, $escape=array()) {
+		$members = array();
+		$conditions = array('User.company_id' => $company_id, 'User.id !=' => $auth_id);
+		if($clue) {
+			$conditions['OR'] = array(
+				'User.first_name LIKE' => '%' . $clue .'%',
+				'User.last_name LIKE' => '%' . $clue .'%'
+			);
+		}
+		if(!empty($escape)) {
+			$conditions['NOT'] = array('User.id' => array_unique($escape));
+		}
+		if($company_id) {
+			$members = $this->find('all',
+									array(
+										'recursive' => -1,
+										'conditions' => $conditions,
+										'fields' => array('User.id', 'User.first_name', 'User.last_name', 'User.email'),
+										'order' => array('User.last_name','User.first_name')
+									)
+								);
+		}
+		return $members;
+	}
+	
+	/**
+	*	Retrive all Company Members 
+	*	for add to a project as member
+	*	exclude already added
+	*	
+	*	@params 
+	*			$auth_id -> Auth user
+	*			$company_id	-> Memeber belongs to this company
+	*			$project_id -> exclude members already added
+	*			$clue -> a filter over users to search (optional)
+	*
+	*	@return 
+	*			Array of users
+	*/
+	public function get_members_to_add_project($auth_id=null, $company_id=null, $project_id=null, $clue='') {
+		$get_members_to_add_project = array();
+
+		if(!$company_id) {
+			$company_id = $this->field('company_id', array('User.id' => $auth_id));
+		}
+		$get_already_added_members_idx = array();
+		$get_already_added_members = $this->ProjectsUser->project_members($project_id);
+		$get_already_added_members_idx = Set::extract('/ProjectsUser/user_id', $get_already_added_members);
+		$project_manager = $this->ProjectsUser->Project->field('manager_id', array('Project.id' => $project_id));
+		$conditions = array('User.company_id' => $company_id, 'NOT' => array('User.id ' => am($project_manager, $get_already_added_members_idx))); // am($auth_id, $get_already_added_members_idx)
+		if($clue) {
+			$conditions['OR'] = array(
+				'User.first_name LIKE' => '%' . $clue .'%',
+				'User.last_name LIKE' => '%' . $clue .'%'
+			);
+		}
+		$conditions['User.status'] = 1;
+		$get_members_to_add_project = $this->find('all',
+											array(
+												'recursive' => -1,
+												'conditions' => $conditions,
+												'fields' => array('User.id', 'User.first_name', 'User.last_name', 'User.company_id'),
+												'order' => array('User.last_name','User.first_name')
+											)
+										);
+		return $get_members_to_add_project;
+	}
+	
+	public function get_projects_list_by_user($auth_id=null, $clue="", $escape=array()) {
+		$activeProjectsListByUserId = $this->Project->get_projects_list_by_user($auth_id, $clue, $escape);
+		return $activeProjectsListByUserId;
+	}
+	
+	private function _format_search_results($type = '', $data = array(), $html='') {
+		foreach($data as $id => $item) {
+			$html .= '<li data-type="'. $type .'" data-id="'. $id .'" class="search_item">'. $item .'</li>';
+		}
+		return $html;
+	}
+	public function get_everything($auth_id=null, $company_id=null, $clue='', $filter = array()) {
+		$resultHtml = '';
+		$this->id = $auth_id;
+		
+		// Get Members
+		$get_company_members = $this->get_company_members($company_id, $clue, $auth_id, Set::extract('/Share/user2_id', $filter));
+		$members_formatted = Set::combine($get_company_members, '{n}.User.id', array('{0} {1}', '{n}.User.first_name', '{n}.User.last_name'));
+		$resultHtml = $this->_format_search_results('user2', $members_formatted, $resultHtml);
+		
+		// Get Groups
+		$get_groups = $this->Group->list_user_created_groups($auth_id, $clue,  Set::extract('/Share/group_id', $filter));
+		$group_formatted = Set::combine($get_groups, '{n}.Group.id', '{n}.Group.name');
+		$resultHtml = $this->_format_search_results('group', $group_formatted, $resultHtml);
+		
+		// Get Projects
+		$get_projects_list = $this->get_projects_list_by_user($auth_id, $clue, Set::extract('/Share/project_id', $filter));
+		$project_idx = Set::extract('/Project/id', $get_projects_list);
+		$projects_formatted = Set::combine($get_projects_list, '{n}.Project.id', '{n}.Project.name');
+		$resultHtml = $this->_format_search_results('project', $projects_formatted, $resultHtml);
+		
+		// Get Tasks
+		$get_projects_task = $this->Project->Task->get_tasks_detail($project_idx, $clue,  Set::extract('/Share/task_id', $filter));
+		$tasks_formatted = Set::combine($get_projects_task, '{n}.Task.id', '{n}.Task.title');
+		$resultHtml = $this->_format_search_results('task', $tasks_formatted, $resultHtml);
+		
+		// Get Calendar Events
+		$get_events_by_user = $this->CalendarEvent->get_events_by_user($auth_id, $clue, Set::extract('/Share/calendar_event_id', $filter));
+		$calevents_formatted = Set::combine($get_events_by_user, '{n}.CalendarEvent.id', '{n}.CalendarEvent.title');
+		$resultHtml = $this->_format_search_results('calendar_event', $calevents_formatted, $resultHtml);
+		
+		// Get Members email
+		$email_formatted = Set::combine($get_company_members, '{n}.User.id', array('{0}', '{n}.User.email'));
+		$resultHtml = $this->_format_search_results('user2', $email_formatted, $resultHtml);
+		
+		return $resultHtml;
+	}
+	
+	public function getActiveTasks($user=NULL){
+		App::uses('Task', 'Model');
+		$task = new Task();
+		return $task->find("count", array("conditions" => array("Task.user_id" => $user['User']['id'], "Task.status" => 2)));
+	}
+	
+	//Manual mime check, CakePHP validation throws Internal 500 Error
+	public function uploadProfilePicture($image, $userId){
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
+		$mime = finfo_file($finfo, $image['tmp_name']);
+		if($mime != "image/jpeg" && $mime != "image/jpg" && $mime != "image/gif" && $mime != "image/png"){
+			return false;
+		}
+		$extension = pathinfo($image['name'], PATHINFO_EXTENSION);
+		$folderPath = APP.'webroot'.DS.'img'.DS.'filocity_img'.DS.'user_'.$userId;
+		if(!is_dir($folderPath))
+			mkdir($folderPath);
+		move_uploaded_file($image['tmp_name'], $folderPath.DS.'profile.'.$extension);
+		return '/img/filocity_img/user_'.$userId.'/profile.'.$extension;
+	}
+	
+	public function afterFind($results, $primary=FALSE){
+		foreach($results as &$a){
+			if(isset($a['User']['profile_picture']) && empty($a['User']['profile_picture']))
+				$a['User']['profile_picture'] = '/img/resources_temp/default-photo.jpg';
+		}
+		return $results;
+	}
+        
+        public function doCallARB($xml_fields)
+        {
+/**Prepair an object for subscription class data **/         
+            $subscriptionObject = new AuthorizeNet_Subscription;
+            $subscriptionObject->name=$xml_fields["package_name"];
+            $subscriptionObject->intervalLength=1;
+            $subscriptionObject->intervalUnit='months';
+            $subscriptionObject->startDate = date("Y-m-d");
+            $subscriptionObject->totalOccurrences=9999;
+            $subscriptionObject->trialOccurrences=0;
+            $subscriptionObject->amount=$xml_fields["package_amount"];
+            $subscriptionObject->trialAmount=0;
+            $subscriptionObject->creditCardCardNumber=$xml_fields["cc_number"];
+            $subscriptionObject->creditCardExpirationDate =$xml_fields["expire_date"];
+            $subscriptionObject->creditCardCardCode=$xml_fields["security_code"];
+            $subscriptionObject->orderInvoiceNumber=date("MY");
+            $subscriptionObject->orderDescription=$xml_fields["package_name"];
+            $subscriptionObject->customerId=121;
+            $subscriptionObject->customerEmail=$xml_fields["customer_email"];
+            $subscriptionObject->customerPhoneNumber='';
+            $subscriptionObject->customerFaxNumber='';
+            $subscriptionObject->billToFirstName=  $xml_fields["bill_firstname"];
+            $subscriptionObject->billToLastName= $xml_fields["bill_lastname"];
+            $subscriptionObject->billToCompany= $xml_fields["bill_company"];
+            $subscriptionObject->billToAddress=$xml_fields["bill_address"];
+            $subscriptionObject->billToCity = $xml_fields["bill_city"];
+            $subscriptionObject->billToState =$xml_fields["bill_state"];
+            $subscriptionObject->billToZip = $xml_fields["bill_zipcode"];
+            $subscriptionObject->billToCountry= $$xml_fields["bill_country"];
+            $subscriptionObject->shipToFirstName='';
+            $subscriptionObject->shipToLastName='';
+            $subscriptionObject->shipToCompany='';
+            $subscriptionObject->shipToAddress='';
+            $subscriptionObject->billToCity='';
+            $subscriptionObject->shipToState='';
+            $subscriptionObject->shipToZip='';
+            $subscriptionObject->shipToCountry='';
+/*
+ * @pasing the subscription object in ARB Class
+ */            
+            $arbObject = new AuthorizeNetARB;            
+            $auth_response_arr = $arbObject->createSubscription($subscriptionObject,$xml_fields["auth_login_key"],$xml_fields["transaction_key"]); 
+            return $auth_response_arr;
+        }
+}

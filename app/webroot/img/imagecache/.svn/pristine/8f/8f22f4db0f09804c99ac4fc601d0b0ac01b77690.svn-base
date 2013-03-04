@@ -1,0 +1,105 @@
+#add_project_member_modal {
+	left: 50%;
+	width: 440px;
+	margin-left: -220px;
+	position: absolute;
+	top: 250px;
+}
+#add_proj_member_modal_container {
+	border: 1px solid #aeaeae;
+	background: #fff;
+	z-index: 1020;
+}
+#add_proj_member_header {
+	height: 35px;
+	border-bottom: 1px solid #a9a9a9;
+	padding: 0 15px;
+	background-color: #f1f1f1;
+	line-height: 27px;
+}
+#add_proj_member_header h3 {    
+    margin: 0;
+    width: 100%;
+	line-height: 2.5em;
+}
+#add_proj_member_form {
+	padding: 25px
+}
+#add_proj_member_form .text {
+	margin: 0
+}
+#add_proj_member_form label {
+	width: 200px;
+	display: inline-block;
+	color: #212121;
+	font-size: 12px;
+}
+#ProjectMemberAdd > div {
+	height: 40px;
+}
+#ProjectMemberAdd input[type="text"], #ProjectMemberAdd input[type="password"] {
+	border: 1px solid #919191;
+	width: 180px;
+	height: 20px;
+}
+#ProjectMemberAdd select {
+	border: 1px solid #919191;
+	width: 183px;
+	height: 25px;
+}
+#add_proj_member_modal_wrapper .display_message {
+	height: auto;
+}
+#add_proj_member_form_buttons button {
+	height: 30px;
+	line-height: 20px;
+	border-radius: 5px;
+	font-weight: bold;
+	width: 80px;
+	margin-right: 10px;
+}
+#add_proj_member_form_buttons button.done{
+	background: #e2e2e2;
+	background: -moz-linear-gradient(top,  #e2e2e2 0%, #fefefe 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e2e2e2), color-stop(100%,#fefefe)); 
+	background: -webkit-linear-gradient(top,  #e2e2e2 0%,#fefefe 100%);
+	background: -o-linear-gradient(top,  #e2e2e2 0%,#fefefe 100%); 
+	background: -ms-linear-gradient(top,  #e2e2e2 0%,#fefefe 100%);
+	background: linear-gradient(to bottom,  #e2e2e2 0%,#fefefe 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e2e2e2', endColorstr='#fefefe',GradientType=0 ); 
+	color: #424242;
+	border: 1px solid #989898;
+}
+#add_proj_member_form_buttons button.cancel{
+	background: #ff3019;
+	background: -moz-linear-gradient(top,  #ff3019 0%, #cf0404 100%); 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ff3019), color-stop(100%,#cf0404)); 
+	background: -webkit-linear-gradient(top,  #ff3019 0%,#cf0404 100%); 
+	background: -o-linear-gradient(top,  #ff3019 0%,#cf0404 100%); 
+	background: -ms-linear-gradient(top,  #ff3019 0%,#cf0404 100%); 
+	background: linear-gradient(to bottom,  #ff3019 0%,#cf0404 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff3019', endColorstr='#cf0404',GradientType=0 ); 
+	color: #fff;
+	border: 1px solid #cf0404;
+}
+#add_proj_member_form .display_message .error {
+	font-size: 10px;
+	color: #f00;
+}
+#add_proj_member_form .display_message .success {
+	font-size: 10px;
+	color: green;
+	float: right;
+}
+#add_proj_member_form .loader {
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	background: transparent url(../img/ajax-loader.gif) no-repeat 50% 50%;
+	float: right
+}
+.member_budget {
+	color: #000;
+	width: 180px;
+	padding-left: 3px;
+}

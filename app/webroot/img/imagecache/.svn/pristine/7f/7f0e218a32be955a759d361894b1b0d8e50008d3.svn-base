@@ -1,0 +1,424 @@
+<?php  echo $this->Html->css('versions.css');?>
+<?php
+	$this->loadHelper("Time");
+	$this->loadHelper("Number");
+	$this->loadHelper("Cabinet");
+	
+	if(!isset($documents[0])):
+		echo $this->Html->tag("div", "No Documents Found", array("class"=>"alert not-found"));
+	endif;
+	$countComments = 0; // temp
+?>
+
+<!-- List view -->
+<ul id="gallery_item_listview" style="padding-bottom: 30px">
+<?php 
+	$folderId = "";
+	
+	foreach ($documents as $results):
+	
+	 	$document = $results["Document"];
+		$user = $results["User"];
+		$folder = $results["Folder"];
+		$doc_shares = $results["Share"];
+		
+		$auth_id = $this->Session->read('Auth.User.id');
+		
+		$doc_comments = $results["Comment"];
+		$folder_comments = $folder["Comment"];
+		$folder_shares= $folder["Share"];
+		
+		$documentCalendarEvent = $results['CalendarEvent'];
+		$folderCalendarEvent = $folder['CalendarEvent'];
+		$ext = $document['ext'];
+		
+		$folder_subscription = !empty($folder['Subscription']) ? 1 : 0;
+		$document_subscription = !empty($results['Subscription']) ? 1 : 0;
+		
+		$size = $this->Number->toReadableSize($document["size"]);
+		$view = "../img/?img=/imagecache/".$document["file"]."&height=800";
+	
+		$documentComments  = count($doc_comments);
+		$documentShares = count(Set::extract('/Share[user_id='. $auth_id .']', $results));
+		$folderComments = count($folder_comments);
+		$documentCalendarEventCount = count($documentCalendarEvent);
+		$folderCalendarEventCount = count($folderCalendarEvent);
+		$folderShares = count(Set::extract('/Share[user_id='. $auth_id .']', $folder));
+		
+		if(($role == 2 || $role == 0) && !empty($folder_shares)) {
+			/**
+			*	If user is Member / Guest
+			* 	then set permission for "My Share" folder
+			*/
+			$is_downloadable = $folder_shares[0]['is_downloadable'];
+			$is_readonly = $folder_shares[0]['is_readonly'];
+			$is_writable = $folder_shares[0]['is_writable'];
+			$is_printable = $folder_shares[0]['is_printable'];
+		} else {
+			$is_downloadable = $is_readonly = $is_writable = $is_printable = 1;
+		}
+		$condition = $folderId != $document["folder_id"];
+		if($folderId != '' && ($folder_type == 'share' || $role == 2)) {
+			$condition = false;
+		}
+		if($condition):
+?>
+	<li class="breadcrumbs me_relative">
+		<div class="folder_item_block">
+			<?php echo $this->Html->image("cabinets/folder-small.jpg");?> 
+			
+			<span> 
+				<?php
+					$root = $this->Cabinet->createBreadCrumb($treeFolders, $folder["name"]);
+					echo $root;
+				?>
+			</span>
+			<?php 
+				if($role == 2 && $folder_name != $root){
+					echo " / ".  $folder_name;
+				} elseif($role != 2) {
+					echo " / ".  $folder["name"]; 
+				}
+			?>
+			<?php if($role == 2 && $folder_type != 'share'):?>
+			<span class="updatedby">
+				shared by
+				<strong><?php echo $user["first_name"][0] . $user["last_name"][0];?></strong>
+				<?php echo ' | ' . $this->Time->format('F jS, Y', $folder_shares[0]['created']) ;?>
+			</span>	
+			<?php endif;?>
+			<!-- action icons for folder hover -->
+			<div class="rolling_container me_relative roll_over">
+				<div class="roll_over_file_processing me_absolute">
+					
+					<!-- Comment Icon -->
+					<?php if($is_readonly || $is_downloadable) {?>
+                    <span class="folder_comment me_relative" style="font-size:16px" title="Comment">
+						<?php if($folderComments > 0): ?><a class="counter"><?php echo $folderComments;?></a><?php endif;?>
+						<?php echo $this->Html->link('', array('controller' => 'folders', 'action' => 'comments', $folder["id"]), array('class' => 'fancyboxComment docComment icon-comments', 'style' => 'color: #45c5f6', 'data-folder' => $this->Cabinet->createBreadCrumb($treeFolders, $folder["name"])." / ".  $folder["name"]));?>	
+					</span>
+					<?php } else { ?>
+					<span class="inactive_icon" style="font-size:16px" title="Comment"><a class="icon-comments"></a></span>
+					<?php } ?>
+					
+					<!-- Task Icon -->
+					<?php if($role != 2) { ?>
+					<span class="folder_task me_relative" style="font-size: 16px;" data-calevent="folder_<?php echo $folder["id"];?>" title="Task">	
+						<?php if($folderCalendarEventCount > 0) : ?><a class="counter"><?php echo $folderCalendarEventCount;?></a> <?php endif;?>
+						<a class="icon-check folder_task" style="color: #d94d7a" href="javascript:void(0)" data-type="folder" data-id="<?php echo $folder["id"];?>"></a>
+					</span>
+					<?php } else { ?>
+					<span class="inactive_icon" style="font-size:16px" title="Task"><a class="icon-check"></a></span>
+					<?php } ?>
+					
+					<!-- Share Icon -->
+					<?php if($is_readonly && $is_downloadable && $is_printable & $is_writable) {?>
+					<span class="folder_share me_relative" style="font-size: 16px;" title="Share">
+						<?php if($folderShares > 0): ?><a class="counter"><?php echo $folderShares;?></a> <?php endif;?>
+						<a class="fancyboxShareModal icon-sitemap" style="color: #34830c" href="<?php echo $this->Html->url(array('controller' => 'shares', 'action' => 'share_modal', 'type' => 'folder', 'id' => $folder['id']), true)?>"  paramId="<?php echo $folder["id"]?>" data-sharetype="folder"></a>
+					</span>
+					<?php } else { ?>
+					<span class="inactive_icon" style="font-size:16px" title="Share"><a class="icon-sitemap"></a></span>
+					<?php } ?>
+					
+					<!-- Subscription Icon -->
+					<?php if($role != 2) { ?>
+					<span class="folder_star" style="font-size:16px;" data-subscription="folder_<?php echo $folder['id'];?>" title="Subscribe">
+						<a class="icon-star-empty" style="color:<?php echo $folder_subscription ? '#FDA102' : '#CCC';?>" href="javascript:void(1)"></a>
+					</span>
+					<?php } else { ?>
+					<span class="inactive_icon" style="font-size:16px" title="Subscribe"><a class="icon-star-empty"></a></span>
+					<?php } ?>
+
+					<!-- More Icons -->
+					<?php if($role != 2) { ?>
+					<span class="folder_info" style="font-size: 16px;" title="More">
+						<a class="showFolderInfo icon-reorder" href="javascript:void(1)" data-target="folder_info<?php echo $folder["id"]?>" style="color: #5e5e5e"></a>
+					</span>
+					<?php } else { ?>
+					<span class="inactive_icon" style="font-size:16px" title="More"><a class="icon-reorder"></a></span>
+					<?php } ?>
+				</div>
+			</div>
+		</div>
+		<!-- More Icons -->
+		<div id="folder_info<?php echo $folder["id"]?>" class="doc-info hide me_hide corner shadow">
+			<ul>
+				<!-- Remane Icon -->
+				<?php if($role == 1) { ?>
+				<li> <a href="javascript:void(0)" class="renameFolder" paramId="edit<?php echo $folder["id"]?>"><i class="icon-pencil"></i><?php echo __("Rename");?></a></li>
+				<?php } else { ?>
+				<li class="inactive_icon"> <a href="javascript:void(0)"><i class="icon-pencil"></i><?php echo __("Rename");?></a></li>
+				<?php } ?>
+				
+				<!-- Delete Icon -->
+				<?php if($role != 2) { ?>
+				<li> <a href="javascript:void(0)" class="delete deleteDoc" paramId="<?php echo $folder["id"]?>"><i class="icon-trash"></i><?php echo __("Delete");?></a> </li>
+				<?php } else { ?>
+				<li class="inactive_icon"><a href="javascript:void(0)"><i class="icon-trash"></i><?php echo __("Delete");?></a></li>
+				<?php } ?>
+			</ul>
+		</div>
+		<!-- Edit Section-->
+		<div id="folder_edit<?php echo $folder["id"]?>" class="doc-edit hide me_hide corner the_folder_active_modal">
+			<ul>
+				<li> 	
+					<?php echo $this->Form->input("name", array("label"=>false,"value"=>$folder["name"],"class"=>"input-edit","div"=>false,"maxlength"=>26));?> 
+					<a href="javascript:void(0)" class="saveInfo" paramId="<?php echo $folder["id"]?>">save</a> 
+					<?php echo $this->Html->image('ajax-loader.gif', array('class' => 'loader', 'style' => 'margin-top:11px; float:right'));?>
+				</li>
+			</ul>
+		</div>
+	</li> 
+	<?php 
+		endif;
+		$folderId = $document["folder_id"];
+		$the_share = array();
+		$the_share = Set::extract('/Share[user2_id='. $auth_id .']', $results);
+		$is_exists = count($the_share) > 0 ? 1 : 0;
+		if(($role == 2 || $role == 0) && $is_exists){
+			$is_downloadable = $the_share[0]['Share']['is_downloadable'];
+			$is_readonly = $the_share[0]['Share']['is_readonly'];
+			$is_writable = $the_share[0]['Share']['is_writable'];
+			$is_printable = $the_share[0]['Share']['is_printable'];
+		} else {
+			$is_downloadable = $is_readonly =$is_writable = $is_printable = 1;
+		}
+	?>  
+    <li class="list_view_each_item me_relative" searchdata="<?php echo $document["name"]?>">
+        <div class="file_item_block">
+            <input type="checkbox" name="file_selected[]" value="<?php echo $document["id"]?>" class="me_hide">
+            <div class="list_item_selection">&nbsp;</div>
+            <div class="file_title_author me_left">
+                <span class="file_title ft<?php echo $document["id"];?>">
+					<?php 
+						$img = $this->Html->image('Transparent.png');
+						if(in_array(strtolower($ext), array('jpg', 'jpeg', 'png', 'gif'))) {
+							if(file_exists(WWW_ROOT . DS . 'img' . DS . 'imagecache' . DS . $document["file"])) {
+								$img = $this->Html->image("?img=/imagecache/".$document["file"]."&height=16&cropratio=2:2", array());
+							} else {
+								$img = $this->Html->image('default-image-icon.png');
+							}
+						} else {
+							$img = $this->Html->image($ext . ".png", array());
+						}
+						echo $img;
+					?> 	
+                    <span>
+                    	<?php 
+							$count = strlen($document["name"]);
+							$name = $document["name"];
+							if($count >=60) {
+								$name = substr($document["name"],0,50) . "...";
+							}
+							echo $name; 
+						?>
+                    </span>
+                    
+                </span>
+                <span class="updatedby">
+                    <?php 
+                    echo date("Y-m-d", strtotime($document['created']));
+                    ?>
+					<?php echo ($folder_type == 'share' || $role == 2) ? ' shared by' : 'via';?> 
+					<strong><?php echo $user["first_name"][0] . $user["last_name"][0];?></strong>
+					<?php echo (($role == 2 && $folder_type == 'share') || $folder_type == 'share') ? ' | ' . $this->Time->format('F jS, Y', $doc_shares[0]['created']) : '';?>   
+                                        <span>, (<?php 
+                                        if($document["version"]==1) {
+                                            echo "version".$document["version"]; 
+                                            }
+                                            else 
+                                            {
+                                         echo $this->Html->link( "version".$document["version"], array('controller' => 'cabinets', 'action'=> 'versions', $document["version_document_id"]), array('class' => 'fancyboxUpload', 'id'=>'versionNo','escape' => false));                 
+                                            }
+                                            
+                                            ?>)
+                                        <?php  ?>
+				
+                                        </span>  
+				
+                </span>	
+                <div class="hide me_hide">
+					<?php echo $this->Form->input("name", array("label"=>false,"value"=>$document["name"],"class"=>"input-edit","div"=>false));?>
+                	<a href="javascript:void(0)" class="saveInfo" paramId="<?php echo $document["id"]?>">save</a>
+					<?php echo $this->Html->image('ajax-loader.gif', array('class' => 'loader'));?>
+                </div>		
+            </div>
+            <div class="rolling_container me_relative roll_over">
+                <div class="roll_over_file_processing me_absolute">
+				
+					<!-- File View Icon -->
+					<?php if($is_readonly || $is_downloadable) {?>
+					<span class="file_viewer" style="font-size:16px" title="View">
+						<?php 
+							if(in_array(strtolower($ext), array('jpg', 'jpeg', 'png', 'gif'))) {   
+								echo $this->Html->link('', 'javascript:void(0)', array('class' => 'icon-eye-open', 'style' => 'color: #0665a5', 'data-relatedthumb' => 'img_' . $document['id'] ));
+							} else {  
+								echo $this->Html->link('',array('controller' => 'documents', 'action' => 'view', 'id' => $document['id']), array('target' => '_blank', 'class' => 'icon-eye-open', 'style' => 'color: #0665a5', 'data-relatedthumb' => $ext . '_' . $document['id'] ));
+							}
+						?>
+					</span>
+					<?php } else {?>
+						<span class="inactive_icon" style="font-size:16px" title="View"><a class="icon-eye-open"></a></span>
+					<?php } ?>
+					
+					<!-- Comment Icon -->
+					<?php if($is_readonly || $is_downloadable) {?>
+                    <span class="file_comment me_relative" style="font-size:16px" title="Comment">
+						<?php if($documentComments > 0): ?><a class="counter"><?php echo $documentComments;?></a><?php endif;?>
+						<?php 
+							echo $this->Html->link('', array('controller' => 'documents', 'action' => 'comments', $document["id"]), array('class' => 'fancyboxComment docComment icon-comments', 'style' => 'color: #45c5f6', 'data-folder' => $this->Cabinet->createBreadCrumb($treeFolders, $folder["name"])." / ".  $folder["name"]));
+						?>
+                    </span>
+					<?php } else { ?>
+					<span class="inactive_icon" style="font-size:16px" title="Comment"><a class="icon-comments"></a></span>
+					<?php } ?>
+					
+					<!-- Task Icon -->
+					<?php if($is_readonly && $is_downloadable && $is_printable & $is_writable) {?>
+                    <span class="file_task me_relative" style="font-size: 16px;" data-show-task="1" data-calevent="document_<?php echo $document['id'];?>" title="Task">
+						<?php if($documentCalendarEventCount > 0) : ?><a class="counter"><?php echo $documentCalendarEventCount;?></a> <?php endif;?>
+						<a class="icon-check file_task" style="color: #d94d7a" data-type="document" data-id="<?php echo $document["id"];?>"></a>
+					</span>
+					<?php } else { ?>
+					<span class="inactive_icon" style="font-size:16px" title="Task"><a class="icon-check"></a></span>
+					<?php } ?>
+					
+					<!-- File Share -->
+					<?php if($is_readonly && $is_downloadable && $is_printable & $is_writable) {?>
+                    <span class="file_share me_relative" style="font-size: 16px;" title="Share">
+						<?php if($documentShares > 0) : ?><a class="counter"><?php echo $documentShares;?></a> <?php endif;?>
+						<a class="fancyboxShareModal icon-sitemap" style="color: #34830c" href="<?php echo $this->Html->url(array('controller' => 'shares', 'action' => 'share_modal', 'type' => 'document', 'id' => $document['id']), true)?>"  paramId="<?php echo $document["id"]?>" data-sharetype="document"></a>
+					</span>
+					<?php } else { ?>
+					<span class="inactive_icon file_share" style="font-size:16px" title="Share"><a class="icon-sitemap"></a></span>
+					<?php } ?>
+					
+					<!-- Subscription Icon -->
+					<?php if($is_readonly || $is_downloadable) {?>
+					<span class="file_star <?php echo $document_subscription ? 'should_visible' : ''?>" style="font-size:16px;" data-subscription="document_<?php echo $document['id'];?>" title="Subscribe">
+						<a class="icon-star-empty" style="color:<?php echo $document_subscription ? '#FDA102' : '#CCC'?>;" href="javascript:void(1)"></a>
+					</span>
+					<?php } else { ?>
+					<span class="inactive_icon" style="font-size:16px" title="Subscribe"><a class="icon-star-empty"></a></span>
+					<?php } ?>
+					
+					<!-- File info / More Icon -->
+					<span class="file_info" style="font-size: 16px;" title="Info" title="More">
+                        <a class="showInfo icon-reorder" href="javascript:void(1)" paramId="info<?php echo $document["id"]?>" style="color: #5e5e5e"></a>
+                    </span>
+                </div>
+            </div>
+        </div>
+		<!-- More Icons -->
+		<div id="info<?php echo $document["id"]?>" class="doc-info hide me_hide corner shadow">
+			<ul>
+				<!-- Remane Icon -->
+				<?php if($role == 1) { ?>
+				<li> <a href="javascript:void(0)" class="renameFile" paramId="edit<?php echo $document["id"]?>"><i class="icon-pencil"></i><?php echo __("Rename");?></a></li>
+				<?php } else { ?>
+				<li class="inactive_icon"> <a href="javascript:void(0)"><i class="icon-pencil"></i><?php echo __("Rename");?></a></li>
+				<?php } ?>
+				
+				<!-- Print Icon -->
+				<?php if($is_printable) { ?>
+				<li> <a href="javascript:void(0)" class="renameFile" paramId="edit<?php echo $document["id"]?>"><i class="icon-print"></i><?php echo __("Print");?></a></li> 
+				<?php } else { ?>
+				<li class="inactive_icon"> <a href="javascript:void(0)"><i class="icon-print"></i><?php echo __("Print");?></a></li> 
+				<?php } ?>
+				
+				<!-- Download Icon -->
+				<?php if($is_downloadable) { ?>
+				<li><?php echo $this->Html->link('<i class="icon-download-alt"></i>Download', array('controller' => 'documents', 'action' => 'download', $document["id"]), array('escape' => false, 'title' => 'Download', 'target'=> '_blank'));?></li>
+				<?php } else { ?>
+				<li class="inactive_icon"><a href="javascript:void(0)"><i class="icon-download-alt"></i><?php echo __("Download");?></a></li>
+				<?php } ?>
+				
+				<!-- Version Icon --> 
+				<li>
+				<?php echo $this->Html->link('<i class="icon-file"></i>' . __('Versions'), array('controller' => 'cabinets', 'action'=> 'versions', $document["version_document_id"]), array('class' => 'fancyboxUpload', 'escape' => false));?>
+				</li> 
+				 
+				<!-- Delete Icon -->
+				<?php if($role != 2) { ?>
+				<li> <a href="javascript:void(0)" class="delete deleteDoc" paramId="<?php echo $document["id"]?>"><i class="icon-trash"></i><?php echo __("Delete");?></a> </li>
+				<?php } else { ?>
+				<li class="inactive_icon"><a href="javascript:void(0)"><i class="icon-trash"></i><?php echo __("Delete");?></a></li>
+				<?php } ?>
+			</ul>
+		</div>
+		<!-- Edit Section-->
+		<div id="edit<?php echo $document["id"]?>" class="doc-edit hide me_hide corner">
+			<ul>
+				<li> 	<?php echo $this->Form->input("name", array("label"=>false,"value"=>$document["name"],
+						"class"=>"input-edit","div"=>false,"maxlength"=>26));?> 
+						<a href="javascript:void(0)" class="saveInfo" paramId="<?php echo $document["id"]?>">save</a> 
+						<?php echo $this->Html->image('ajax-loader.gif', array('class' => 'loader', 'style' => 'margin-top:11px; float:right'));?>
+				</li>
+			</ul>
+		</div>
+    </li>
+<?php 
+	endforeach; 
+?>
+</ul>
+
+<!-- Thumb view -->
+<ul id="image_holder" class="clearfix gallery_items_thumbnail_view" style="display: none">
+<?php 	
+	foreach ($documents as $results):
+		$document = $results["Document"];
+		$user = $results["User"]; 
+		$ext = $document['ext'];
+		
+		if(in_array(strtolower($ext), array('jpg', 'jpeg', 'png', 'gif'))) {
+			if(file_exists(WWW_ROOT . DS . 'img' . DS . 'imagecache' . DS . $document["file"])) {
+?>
+		<li class="each_item me_left me_relative t<?php echo $document["id"]?>" data-description="" searchdata="<?php echo $document["name"]?>">
+			<div class="thumb-content">
+				<?php 
+						$view = "../img/?img=/imagecache/".$document["file"]."&height=800";
+						$image = $document["file"];
+						$img =  $this->Html->image("?img=/imagecache/".$document["file"]."&height=173", array());
+						echo $this->Html->link($img, array('action' =>$view),array("class"=>"fancybox img_" . $document["id"],"escape"=>false,"rel"=>"gallery",)); 
+				?>	
+			</div>
+			<div class="image_overlay_with_title me_absolute">
+				<div class="image_overlay_title me_absolute abs">
+				<strong><?php echo $document["name"] ?></strong><br />
+				Updated <?php echo $this->Time->timeAgoInWords($document["created"])?> by <span class="auth_name">
+				<?php echo $user["first_name"] . " " . $user["last_name"]?></span>
+				</div>
+			</div>
+			<input type="hidden" value="<?php echo $document["id"]?>" >
+		</li>
+	<?php 
+			}
+		}
+	?>
+<?php endforeach; ?>    
+	<?php if($role != 2) : ?>
+	<li class="each_item me_left me_relative upload-holder">
+		<?php 
+			$url = "/cabinets/uploadToS3?folderId=" . $this->params->query["sourceId"];
+			$agent = env('HTTP_USER_AGENT');
+			$style = "";
+			if(strlen(strstr($agent,"Firefox")) > 0 ): 
+				$style = "position:absolute;left: -450px;font-size: 40px;";
+			endif;
+		?>
+		<form class="formUpload" accept-charset="utf-8" method="post" enctype="multipart/form-data" action="<?php echo $url?>">
+		<?php	
+			foreach ($params as $p => $v):
+				echo $this->Form->hidden("{$p}", array("value"=>"{$v}", "name"=>"{$p}"));
+			endforeach;
+			echo $this->Form->file('fileUpload', array("class"=>"upload-file","name"=>"data[file]","style"=>$style));
+			
+			echo $this->Html->tag("span", "", array("class"=>"ajaxTarget hide me_hide"));
+			echo $this->Form->submit("Upload", array("class"=>"hide me_hide"));
+		 ?>
+		<span class="loader upl"><?php echo $this->Html->image('ajax-loader-transparent.gif');?> Uploading...</span>
+		 </form>
+	</li>
+	<?php endif;?>
+</ul>

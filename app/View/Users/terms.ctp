@@ -1,0 +1,3 @@
+This is Filocity Terms and Conditions page...
+
+<p style="width: 900px; text-align: center; font-size: 25px">COMING SOON...... :)</p>

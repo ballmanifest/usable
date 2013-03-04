@@ -1,0 +1,2 @@
+[11-Nov-2012 15:18:24] PHP Parse error:  syntax error, unexpected T_STRING in /home/virtue66/public_html/clients/filocity/wp-content/plugins/newsletter-sign-up/frontend/NewsletterSignUp.php on line 263
+[13-Nov-2012 13:42:53] WordPress database error Duplicate column name 'user_id' for query ALTER TABLE `fly_wti_like_post` ADD `user_id` INT NOT NULL DEFAULT '0' made by activate_plugin, do_action('activate_wti-like-post/wti_like_post.php'), call_user_func_array, SetOptionsWtiLikePost

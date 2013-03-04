@@ -1,0 +1,14 @@
+<?php
+class S3_CONFIG {
+
+    var $default = array(
+        'accessKey' => 'AKIAJV5DHUAR2GGUSHUQ',
+        'secretKey' => '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',
+        'bucket'    => 'filocity-files-002',
+        'url'       => "http://{bucket}.s3.amazonaws.com/",
+        'ssl'       => false,
+        'version'   => 4,
+        'fileFormat'=> "{folder-id}-{file-id}.{ext}"
+    );
+
+}

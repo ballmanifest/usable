@@ -1,0 +1,3 @@
+[12-Nov-2012 09:55:12] PHP Fatal error:  Call to undefined function  get_header() in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/index.php on line 18
+[12-Nov-2012 09:55:21] PHP Fatal error:  Call to undefined function  get_header() in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/index.php on line 18
+[12-Nov-2012 10:01:28] PHP Fatal error:  Call to undefined function  get_header() in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/index.php on line 18

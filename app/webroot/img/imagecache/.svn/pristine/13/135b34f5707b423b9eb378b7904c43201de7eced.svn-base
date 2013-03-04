@@ -1,0 +1,11 @@
+[10-Nov-2012 13:30:05] PHP Warning:  Missing argument 1 for wp_socializer(), called in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/header.php on line 91 and defined in /home/virtue66/public_html/clients/filocity/wp-content/plugins/wp-socializer/wp-socializer.php on line 1093
+[11-Nov-2012 11:49:29] PHP Fatal error:  Call to undefined function  form() in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/sidebar.php on line 19
+[12-Nov-2012 12:00:21] PHP Parse error:  syntax error, unexpected '}' in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/home_template.php on line 111
+[13-Nov-2012 10:23:06] PHP Fatal error:  Call to undefined function  get_the_permalink() in /home/virtue66/public_html/clients/filocity/wp-content/plugins/wp-most-popular/system/helpers.php on line 83
+[13-Nov-2012 10:28:37] PHP Warning:  mysql_real_escape_string() expects parameter 1 to be string, array given in /home/virtue66/public_html/clients/filocity/wp-includes/wp-db.php on line 789
+[13-Nov-2012 13:07:03] PHP Catchable fatal error:  Object of class stdClass could not be converted to string in /home/virtue66/public_html/clients/filocity/wp-includes/query.php on line 1449
+[14-Nov-2012 09:34:14] PHP Fatal error:  Cannot use object of type stdClass as array in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/category.php on line 67
+[14-Nov-2012 09:34:57] PHP Fatal error:  Cannot use object of type stdClass as array in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/category.php on line 67
+[14-Nov-2012 09:35:13] PHP Fatal error:  Cannot use object of type stdClass as array in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/category.php on line 67
+[14-Nov-2012 09:37:16] PHP Fatal error:  Cannot use object of type stdClass as array in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/category.php on line 69
+[14-Nov-2012 09:37:30] PHP Fatal error:  Cannot use object of type stdClass as array in /home/virtue66/public_html/clients/filocity/wp-content/themes/filocity/category.php on line 69

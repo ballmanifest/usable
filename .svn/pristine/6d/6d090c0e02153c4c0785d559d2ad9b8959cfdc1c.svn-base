@@ -1,0 +1,84 @@
+#DocViewer, #DocEditor {     
+	bottom: 0;
+    left: 50%;
+    margin-left: -475px;
+    position: absolute;
+    right: 0;
+    top: 100px;
+    width: 950px;
+	height: 895px;
+	border: 1px solid rgba(127, 127, 127, 0.2)
+}
+#DocEditor {
+	height: 930px;
+	border: none;
+	top: 60px;
+	width: 960px
+}
+.doc_editor_header  {
+	height: 60px;
+	clear: both;
+	
+}
+.docviewer .doc {
+	background: transparent !important
+}
+.toolbar { 
+	background: transparent; 
+	height:30px; 
+	cursor:default;  
+	margin: 0 20px;
+}
+.zoom-btns { 
+	position:absolute; left:4px; top:2px; width:150px; z-index:2; 
+}
+.page-nav { 
+	position:absolute; top:2px; width:100%; text-align:center; 
+}
+button { 
+	line-height:18px; 
+}
+.label { 
+	display:inline-block; width:80px;
+}
+.doc_header_des {
+	width: 100%
+}
+.doc_header_des h2 {
+	color: #000;
+    font-size: 20px;
+    font-weight: normal;
+    margin: 0 0 0 20px;
+    padding: 20px 0 10px 0;
+}
+.subscription_star {
+	float: left;
+    margin-right: 3px;
+    margin-top: 3px;
+}
+.doc_header_des p {
+	color: gray;
+    font-size: 12px;
+    margin: 0 20px;
+}
+.doc_header_des .related_to_doc {
+	margin: 45px 25px 0 0;
+}
+.doc_header_des .related_to_doc a {
+	border-radius: 5px 5px 5px 5px;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 10px;
+    text-align: center;
+    text-decoration: none;
+}
+.green_pill {
+	background-color: #619228;
+}
+.edit_pdf_pill {
+	background-color: #1e4c6e;
+}
+.adeptol_viewer {
+	padding: 20px
+}

@@ -1,0 +1,166 @@
+<div class="me_hide">
+	<div class="manage_event me_absolute eventPopulateModal" style="background-color: #fff" title="eventPopulateModal" id="eventPopulateModal" style="width:600px">
+		<input type="hidden" class="this_controller" value="<?php echo $this->params->controller;?>" readonly="readonly">
+		<?php
+			echo $this->Form->create('CalendarEvent', array('id' => false, 'class' => 'event_create_popup', 'inputDefaults' => array('id' => false, 'div' => false, 'label' => false)));
+			echo $this->Form->input('user_id', array('type' => 'hidden', 'value' => $this->Session->read('Auth.User.id')));
+			echo $this->Form->input('event_id', array('type' => 'hidden', 'class' => 'calendar_event_id'));
+			echo $this->Form->input('folder_id', array('type' => 'hidden', 'class' => 'calendar_event_folder_id', 'value' => '0'));
+			echo $this->Form->input('document_id', array('type' => 'hidden', 'class' => 'calendar_event_document_id', 'value' => '0'));
+		?>
+		<div class="manage_event_content edit_event_border">
+			<div class="title_change_cancel">
+				<div class="title_modify">
+					<h3 style="margin:0;">Event Title</h3>
+					<?php echo $this->Form->input('title', array('type' => 'text', 'class' => 'event_title')); ?>
+				</div>
+				<!--<div class="event_exit"><span class="icon-remove-sign" style="font-size:16px; color:#f00;cursor:pointer"></span></div>-->
+			</div>
+			<div class="time_standard" style="float:left;">
+				<div class="time_zone">
+					<label style="float:left;">Start Time<br />
+					<?php echo $this->Form->input('my_date_start', array('type' => 'text', 'class' => 'my_date_start', 'div' => false)); ?>
+					</label>
+					<label style="float:left;margin-left:5px;">End Time<br />
+					<?php echo $this->Form->input('my_date_end', array('type' => 'text', 'class' => 'my_date_end', 'div' => false, 'before' => ''));?>
+					</label>
+					<?php
+						echo $this->Form->input('date_start', array('type' => 'text', 'class' => 'date_start', 'div' => false, 'hidden' => true)); 
+						echo $this->Form->input('date_end', array('type' => 'text', 'class' => 'date_end', 'div' => false, 'hidden' => true)); 
+					?>
+					<!-- <label>(GMT-05) Estern Time</label> -->
+				</div>
+				<!-- <div class="time_zone_link"><a href="#">Time Zone</a></div> -->
+			</div>
+			<div class="remainder_event">
+				<div class="remainder_label">Reminder</div>
+				<div class="event_timeout" style="width:auto;float:left;">
+					<select style="float:left;margin-right:3px;">
+						<option>Pop-up</option>
+						<option>Email</option>
+					</select>
+					<input type="text" class="remainder_time_log" />
+					<select style="float:left;margin-left:3px;">
+						<option>minutes</option>
+						<option>hours</option>
+						<option>days</option>
+						<option>weeks</option>
+					</select>
+					<div class="calender_event_cross" style="display:none;">X</div>
+					<div class="addremainder" style="display:none;">
+						<a href="#">Add a Remainder</a>
+					</div>
+				</div>
+			</div>
+			<div style="float:left;width:auto;">
+				<div class="show_my_status">
+					<div class="status_label">Show me as</div>
+					<div class="status_state">
+						<?php echo $this->Form->input('availability', array('hidden' => true, 'value' => 1));?>
+						<label>
+							<input type="radio" name="user_availability" value="0" checked="checked">
+							<span>Available</span>
+						</label>
+						<label>
+							<input type="radio" name="user_availability" value="1">
+							<span>Busy</span>
+						</label>
+					</div>
+				</div>
+				
+			</div>
+			<div class="day_repeat" style="float:left;width:auto;">
+				<?php
+					echo $this->Form->input('is_all_day', array('class' => 'day_check', 'label' => 'All Day Event'));
+					echo $this->Form->input('is_repeat', array('class' => 'day_repeat_chk', 'label' => 'Recurring'));
+				?>
+			</div>
+			
+			<div style="clear:both;"></div>
+			
+			<div class="find_atime_event" style="display:none;">
+				<div class="event_details">Event Details</div>
+				<div class="find_atime"><a href="">Find a Time</a></div>
+			</div>
+			
+			<div class="edit_event_where">
+				<!--
+				<div class="event_place" style="float:left;width:auto;">
+					<div class="event_map">
+						<a href="#" id="event_map_picker">map</a>
+						<?php echo $this->Form->input('lat', array('type' => 'hidden', 'id'=>'event_map_lat'));?>
+						<?php echo $this->Form->input('lng', array('type' => 'hidden', 'id'=>'event_map_lng'));?>
+					</div>
+					<div class="event_where"><strong>Where</strong></div><br />
+					<div class="event_where_input">
+						<?php echo $this->Form->input('location', array('type' => 'text', 'id'=>'event_map_location'));?>
+					</div>
+				</div>
+				<div class="add_google_plus" style="display:none;">
+					<div class="vedio_call">Video call</div>
+					<div class="add_plus_handout" style=""><a href="#">Add a Google+ handout</a></div>
+				</div>
+				<div class="calendar_edit_owner" style="float:left;width:auto;display:none;">
+					<div class="editcalendar"><strong>Calendar</strong></div><br />
+					<div class="cal_owner">
+						<?php
+							echo $this->Form->input('calendar_id', array('type' => 'select', 'options' => $calendars, 'class' => 'select_calenderowner'));
+						?>
+					</div>
+				</div>-->
+				<div class="event_decription" style="float:left;width:auto;">
+					<div class="event_description_label"><strong>Description</strong></div><br />
+					<div class="event_description_area">
+						<?php 
+							echo $this->Form->input('description', array('class' => 'event_description'));
+						?>
+					</div>
+				</div>
+				<div class="show_my_privacy">
+					<div class="privacy_state">
+						<?php echo $this->Form->input('privacy', array('hidden' => true, 'value' => 1));?>
+						<label>
+							<input type="radio" name="user_privacy" value="1" checked="checked">
+							<span>Public</span>
+						</label>
+						<label>
+							<input type="radio" name="user_privacy" value="2">
+							<span>Private</span>
+						</label>
+					</div>
+					<div class="learn_more" style="display:none;">
+						<a href="#" class="learn_more_text">Learn more about private vs public events</a>
+						<a href="#" class="learn_more_publish">Publish event</a>
+					</div>
+				</div>
+				<div class="event_color" style="float:left;width:auto;">
+					<div class="color_title"><strong>Event Color</strong></div><br />
+					<div class="color_name">
+						<?php echo $this->Form->input('color', array('type' => 'hidden'));?>
+						<div class="chkcolor_color_1 me_absolute"><input value="A8A6FF" type="radio" name="user_color"></div>
+						<div class="chkcolor_color_2"><input value="5181EF" type="radio" name="user_color" ></div>
+						<div class="chkcolor_color_3"><input value="A3BBFE"  type="radio" name="user_color"></div>
+						<div class="chkcolor_color_4"><input value="3BD6DC"  type="radio" name="user_color"></div>
+						<div class="chkcolor_color_5"><input value="74E8BE"  type="radio" name="user_color"></div>
+						<div class="chkcolor_color_6"><input value="4BB842"  type="radio" name="user_color"></div>
+						<div class="chkcolor_color_7"><input value="FCD74E"  type="radio" name="user_color"></div>
+						<div class="chkcolor_color_8"><input value="FFB871"  type="radio" name="user_color"></div>
+						<div class="chkcolor_color_9"><input value="FF8678"  type="radio" name="user_color"></div>
+						<div class="chkcolor_color_10"><input value="DE1D1D"  type="radio" name="user_color"></div>
+						<div class="chkcolor_color_11"><input value="DBAAFF"  type="radio" name="user_color"></div>
+						<div class="chkcolor_color_12"><input value="E1E1E1"  type="radio" name="user_color"></div>
+					</div>
+				</div>
+			</div>
+			<div class="sdd_panel">
+				<div class="sdd_panel_save button"><input type="button" value="Submit" class="full_event_edit"></div>
+				<div class="sdd_panel_discard" style="display:none;"><input type="submit" value="Discard change"></div>
+				<!--<div class="sdd_panel_delete"><input type="submit" value="Delete"></div>-->
+				<div class="event_exit"><a href="#"></a></div>
+				<?php echo $this->Html->image('ajax-loader.gif', array('class' => 'loader_img me_hide', 'style' => 'margin-top:8px'));?>
+			</div>
+			<div style="clear:both;"></div>
+		</div>
+		<?php echo $this->Form->end(); ?>
+	</div>
+</div>

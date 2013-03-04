@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+Example of external properties file.
+Can be assigned inside <APPLET>...</APPLET> tag using following HTML code:
+<param name="Common.PropertiesFile" value="properties.xml" /> 
+
+-->
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<entry key="Download.UseHeadMethodToGetFileLength">false</entry>
+<entry key="Common.SkinLF.ThemepackURL">themepack1.zip</entry>
+<entry key="Common.FtpPassiveTransferMode">true</entry>
+<entry key="Upload.UploadUrl"></entry>
+<entry key="Common.FinishUrl"></entry>
+<entry key="Common.NoPermissionsUrl"></entry>
+<entry key="Common.UploadMode">false</entry>
+<entry key="Common.UseLiveConnect">false</entry>
+</properties>
+

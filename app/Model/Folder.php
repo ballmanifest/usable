@@ -1,0 +1,423 @@
+<?php
+App::uses('AppModel', 'Model');
+
+class Folder extends AppModel {
+
+    /**
+     * Holds private assigned $threaded records
+     * @var array
+     */
+    private $threaded = array();
+
+    /**
+     * Association
+     * @var array
+     */
+	 
+	public $belongsTo = array(
+		'Project' => array(
+			'className' => 'Project',
+			'foreignKey' => 'project_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		),
+		'User' => array(
+			'className' => 'User',
+			'foreignKey' => 'user_id',
+			'conditions' => '',
+			'fields' => '',
+			'order' => ''
+		)
+	);
+	
+    public $hasMany = array(
+        'Children' => array(
+            'className' => 'Folder',
+            'foreignKey' => 'parent_id'
+        ),
+		'Share' => array(
+			'className' => 'Share',
+			'foreignKey' => 'folder_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Document' => array(
+			'className' => 'Document',
+			'foreignKey' => 'folder_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Subscription' => array(
+			'className' => 'Subscription',
+			'foreignKey' => 'folder_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Contact' => array(
+			'className' => 'Contact',
+			'foreignKey' => 'folder_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'Comment' => array(
+			'className' => 'Comment',
+			'foreignKey' => 'folder_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		),
+		'CalendarEvent' => array(
+			'className' => 'CalendarEvent',
+			'foreignKey' => 'folder_id',
+			'dependent' => false,
+			'conditions' => '',
+			'fields' => '',
+			'order' => '',
+			'limit' => '',
+			'offset' => '',
+			'exclusive' => '',
+			'finderQuery' => '',
+			'counterQuery' => ''
+		)
+    );
+	
+    /**
+     * A convenience method for returning a hierarchical
+     *
+     * @param integer $id Integer to holds Folder.id
+     * @param integer $depth An integer that holds deep level on an array
+     * @return array $threaded
+     */
+    public function findThreaded($id = 1, $depth = 0, $auth_id=null) {
+	
+		$is_owner = 0;
+		$is_shared = 0;
+		$folder_type = null;
+		
+        $is_owner = $this->findByIdAndUserId($id, $auth_id);
+		$idx = array($id);
+		if(empty($is_owner) || !$is_owner) {
+			$is_shared = $this->Share->is_shared(array('Share.folder_id' => $id, 'Share.user2_id' => $auth_id));
+		} else {
+			$file_type = $is_owner['Folder']['folder_type'];
+			if($file_type == 'share') {
+				$conditions = array(
+									'Share.user_id !=' => 0,
+									'Share.user2_id' => $auth_id,
+									'Share.folder_id !=' => 0
+								);
+				$shared_folders = $this->Share->get_all_shared_folder($conditions);
+				$shared_folder_idx = Set::extract('/Share/folder_id', $shared_folders);
+				$idx = am($id, $shared_folder_idx);
+			}
+		}
+		
+		if(count($is_owner) > 0  || $is_shared) {
+			foreach($idx as $id) {
+				$arg["conditions"] = array("Folder.id"=>$id);
+				$results = $this->find("all",$arg);
+				$this->threaded = $this->threaded + $this->make($results[0]["Folder"], $depth);
+				if(count($results[0]["Children"]) > 0) {
+					++$depth;
+				} else {
+					$depth = 1;
+				}
+				
+				foreach($results[0]["Children"] as $result) {
+					$this->threaded = $this->threaded + $this->make($result, $depth);
+					$arg["conditions"] = array("parent_id"=>$result["id"]);
+					$childrenArray = $this->find("all",$arg);
+					if(count($childrenArray)>=1) {
+						$counter = $depth+1;
+						foreach($childrenArray as $children) {
+							$this->findThreaded($children["Folder"]["id"], $counter, $auth_id);
+						}
+					} else {
+						$counter = $depth-1;
+					}
+				}
+			}
+			return $this->threaded;
+		} else return array();
+    }
+
+    /**
+     * Creates underscore prefixes for hierarchical results
+     *
+     * @param array $results Array that holds id and name
+     * @param integer $depth An integer that holds how deep the hierarchy
+     * @return array $data
+     */
+    private function make($results, $depth) {
+        $spacer = "_";
+        $id = $results["id"];
+        $name = $results["name"];
+        $data[$id] = str_repeat($spacer, $depth) . $name ;
+        return $data;
+    }
+
+    /**
+     * Returns hierarchical level of Folder Ids
+     *
+     * @param integer $folderId Integer that represents parent folder id
+     * @param boolean $isParent Boolean indicator for parent records
+     * @return array $this->threaded
+     */
+    public function getChildrenId($folderId, $isParent = true, $auth_id, $user_type='') {
+        $merge = array();
+        $id = array();
+		$args = array("conditions"=>array("Folder.id"=>$folderId)); // , "Folder.user_id" => $auth_id
+		
+		$is_owner = 0;
+		$is_shared = 0;
+		$folder_type = null;
+		
+        $is_owner = $this->findByIdAndUserId($folderId, $auth_id);
+
+		if($is_owner) {
+			$file_type = $is_owner['Folder']['folder_type'];
+			if($file_type == 'share') {
+				$conditions = array(
+									'Share.user_id !=' => 0,
+									'Share.user2_id' => $auth_id,
+									'Share.folder_id !=' => 0
+								);
+				$shared_folders = $this->Share->get_all_shared_folder($conditions);
+				$shared_folder_idx = Set::extract('/Share/folder_id', $shared_folders);
+				$args = array('conditions' => array('Folder.id' => am($shared_folder_idx, $folderId)));
+			}
+		}
+		
+		$this->Behaviors->attach('Containable');
+		$args['contain'] = array('Document', 'Children');
+		$results = $this->find("all",$args);
+		
+		if(!empty($results)){
+			if($isParent){
+			   $id[] = $results[0]["Folder"]["id"];
+			   $this->threaded = $id;
+			}
+			if(isset($results[0]["Children"])) {
+				foreach($results[0]["Children"] as $result) {
+					$folderId = $result["id"];
+					$id[] = $folderId;
+					$ids = $this->getChildrenId($folderId, $isParent = false, $auth_id);
+					$this->threaded = array_merge($id, $ids);
+				}
+			}
+		}
+		
+        return array_unique($this->threaded);
+    }
+
+	/**
+	*	Checking that a Folder
+	*	Shared with guest
+	*/
+	
+	public function is_this_folder_shared_with_user($folder_id, $auth_id) {
+		return $this->Share->find('count', array('conditions' => array('Share.folder_id' => $folder_id, 'Share.guest_id' => $auth_id)));
+	}
+	
+    /**
+     * Returns all Folder records array
+     * @return array $results
+     */
+    public function listAll($auth_id,$role=null,$company_id=null, $guest_id=null) {
+		/**
+		*	If user is not an Owner
+		*	ie. A Member, then his "Company Space"
+		*	will comes from Share
+		*/
+		$company_space_id = null;
+		
+		if($role != null && !$role && $company_id != null) {
+			$company_space_id = $this->Share->field('folder_id', array('Share.company_id' => $company_id, 'Share.to_all' => 1, 'Share.is_active' => 1));
+		}
+
+		$arg["conditions"] = array("Folder.parent_id"=> 0, "Folder.project_id" => 0, "OR" => array("Folder.user_id" => $auth_id, "Folder.id" => $company_space_id));
+		$arg["fields"] = array("name");
+		$arg["order"] = array("id" => "asc");
+		$results = $this->find("list",$arg);
+		return $results;
+    }
+	
+	/**
+     * Returns all Folder records array in a given folder_id
+     * @return array $results
+     */
+    public function listFolderContents($parent_id, $user_id=null) {
+       $arg["conditions"] = array("parent_id"=>$parent_id);
+	   if($user_id!=null){
+			$arg["conditions"]["user_id"]=$user_id;
+	   }
+       $arg["fields"] = array("name");
+       $results = $this->find("list",$arg);
+       return $results;
+    }
+	
+	/**
+	 *	Create "Company Space", "My Space" and "My Share"
+	 */
+	
+	public function create_company_and_my_space($auth_id = null, $company_id = null, $is_member=false) {
+		$results = array();
+		$data = array();
+		
+		// Company Space
+		
+		/**
+		*	" Company Space " will create for 
+		*	Company Admin(Owner) only, not for Members'
+		*/
+		
+		if(!$is_member) {
+			$data = array(
+					'Folder' => array(
+								'parent_id' => 0,
+								'name' => 'Company Space',
+								'user_id' => $auth_id,
+								'status' => 1,
+								'folder_type' => 'space'
+							)
+				);
+			$this->create();
+			$this->save($data);
+			$results['company_space_id'] = $this->id;
+			$data = array();
+		}
+		
+		/**
+		*	"My Space" and "My Share" folders
+		*	will create for each Owner and Member
+		*/
+		
+		// My Space
+		$data = array(
+				'Folder' => array(
+							'parent_id' => 0,
+							'name' => 'My Space',
+							'user_id' => $auth_id,
+							'status' => 1,
+							'folder_type' => 'space'
+						)
+			);
+		$this->create();
+		$this->save($data);
+		$results['my_space_id'] = $this->id;
+		
+		// My Share
+		$data = array(
+				'Folder' => array(
+							'parent_id' => 0,
+							'name' => 'Shared With Me',
+							'user_id' => $auth_id,
+							'status' => 1,
+							'folder_type' => 'share'
+						)
+			);
+		$this->create();
+		$this->save($data);
+		$results['my_share_id'] = $this->id;
+		
+		/**
+		*	An Owner is sharing his:
+		*
+		*	"Company Space"
+		*
+		*	folder to all Members' of
+		*	his company by default
+		*/
+		
+		if(!$is_member) {
+			$share_data = array(
+							'Share' => array(
+											'user_id' => $auth_id, // owner
+											'folder_id' => $results['company_space_id'], // company space folder
+											'company_id' => $company_id, // company
+											'to_all' => 1 //  means everyone can get access of this folder by default
+										)
+						);
+			$this->Share->create();
+			$this->Share->save($share_data, false);
+		}
+		return $results;
+	}
+	
+	/**
+	 * Get Folders of Projects
+	 */
+	 
+	public function get_project_folders($auth_id = null) {
+		$project_list = $this->Project->get_projects_list_by_user($auth_id);
+		$project_idx = Set::extract('/Project/id', $project_list);
+		$project_folders= $this->find('list',
+								array(
+									'conditions' => array('Folder.user_id' => $auth_id, 'Folder.project_id' => $project_idx),
+									'order' => array('Folder.name' => 'asc')
+								)
+							);
+		return $project_folders;
+	}
+	
+	/**
+	*	Get folders details
+	*	for guests
+	*/
+	
+	public function listAllGuestFolder($folder_idx = null){
+		$this->Behaviors->attach('Containable');
+		return $this->find('all',
+							array(
+								'recursive' => -1,
+								'fields' => array('id', 'name', 'folder_type'),
+								'conditions' => array('Folder.id' => $folder_idx)								
+							)
+						);
+	}
+	
+	/**
+	*	Get Folder permission
+	*/
+	public function get_folder_permissoin() {
+		
+	}
+	
+}
+
+

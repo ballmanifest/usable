@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^blog - [L]
+    RewriteRule ^svnhook - [L]
+    RewriteRule ^temp - [L]
+    RewriteRule ^thecloud - [L]
+	 RewriteRule ^rest - [L]
+	 RewriteRule ^pdfeditor - [L]
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_URI} !/22385524040230
+    RewriteRule ^(.*)$ index.php [QSA,L]
+</IfModule> 

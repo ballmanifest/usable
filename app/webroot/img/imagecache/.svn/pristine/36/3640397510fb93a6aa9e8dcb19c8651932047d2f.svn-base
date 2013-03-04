@@ -1,0 +1,7 @@
+<?php
+	Router::parseExtensions('json');
+	Router::connect('/', array('controller' => 'users', 'action' => 'login'));
+	Router::connect('/pages/*', array('controller' => 'pages', 'action' => 'display'));
+	Router::connect('/registration/*', array('controller' => 'users', 'action' => 'registration'));
+	CakePlugin::routes();
+	require CAKE . 'Config' . DS . 'routes.php';

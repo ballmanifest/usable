@@ -1,0 +1,154 @@
+<?php 
+if($new_project>0)
+{
+?>
+<script>
+parent.location.href="/projects/view/<?php echo $new_project;?>";
+parent.jQuery.fancybox.close();
+</script>
+<?php 
+}
+$this->start('css');
+	echo $this->Html->css(array('//ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/base/jquery-ui.css'));
+$this->end();
+$this->start('script');
+	echo $this->Html->script(array('//ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/jquery-ui.min.js'));
+$this->end();
+echo $this->Html->script(array('add_project'));
+?>
+<style>
+	body *{
+		box-sizing:border-box;
+		-moz-box-sizing:border-box;
+		-webkit-box-sizing:border-box;
+	}
+	
+	.projects.form{
+		width: 415px;
+		height: 386px;
+	}
+	#ProjectAddForm{
+		width: 415px;
+		height: 386px;
+		padding: 19px 17px;
+	}
+	
+	h1{
+		margin: 0;
+		font-size: 19px;
+		border-bottom: 1px solid #AAA;
+		padding-bottom: 12px;
+		margin-bottom: 14px;
+	}
+	
+	label, h2{
+		margin: 0;
+		display: block;
+		font-size: 16px;
+		margin-bottom: 5px;
+		font-weight: bold;
+		font-size: 14px;
+	}
+	
+	input[type="text"]{
+		width: 100%;
+		padding: 4px 10px;
+		margin-bottom: 11px;
+		margin-top: 3px;
+	}
+	
+	h2.subtext{
+		color: #b4aaaa;
+		font-size: 12px;
+		margin-bottom: 3px;
+		margin-top: 4px;
+		font-weight: normal;
+	}
+	
+	.row-fluid{
+		margin-bottom: 4px;
+	}
+	.row-fluid i{
+		font-size: 14px;
+		display: block;
+		margin-top: 8px;
+		font-size: 16px;
+	}
+	
+	.actions_panel{
+		margin-top: 4px;
+		margin-right: 3px;
+	}
+	.error
+	{
+	  color:red;
+	}
+</style>
+<!--<script>
+	$(function() {
+    $("#ProjectDateStart").datepicker({
+      defaultDate: "+1w",
+      changeMonth: true,
+      numberOfMonths: 1,
+      onClose: function(selectedDate) {
+        $("#ProjectDateEnd").datepicker("option", "minDate", selectedDate);
+      }
+    });
+    $("#ProjectDateEnd").datepicker({
+      defaultDate: "+1w",
+      changeMonth: true,
+      numberOfMonths: 1,
+      onClose: function(selectedDate) {
+        $("#ProjectDateStart").datepicker("option", "maxDate", selectedDate);
+      }
+    });
+  });
+</script>-->
+	<?php echo $this->Form->create('Project',array('action' => 'add')); ?>
+		<h1><?php echo __('Add New Project'); ?></h1>
+		<h2 class="subtext me_right">*All fields required</h2>
+		<?php
+			echo $this->Form->input('name', array('type' => 'text', 'placeholder' => 'Project Name','label' => 'Name*'));
+			
+			echo $this->Form->input('manager_id', array('label' => 'Project Manager*','empty'=>'Select A Project Manager', 'options'=>Set::combine($get_company_members, '{n}.User.id', array('{0} {1}', '{n}.User.first_name', '{n}.User.last_name'))));
+		?>
+		<div class="row-fluid">
+			<div class="span6">
+				<h2>Dates*</h2>
+				<div class="row-fluid">
+					<div class="span10">
+						<?php echo $this->Form->input('date_start', array('label' => false, 'placeholder' => 'Time Starting')); ?>
+					</div>
+					<div class="span2">
+						<i id="from" class="icon-calendar"></i>
+					</div>
+				</div>
+			</div>
+			<div class="span6">
+				<h2 class="subtext">*End time optional</h2>
+				<div class="row-fluid">
+					<div class="span10">
+						<?php echo $this->Form->input('date_end', array('label' => false, 'placeholder' => 'Time Ending')); ?>
+					</div>
+					<div class="span2">
+						<i id="to" class="icon-calendar"></i>
+					</div>
+				</div>
+			</div>
+		</div>		
+		<?php echo $this->Form->input('budget', array('type' => 'text', 'placeholder' => 'Add Project Budget', 'label' => 'Total Project Budget ($)')); ?>
+		
+		<div class="display_message">
+					<div class="success me_hide">This is success message</div>
+					<div class="error me_hide">This is error message</div>
+				</div>
+				<div class="loader_container me_hide">
+					<span class="loader">&nbsp;</span>
+		</div>
+		<div class="actions_panel clearfix" id="form_buttons">
+		<input type="button" class="btn btn-small me_right cancel"  value="Cancel"/>&nbsp;
+		
+			<!--<?php echo $this->Form->button(__('Create'), array('class' => 'btn btn-small btn-info me_right')); ?>-->
+			<input type="button" class="btn btn-small btn-info me_right done" style="margin-right:10px;" value="Create"/>
+		</div>
+	<?php echo $this->Form->end(); ?>

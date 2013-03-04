@@ -1,0 +1,267 @@
+<?php
+App::uses('AppController', 'Controller');
+
+class DocumentsController extends AppController {
+
+	public function index() {
+		$this->Document->recursive = 0;
+		$this->set('documents', $this->paginate());
+	}
+	
+	/*
+	public function view($id = null) {
+		$this->Document->id = $id;
+		if (!$this->Document->exists()) {
+			throw new NotFoundException(__('Invalid document'));
+		}
+		$this->set('document', $this->Document->read(null, $id));
+	}
+	*/
+	
+	public function view () {
+		$viewer_info = array();
+		if(!empty($this->request->params['named'])) {
+			$params = $this->request->params['named'];
+			$doc_id = $params['id'];
+			
+			$viewer_info = array();
+			$doc_info = array();
+			$auth_id = $this->Auth->user('id');
+			$role = intval($this->Auth->user('role'));
+			
+			$doc_detail = $this->Document->get_doc_info($doc_id, $auth_id);
+			$share_info = array();
+			
+			if(!$doc_detail) {
+				$this->Session->setFlash(__('Sorry, Invalid Document.'));
+				return false;
+			}
+			if($role == 0) {
+				$share_info = Set::extract('/Share[user2_id='. $auth_id .']', $doc_detail);
+			} elseif($role == 2) {
+				$share_info = Set::extract('/Share[guest_id='. $auth_id .']', $doc_detail);
+			}
+			
+			if(($role == 0 || $role == 2) && empty($share_info)) {
+				$this->Session->setFlash(__('Not permitted to see this document.'));
+				return false;
+			}
+
+			$ext = $doc_detail['Document']['ext'];
+			if( !empty($ext) && in_array($ext , array('doc', 'docx' ,'pdf')) ) {
+				$viewer_info = array(
+									'viewer' => 'crocodoc',
+									'doc_detail'=> $doc_detail
+								);
+			} else {
+				$viewer_info = array(
+									'viewer' => 'adeptol',
+									'doc_detail' => $doc_detail
+								);
+			}
+			$this->set(compact('viewer_info', 'share_info'));
+			$permitted = count($doc_detail) > 0 ? 1 : 0;
+			$ext = $doc_detail['Document']['ext'];
+			if( !empty($ext) && in_array($ext , array('doc', 'docx' ,'pdf')) ) {
+				$viewer_info = array(
+									'viewer' => 'crocodoc',
+									'doc_detail'=> $doc_detail
+								);
+			} else {
+				$viewer_info = array(
+									'viewer' => 'adeptol',
+									'doc_detail' => $doc_detail
+								);
+			}
+			$this->set(compact('viewer_info', 'share_info'));
+		} 
+	}
+	
+	public function download($file = null) {
+		// checking for a valid request
+		if (empty($doc_id)){
+			$this->Session->setFlash(__('Invalid file'));
+			$this->redirect($this->referer());
+		}
+			
+		// uncomment if needed this routine from another controller
+		// $this->loadModel("Document");
+		 
+		$auth_id = $this->Auth->user('id');
+		$role = $this->Auth->user('role');
+		$doc = $this->Document->get_doc_info($doc_id, $auth_id);
+		
+		$doc = $this->Document->findById($file);
+		if ( ! $doc ) {
+			$this->Session->setFlash(__('Invalid file'));
+			$this->redirect($this->referer());
+		}
+		 
+		if($role == 0) {
+			$share_info = Set::extract('/Share[user2_id='. $auth_id .']', $doc_detail);
+		} elseif($role == 2) {
+			$share_info = Set::extract('/Share[guest_id='. $auth_id .']', $doc_detail);
+		}
+		
+		if(($role == 0 || $role == 2) && (empty($share_info) || !$share_info[0]['Share']['is_downloadable'])) {
+			$this->Session->setFlash(__('Not permitted to download this document.'));
+			$this->redirect($this->referer());
+		}
+		
+		
+		$path = WWW_ROOT . DS . "img" . DS . "imagecache" . DS . $doc['file'];
+		 
+		if(!file_exists($path)) {
+			$this->Session->setFlash(__('This file does not exists.'));
+			$this->redirect($this->referer());
+		}
+		 
+		$nicename = $doc['Document']['name'] . '.' . $doc['Document']['ext'];
+		$type = $doc['Document']['type'];
+		$size = $doc['Document']['size'];  // and filesize($path) should be equal
+		$modified = $doc['Document']['modified'];
+		 
+		// use 2.3 new Response::file way of sending files. Media View is deprecated  as of 2.1
+		$this->response->file($path, array (
+				'download' => true, // uncomment below headers if does not work in all browsers
+				'name' => $nicename
+		));
+		
+		// uncomment if above does not recommend a filename
+		//$this->response->header('Content-Disposition: attachment; filename="'. $friendly_filename .'"');
+		//$this->response->header("Content-Description: File Transfer");
+		 
+		// uncomment if above does not show browser filesize
+		//$this->response->header("Content-Length: " . filesize($path));
+		 
+		// uncomment if above does not force download on all browsers
+		/*
+		 $this->response->header("Content-Type: application/force-download");
+		$this->response->header("Content-Type: application/octet-stream");
+		$this->response->header("Content-Type: application/download");
+		*/
+		 
+		$this->response->type( $type );
+		 
+		$this->response->disableCache();
+		 
+		// uncomment below fix for Caching if there are caching problems with above
+		/*
+		 $this->response->header("Pragma: private");
+		$this->response->header("Expires: 0"); // set expiration time
+		$this->response->header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+		*/
+		 
+		$this->response->shareable( $public = false, $time = 0 );
+		 
+		$this->response->expires( time() - 60*60*24 ); // expire yesterday
+		$this->response->etag( $tag = md5(time() . $nicename . $type . $size . $modified), $weak = false ); // sufficiently complex  strong etag
+		$this->response->modified( $time = $modified );
+		$this->response->compress(); // gzip response
+		 
+		$this->response->send();
+		
+		//flush(); // uncomment essential for large downloads
+		
+		//Return reponse object to prevent controller from trying to render a view
+		return $this->response;
+	}
+	
+	public function add() {
+		if ($this->request->is('post')) {
+			$this->Document->create();
+			if ($this->Document->save($this->request->data)) {
+				$this->Session->setFlash(__('The document has been saved'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The document could not be saved. Please, try again.'));
+			}
+		}
+		$users = $this->Document->User->find('list');
+		$folders = $this->Document->Folder->find('list');
+		$this->set(compact('users', 'folders'));
+	}
+	
+	public function edit($id = null) {
+		$this->Document->id = $id;
+		if (!$this->Document->exists()) {
+			throw new NotFoundException(__('Invalid document'));
+		}
+		if ($this->request->is('post') || $this->request->is('put')) {
+			if ($this->Document->save($this->request->data)) {
+				$this->Session->setFlash(__('The document has been saved'));
+				$this->redirect(array('action' => 'index'));
+			} else {
+				$this->Session->setFlash(__('The document could not be saved. Please, try again.'));
+			}
+		} else {
+			$this->request->data = $this->Document->read(null, $id);
+		}
+		$users = $this->Document->User->find('list');
+		$folders = $this->Document->Folder->find('list');
+		$this->set(compact('users', 'folders'));
+	}
+
+	public function delete($id = null) {
+		if (!$this->request->is('post')) {
+			throw new MethodNotAllowedException();
+		}
+		$this->Document->id = $id;
+		if (!$this->Document->exists()) {
+			throw new NotFoundException(__('Invalid document'));
+		}
+		if ($this->Document->delete()) {
+			$this->Session->setFlash(__('Document deleted'));
+			$this->redirect(array('action' => 'index'));
+		}
+		$this->Session->setFlash(__('Document was not deleted'));
+		$this->redirect(array('action' => 'index'));
+	}
+
+    public function comments($id = 0) {
+        if($id) {
+            $this->loadModel("Comment");
+			$user = $this->Auth->user();
+			!empty($user['uuid']) ? $guest_id = $this->Auth->user('uuid') : $auth_id = $this->Auth->user('id');
+			$title = 'Document';
+			$comment_for = 'document_id';
+			$target_id = $id;
+			$documentsComment =  $this->Comment->find("all", array("conditions"=>array("Comment.document_id"=>$id)));
+            $this->set(compact("documentsComment", "auth_id", "title", "comment_for", "target_id", "guest_id"));
+            $this->render("ajax_comments", false);
+        }
+    }
+
+    public function addComment() {
+        $authId = $this->Auth->user("id");
+        if($this->request->is('ajax') && !empty($this->request->data)) {
+            $this->loadModel("Comment");
+            $this->Comment->create();
+            $this->Comment->save($this->request->data);
+            $newId = $this->Comment->getLastInsertId();
+			/**
+			*	Create a Notice when New
+			*	Comment Added to document
+			*/
+			$this->loadModel('Notice');
+			$notice = array();
+			$auth_name = $this->Auth->user('first_name') . ' ' . $this->Auth->user('last_name');
+			$time = date('g:ia');
+			$notice['Notice']['user_id'] = $this->Auth->user('id');
+			$notice['Notice']['comment_id'] = $newId;
+			$notice['Notice']['notice_type'] = 'new_comment';
+			$getDocName = $this->Document->field('name',array('Document.id' => $this->request->data['Comment']['document_id']));
+			$notice['Notice']['short_message'] = htmlspecialchars('<div class="notice_block"><div class="pill new_comment">New Comment</div><div class="the_notice"><span class="time"> | '. $time .'</span>To '. $getDocName .' By <strong>'. $auth_name .'</strong></div></div>');
+			$this->Notice->create();
+			$this->Notice->save($notice, false);
+			/**
+			*	Create Notice block end
+			*/
+           	$guest_id = !empty($this->request->data['Comment']['guest_id']) ? $this->request->data['Comment']['guest_id'] : '';
+            $this->set("isNewAdded",true);
+			$this->set('guest_id',  $guest_id);
+            $this->set("documentsComment", $this->Comment->find("all", array("conditions"=>array("Comment.id"=>$newId))));
+            $this->render("ajax_comments", false);
+        }
+    }
+}

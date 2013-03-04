@@ -1,0 +1,1 @@
+$(document).ready(function() {		// css can't do anything with replaced elements or find parents, so use js	// add focus class to show credit card cvv code location image	$('#UserSecurityCode').focus(function(e) { 		$(this).parent().addClass('focus');	}).blur(function(e){$(this).parent().removeClass('focus');});});

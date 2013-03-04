@@ -1,0 +1,148 @@
+#contact_modal_container {
+	padding: 5px;
+}
+#contact_modal_header p {
+	font-size:20px;
+	padding-bottom: 13px;
+	border-bottom: 1px solid #000;
+	margin-bottom: 10px;
+}
+#contact_left_container {
+	padding-right: 10px;
+	border-right: 1px solid #ddd7d7;
+	height: 480px;
+	overflow: auto
+}
+#contact_left_container ul, #create_new_group {
+	width: 165px;
+}
+#create_new_group {
+	margin-top: 10px;
+}
+#create_new_group a {
+	color: #607dea;
+	text-decoration: underline;
+	cursor: pointer;
+	font-weight: bold;
+}
+#create_new_group p {
+	margin-top: 5px;
+}
+#contact_list_container {
+	width: 349px;
+	height: 480px;
+	overflow: none;
+	margin-left: 5px;
+}
+.group-panel {
+	height: 405px;
+	overflow: auto;
+}
+.show_contacts_for_create_group {
+	border: 1px solid #CCCCCC;
+    height: 180px;
+    overflow: auto;
+    padding: 3px;
+}
+.group-panel label, .show_contacts_for_create_group label {
+	height: 20px;
+	padding: 2px 0;
+	display: block;
+	clear: both;
+	color: #000812;
+}
+.group-panel label span, .show_contacts_for_create_group label span {
+	display: inline-block;
+	vertical-align: top;
+	margin-top: 2px;
+}
+.contact-group li a, .contact-contact li a {
+	text-decoration: none;
+	color: #6e7073;
+	padding: 10px;
+	display: block
+}
+.contact-group li a:hover, .contact-contact li a:hover{
+	text-decoration: none;
+}
+.contact-group li, .contact-contact li {
+	font-size: 14px;
+	border-bottom: 1px solid #fff;
+}
+.contact_type {
+	background-color: #d6ebf8;
+	color: #fff
+}
+.contact_type.loading_content {	
+	background-image: url(../img/ajax-loader-trans.gif);
+	background-repeat: no-repeat;
+	background-position: 98% 50%;
+}
+.groups_title {
+	background-color: #fff;
+	color: #000;
+	font-weight: bold;
+}
+.contact_type.selected_contact_type {
+	background-color: #58b1f0 ;
+}
+.contact_type.selected_contact_type a {
+	color: #fff;
+}
+#sort_types, #sort_types_for_create_group {
+	font-weight: bold;
+	border-bottom: 1px solid #e8dcdc;
+	padding-bottom: 10px;
+}
+#sort_types a, #sort_types_for_create_group a {
+	color: #607dea;
+	text-decoration: underline;
+	display: inline
+}
+#sort_types a.current_sort, #sort_types_for_create_group a.current_sort{
+	color: #000;
+	text-decoration: none;
+}
+.contact_share_buttons, .create_group_button {
+	float:right;
+	padding-top: 10px;
+	border-top: 1px solid #e8dcdc;
+	width: 100%
+}
+.create_group_button img {
+	display: none;
+	margin-top: 10px;
+}
+#create_group_modal  {
+	background: #fff;
+	width: 395px;
+	height: 395px;
+	padding: 5px;
+	left: 560px;
+	top: 0
+}
+#create_group_modal h2 {
+	padding-bottom: 10px;
+	border-bottom: 1px solid #b3b3b3;
+	color: #0f0f0f
+}
+.auxiliary_header {
+	padding-bottom: 10px;
+	margin: 0;
+	color: #0f0f0f;
+	font-size: 12px;
+}
+#created_group_name {
+	border: 1px solid #A8A8A8;
+    border-radius: 3px 3px 3px 3px;
+    color: #AFACAC;
+    height: 20px;
+    margin-bottom: 25px;
+    padding: 3px;
+    width: 385px;
+}
+p.success_message {
+	color: green;
+	font-size: 12px;
+	margin: 0 10px;
+}

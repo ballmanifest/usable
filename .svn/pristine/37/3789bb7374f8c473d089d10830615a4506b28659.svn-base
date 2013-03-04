@@ -1,0 +1,830 @@
+$(document).on('focusout','textarea.task_description_text', function() {
+    $(this).hide();
+	$(this).parent().find('p').show();
+	$(this).parent().css('padding','4px');
+	$(this).parent().toggleClass('highlight');
+	$(this).parent().find('p').text($(this).val());
+});
+
+$(function() {
+	$(".fancybox").fancybox();
+	$(".fancyboxFrame").on("click", function(event){
+		var _this = this;
+		event.preventDefault();
+		$.fancybox({
+			padding: 0,
+			type: 'iframe',
+			href: this.href,
+			autoScale: false,
+			width: $(_this).data('width'),
+			height: $(_this).data('height')
+		});
+	});
+	/*$('.tasks_list li').on('click', function() {
+		$(this).toggleClass('completed_task');
+	});*/
+	
+	$('head').append('\
+		<style type="text/css">\
+		.shadow{\
+			-moz-box-shadow: 0 0 15px #444;\
+			-webkit-box-shadow: 0 0 15px #444;\
+			box-shadow: 0 0 15px #444;\
+			-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=15, Direction=0, Color=\'#444444\')";\
+			filter: progid:DXImageTransform.Microsoft.Shadow(Strength=15, Direction=0, Color=\'#444444\');\
+		}\
+		</style>\
+		\
+	');
+	FilocityModal.init();
+	
+	/*
+	*	Mini Calendar Call
+	*/
+	$.miniCalendar().drawCalendar();
+	
+	/*
+	*	Set Events List under
+	*/
+	$.eventsList('#event_lists').generateList();
+	
+	/*
+	*	Toggle Events List
+	*/
+	
+	$('#event_selection a').on({
+		click: function(e) {
+			e.preventDefault();
+			var ref = $(this),
+			eventsType = $.trim( ref.data('eventcat') );
+			ref.parent().find('a.selected').removeClass('selected');
+			ref.addClass('selected');
+			if( eventsType == 'all') {
+				$.eventsList('#event_lists', {
+					data: {
+						'data[CalendarEvent][type]' : 'all'
+					}
+				}).generateList();
+			} else {
+				$.eventsList().generateList();
+			}
+		}
+	});
+	
+	/*
+	 *	My Active Project Task slider
+	 */
+	
+	$('.storage_usage .progress_percentile, .task_completion_bar .progress_percentile').each(function() {
+		var _ref = $(this),
+		width = 190,
+		completed = +_ref.data('completed'),
+		total = +_ref.data('total'),
+		ratio = total == 0 ? 0 : (completed / total),
+		percentile = Math.ceil(parseInt( ratio * 100 )),
+		pos = width * ratio;
+		_ref.animate({
+			width: pos
+		}, 1000, function() {
+			$(this).attr('title', percentile + '%'); // .text(percentile + '%')
+		});
+	});
+	
+	/*
+	 *	Upgrade Package Modal
+	 */
+	
+	$('a.packageUpgradeModal').on({
+		click : function(e) {
+			e.preventDefault();
+			$.fancybox({
+				href: '#packageUpgradeModal',
+				autoDimensions: false,
+				width: 610,
+				height: 370
+			});
+		}
+	});
+
+	/**
+	*	Package Upgrade Modal functionality
+	*/
+	$.packageUpgradeModal = function() {
+		var _r = this;
+		this.init = function() {
+			_r.onPackageSelect();
+			_r.submitPackage();
+			_r.onConfirmPaymentClick();
+			_r.closeConfirmWindow();
+			_r.makePayment();
+		};
+		this.onPackageSelect = function() {
+			$('body').on('change', 'input[type="radio"].active.select_my_package', function() {
+				$('button#submit_package_upgrade').prop('disabled', false);
+			});
+		};
+		this.submitPackage = function() {
+			$('body').on('click', 'button#submit_package_upgrade', function() {
+				$('input[type="radio"].active.select_my_package, button#submit_package_upgrade').prop('disabled', true);
+				$('p.message:visible').removeClass('success').empty().hide(0);
+				$('button, img', '.submit_button').toggle(0);
+				var data = {},
+				$input = $('input[type="radio"].active.select_my_package:checked');
+				data[$input.attr('name')] = $input.val();
+				$.post(_ROOT + 'users/upgrade_package', data, function(response) {
+					$.fancybox({
+						href: '#fancyAlertBox',
+						width: 300,
+						height: 150,
+						autoDimensions: false,
+						onComplete : function() {
+							$('#fancyAlertBox .alert_message').html(response.message);
+						},
+						onClosed : function() {
+							if(response.status == 'y') {
+								window.location.reload();
+							}
+						}
+					});
+				}, 'json');
+			});
+		};
+		this.onConfirmPaymentClick = function() {
+			$('body').on({
+				click : function(e) {
+					e.preventDefault();
+					$('#confirm_window_container, #modal_overlay').fadeIn(100);
+				}
+			}, 'a.make_payment_link');
+		};
+		this.closeConfirmWindow = function() {
+			$('body').on({
+				click : function(e) {
+					e.preventDefault();
+					$('#confirm_window_container, #modal_overlay').fadeOut(100);
+				}
+			}, 'span.close-confirm-window, .cancel_payment_btn');
+		};
+		this.makePayment = function() {
+			$('body').on('click', 'a#do_my_payment', function(e) {
+				e.preventDefault();
+				$('#confirm_window_container').hide(0);
+				var data = {'data[User][payment]' : 'do'};
+				$.post(_ROOT + 'users/do_payment', data, function(response) {
+					$.fancybox({
+						href: '#fancyAlertBox',
+						width: 300,
+						height: 150,
+						autoDimensions: false,
+						onComplete : function() {
+							$('#fancyAlertBox .alert_message').html(response.message);
+						},
+						onClosed : function() {
+							if(response.status == 'y') {
+								window.location.reload();
+							}
+						}
+					});
+				}, 'json');
+			})
+		};
+		return this;
+	};
+	$.packageUpgradeModal().init();
+	
+	/**
+	 *	Activate Manage Member link
+	 */
+	 
+	$('a.manage_member_link').on('click', show_manage_members_dialog);
+	
+	/**
+	*	Resend Authorization mail
+	*/
+	$('body').on('click', '.resend_auth_mail', function(e) {
+		e.preventDefault();
+		var H = this;
+		$.post(_ROOT + 'users/resend_auth_mail', {
+			'data[User][id]' : $(H).data('user-id'),
+		}, function(response) {
+			if(response.status == 'y') {
+				$(H).html('Authorization mail sent.').css('color', 'green');
+			} else {
+				$(H).html('Sent fail. Please try later.').css('color', '#f00');
+			}
+		}, 'json')
+	});
+
+	/**
+	*	Set nice scroll bar to 
+	*	dashboard activity feed
+	*/
+	$('.notices_container').mCustomScrollbar();
+	
+	/**
+	*	Link to change profile thumb
+	*/
+	/*
+	$('.header_image').on({
+		mouseenter : function() {
+			$('.change_profile_image_link').animate({
+				top: '-=32px'
+			},0);
+		},
+		mouseleave : function(e) {
+			$('.change_profile_image_link').animate({
+				top: '+=32px'
+			},0);
+		}
+	});
+	*/
+	/**
+	*	Shoe Pricing Modal
+	*/
+	$('.pricingInfoModalLink').fancybox({
+		autoDimensions: false,
+		width: 470,
+		height: 170
+	});
+	
+	//photo uploader
+	/*
+	var uploader = new plupload.Uploader({
+		runtimes : 'gears,flash,silverlight,html5',
+		browse_button : 'filePickForProfileThumb',
+		//container: 'user_profile_image_thumb',
+		max_file_size : '10mb',
+		url : _ROOT+'users/upload_user_profile_and_company_logo',
+		flash_swf_url : _ROOT+'files/plupload.flash.swf',
+		silverlight_xap_url : _ROOT+'files/plupload.silverlight.xap',
+		filters : [
+			{title : "Image files", extensions : "jpg,gif,png"}
+		],
+		resize : {width : 1024, height : 768, quality : 90},
+		multi_selection:false,
+		multipart:true
+	});
+
+	uploader.bind('Init', function(up, params) {
+		
+	});
+
+	uploader.init();
+
+	uploader.bind('FilesAdded', function(up, files) {
+		uploader.start();
+	});
+
+	uploader.bind('UploadProgress', function(up, file) {
+	});
+
+	uploader.bind('Error', function(up, err) {
+		up.refresh(); // Reposition Flash/Silverlight
+		alert('Upload Failed');
+	});
+
+	uploader.bind('FileUploaded', function(up, file, serv) {
+		serv['response']=$.parseJSON(serv['response']);
+		if(serv['response']['error']!=undefined){
+			//error
+		}
+		$('.my_thumb').attr('src', _ROOT+'image/profile/'+ $('input:hidden[name="data[User][id]"]').val() + '/thumb.jpg?' + new Date().getTime()).show(0);
+	});
+	*/
+});
+
+
+
+var FilocityModal={
+	dialog: null,
+	maxHeight: null,
+	show: function(){
+		$('#filocity_modal_progress').hide();
+		$('#filocity_modal_dialog_outer').show();
+		this.dialog.css({
+			'display':'block',
+			'position':'fixed',
+			'opacity':0,
+			'padding':'10px'
+		});
+		FilocityModal.alignCenter();
+		this.current_dialog.mCustomScrollbar();
+		$('.mCSB_draggerContainer').css({
+			'opacity':0.4
+		});
+		this.dialog.animate({
+			'opacity':1
+		},200,function(){
+		
+		});
+	},
+	setMaxHeight:function(h){
+		this.maxHeight=h;
+	},
+	showProgress:function(){
+		this.dialog.css({'display':'none'});
+		$('#filocity_modal_dialog_outer').show();
+		$('#filocity_modal_progress').show();
+	},
+	scrollBottom:function(){
+		//this.current_dialog.stop().animate({'scrollTop':this.current_dialog.prop('scrollHeight')},0);
+		this.current_dialog.mCustomScrollbar('scrollTo','bottom');
+	},
+	alignCenter: function(){
+		if(this.maxHeight>$(window).height()-40){
+			this.maxHeight=$(window).height()-40;
+		}
+		if(this.current_dialog.height()>=this.maxHeight){
+			this.current_dialog.css({
+				'height': this.maxHeight
+			});
+		}
+		var t=Math.max(0, (($(window).height() - this.dialog.outerHeight()) / 2));
+		var l=Math.max(0, (($(window).width() - this.dialog.outerWidth()) / 2));
+		this.dialog.css({
+			'left': l + 'px',
+			'top': t + 'px'
+		});
+		this.current_dialog.mCustomScrollbar('update');
+	},
+	close: function(){
+		this.onClose();
+		this.dialog.hide();
+		$('#filocity_modal_dialog_outer').hide();
+		this.onClose=function(){};
+		return false;
+	},
+	setContent: function(html){
+		this.current_dialog.html(html);
+	},
+	init: function(){
+		$('body').append('<div id="filocity_modal_dialog" class="shadow"><div class="btn_container me_absolute"><div class="btn_wrapper"><div class="btn_self"><span class="cross_icon">&nbsp;</span></div></div></div></div>')
+		$('body').append('<div id="filocity_modal_progress" style="display:none;position:fixed;top:0;left:0;">Loading...</div>');
+		
+		$('#filocity_modal_dialog_outer').css({
+			backgroundColor:'#000000',
+			opacity:0.5
+		});
+		this.dialog=$('#filocity_modal_dialog');
+		this.dialog.hide();
+		this.dialog.css('display','none');
+		$('#filocity_modal_dialog_outer').click(function(){
+			FilocityModal.close();
+			$('#package_upgrade_modal_container').fadeOut(50);
+		});
+		$(document).keyup(function(e) {
+			if (e.keyCode == 27) {
+				FilocityModal.close();
+			}
+		});
+	},
+	dialogs:{},
+	current_dialog:null,
+	setCurrent: function(dialog_id){
+		this.maxHeight=$(window).height()-40;
+		if(this.dialogs[dialog_id]==undefined){
+			this.dialog.append('<div class="dialog-content" id="filocity_modal_dialog_'+dialog_id+'"></div>');
+			this.dialogs[dialog_id]=$('#filocity_modal_dialog_'+dialog_id);
+		}
+		$('#filocity_modal_dialog .dialog-content').css('display','none');
+		this.dialogs[dialog_id].css({
+			'display':'block',
+			'overflowX':'hidden',
+			'overflowY':'auto'
+		});
+		this.current_dialog=this.dialogs[dialog_id];
+	},
+	onClose: function(){},
+};
+
+function show_manage_members_dialog(){
+	FilocityModal.setCurrent('manage_members');
+	FilocityModal.setContent('\
+	<form id="member_info_form" data-mode="add">\
+	<div id="manage_members" style="width:812px;float:left;">\
+		<div id="manage_members_pane">\
+			<div class="filocity-modal-title">Manage Company Members</div>\
+			<div class="members"></div>\
+			<div class="add-member">\
+				<div class="photo">\
+					<img src="'+_ROOT+'img/resources_temp/default-photo.jpg">\
+				</div>\
+				<div class="link">\
+					<span>+</span> <a href="#" id="members_add_button">Add Member</a>\
+				</div>\
+			</div>\
+			<input type="hidden" readonly="readonly" value="0" class="total_member_added">\
+		</div>\
+		<div id="edit_member_photo_pane" style="display:none;">\
+			<div class="filocity-modal-title" style="padding-bottom:25px;">New Member - Profile Picture</div>\
+			<div style="height: 128px; position: relative; width: 128px; padding: 1px; background: none repeat scroll 0% 0% rgb(255, 255, 255); border: 1px solid rgb(221, 225, 228);" id="new_member_profile_photo_container">\
+				<img id="new_member_profile_photo" alt="Photo" src="'+_ROOT+'img/resources_temp/default-photo.jpg" style="margin-bottom:10px;" border="0" width="128" height="128" /><br />\
+			</div>\
+			<input id="filepick" class="filocity-modal-button" type="button" value="Browse" style="margin-left:2px;width:128px;clear:both;" />\
+			<div style="clear:both; display:block; padding-top:20px; color:blue;"><a href="#" class="resend_auth_mail">Resend Authorization Email</a></div>\
+		</div>\
+		<div id="edit_member_pane" style="display:none;">\
+			<div class="filocity-modal-title" style="padding-bottom:25px;" id="member_info_title">Personal Info</div>\
+			<div id="edit_member_pane_inputs">\
+				<div class="input">\
+					<label for="">Email Address<span style="color:red;">*</span></label><input class="required" name="data[User][email]" />\
+				</div>\
+				<div class="input">\
+					<label for="">First Name<span style="color:red;">*</span></label><input class="required" name="data[User][first_name]" />\
+				</div>\
+				<div class="input">\
+					<label for="">Last Name<span style="color:red;">*</span></label><input class="required" name="data[User][last_name]" />\
+				</div>\
+				<div class="input">\
+					<label for="">Department</label><input name="data[User][department]" />\
+				</div>\
+				<div class="input">\
+					<label for="">Position</label><input name="data[User][position]" />\
+				</div>\
+				<div class="input">\
+					<label for="">Title <span style="color:#b3bfcb;">(optional)</span></label><input name="data[User][title]" />\
+				</div>\
+				<div class="input">\
+					<label for="">City</label><input name="data[User][city]" />\
+				</div>\
+				<div class="input">\
+					<label for="">State/Province</label>\
+					<select id="state" name="data[User][state_id]">\
+						<option value="0">Other</option><option value="1">Alabama</option><option value="2">Alaska</option><option value="3">Arizona</option><option value="4">Arkansas</option><option value="5">California</option><option value="6">Colorado</option><option value="7">Connecticut</option><option value="8">Delaware</option><option value="9">District of Columbia</option><option value="10">Florida</option><option value="11">Georgia</option><option value="12">Hawaii</option><option value="13">Idaho</option><option value="14">Illinois</option><option value="15">Indiana</option><option value="16">Iowa</option><option value="17">Kansas</option><option value="18">Kentucky</option><option value="19">Louisiana</option><option value="20">Maine</option><option value="21">Maryland</option><option value="22">Massachusetts</option><option value="23">Michigan</option><option value="24">Minnesota</option><option value="25">Mississippi</option><option value="26">Missouri</option><option value="27">Montana</option><option value="28">Nebraska</option><option value="29">Nevada</option><option value="30">New Hampshire</option><option value="31">New Jersey</option><option value="32">New Mexico</option><option value="33">New York</option><option value="34">North Carolina</option><option value="35">North Dakota</option><option value="36">Ohio</option><option value="37">Oklahoma</option><option value="38">Oregon</option><option value="39">Pennsylvania</option><option value="40">Rhode Island</option><option value="41">South Carolina</option><option value="42">South Dakota</option><option value="43">Tennessee</option><option value="44">Texas</option><option value="45">Utah</option><option value="46">Vermont</option><option value="47">Virginia</option><option value="48">Washington</option><option value="49">West Virginia</option><option value="50">Wisconsin</option><option value="51">Wyoming</option>\
+					</select>\
+				</div>\
+				<div class="input">\
+					<label for="">Zip</label><input name="data[User][zip]" />\
+				</div>\
+				<div class="input">\
+					<label for="">Country</label>\
+					<select id="country" name="data[User][country_id]">\
+						<option value="223" selected="selected">United States</option><option value="36">Canada</option><option value="3">Afghanistan</option><option value="6">Albania</option><option value="60">Algeria</option><option value="12">American Samoa</option><option value="1">Andorra</option><option value="9">Angola</option><option value="5">Anguilla</option><option value="10">Antarctica</option><option value="4">Antigua and Barbuda</option><option value="11">Argentina</option><option value="7">Armenia</option><option value="15">Aruba</option><option value="14">Australia</option><option value="13">Austria</option><option value="16">Azerbaijan</option><option value="30">Bahamas</option><option value="23">Bahrain</option><option value="19">Bangladesh</option><option value="18">Barbados</option><option value="34">Belarus</option><option value="20">Belgium</option><option value="35">Belize</option><option value="25">Benin</option><option value="26">Bermuda</option><option value="31">Bhutan</option><option value="28">Bolivia</option><option value="17">Bosnia and Herzegovina</option><option value="33">Botswana</option><option value="32">Bouvet Island</option><option value="29">Brazil</option><option value="102">British Indian Ocean Territory</option><option value="27">Brunei Darussalam</option><option value="22">Bulgaria</option><option value="21">Burkina Faso</option><option value="24">Burundi</option><option value="112">Cambodia</option><option value="45">Cameroon</option><option value="51">Cape Verde</option><option value="119">Cayman Islands</option><option value="39">Central African Republic</option><option value="205">Chad</option><option value="44">Chile</option><option value="46">China</option><option value="52">Christmas Island</option><option value="37">Cocos (Keeling) Islands</option><option value="47">Colombia</option><option value="114">Comoros</option><option value="40">Congo</option><option value="38">Congo, the Democratic Republic of the</option><option value="43">Cook Islands</option><option value="48">Costa Rica</option><option value="42">Cote D\'Ivoire</option><option value="95">Croatia</option><option value="50">Cuba</option><option value="53">Cyprus</option><option value="54">Czech Republic</option><option value="57">Denmark</option><option value="56">Djibouti</option><option value="58">Dominica</option><option value="59">Dominican Republic</option><option value="61">Ecuador</option><option value="63">Egypt</option><option value="201">El Salvador</option><option value="85">Equatorial Guinea</option><option value="65">Eritrea</option><option value="62">Estonia</option><option value="67">Ethiopia</option><option value="70">Falkland Islands (Malvinas)</option><option value="72">Faroe Islands</option><option value="69">Fiji</option><option value="68">Finland</option><option value="73">France</option><option value="78">French Guiana</option><option value="168">French Polynesia</option><option value="206">French Southern Territories</option><option value="74">Gabon</option><option value="82">Gambia</option><option value="77">Georgia</option><option value="55">Germany</option><option value="79">Ghana</option><option value="80">Gibraltar</option><option value="86">Greece</option><option value="81">Greenland</option><option value="76">Grenada</option><option value="84">Guadeloupe</option><option value="89">Guam</option><option value="88">Guatemala</option><option value="83">Guinea</option><option value="90">Guinea-Bissau</option><option value="91">Guyana</option><option value="96">Haiti</option><option value="93">Heard Island and Mcdonald Islands</option><option value="226">Holy See (Vatican City State)</option><option value="94">Honduras</option><option value="92">Hong Kong</option><option value="97">Hungary</option><option value="105">Iceland</option><option value="101">India</option><option value="98">Indonesia</option><option value="104">Iran, Islamic Republic of</option><option value="103">Iraq</option><option value="99">Ireland</option><option value="100">Israel</option><option value="106">Italy</option><option value="107">Jamaica</option><option value="109">Japan</option><option value="108">Jordan</option><option value="120">Kazakhstan</option><option value="110">Kenya</option><option value="113">Kiribati</option><option value="116">Korea, Democratic People\'s Republic of</option><option value="117">Korea, Republic of</option><option value="118">Kuwait</option><option value="111">Kyrgyzstan</option><option value="121">Lao People\'s Democratic Republic</option><option value="130">Latvia</option><option value="122">Lebanon</option><option value="127">Lesotho</option><option value="126">Liberia</option><option value="131">Libyan Arab Jamahiriya</option><option value="124">Liechtenstein</option><option value="128">Lithuania</option><option value="129">Luxembourg</option><option value="141">Macao</option><option value="137">Macedonia, the Former Yugoslav Republic of</option><option value="135">Madagascar</option><option value="149">Malawi</option><option value="151">Malaysia</option><option value="148">Maldives</option><option value="138">Mali</option><option value="146">Malta</option><option value="136">Marshall Islands</option><option value="143">Martinique</option><option value="144">Mauritania</option><option value="147">Mauritius</option><option value="236">Mayotte</option><option value="150">Mexico</option><option value="71">Micronesia, Federated States of</option><option value="134">Moldova, Republic of</option><option value="133">Monaco</option><option value="140">Mongolia</option><option value="145">Montserrat</option><option value="132">Morocco</option><option value="152">Mozambique</option><option value="139">Myanmar</option><option value="153">Namibia</option><option value="162">Nauru</option><option value="161">Nepal</option><option value="159">Netherlands</option><option value="8">Netherlands Antilles</option><option value="154">New Caledonia</option><option value="164">New Zealand</option><option value="158">Nicaragua</option><option value="155">Niger</option><option value="157">Nigeria</option><option value="163">Niue</option><option value="156">Norfolk Island</option><option value="142">Northern Mariana Islands</option><option value="160">Norway</option><option value="165">Oman</option><option value="171">Pakistan</option><option value="178">Palau</option><option value="176">Palestinian Territory, Occupied</option><option value="166">Panama</option><option value="169">Papua New Guinea</option><option value="179">Paraguay</option><option value="167">Peru</option><option value="170">Philippines</option><option value="174">Pitcairn</option><option value="172">Poland</option><option value="177">Portugal</option><option value="175">Puerto Rico</option><option value="180">Qatar</option><option value="181">Reunion</option><option value="182">Romania</option><option value="183">Russian Federation</option><option value="184">Rwanda</option><option value="191">Saint Helena</option><option value="115">Saint Kitts and Nevis</option><option value="123">Saint Lucia</option><option value="173">Saint Pierre and Miquelon</option><option value="227">Saint Vincent and the Grenadines</option><option value="234">Samoa</option><option value="196">San Marino</option><option value="200">Sao Tome and Principe</option><option value="185">Saudi Arabia</option><option value="197">Senegal</option><option value="49">Serbia and Montenegro</option><option value="187">Seychelles</option><option value="195">Sierra Leone</option><option value="190">Singapore</option><option value="194">Slovakia</option><option value="192">Slovenia</option><option value="186">Solomon Islands</option><option value="198">Somalia</option><option value="237">South Africa</option><option value="87">South Georgia and the South Sandwich Islands</option><option value="66">Spain</option><option value="125">Sri Lanka</option><option value="188">Sudan</option><option value="199">Suriname</option><option value="193">Svalbard and Jan Mayen</option><option value="203">Swaziland</option><option value="189">Sweden</option><option value="41">Switzerland</option><option value="202">Syrian Arab Republic</option><option value="218">Taiwan, Province of China</option><option value="209">Tajikistan</option><option value="219">Tanzania, United Republic of</option><option value="208">Thailand</option><option value="211">Timor-Leste</option><option value="207">Togo</option><option value="210">Tokelau</option><option value="214">Tonga</option><option value="216">Trinidad and Tobago</option><option value="213">Tunisia</option><option value="215">Turkey</option><option value="212">Turkmenistan</option><option value="204">Turks and Caicos Islands</option><option value="217">Tuvalu</option><option value="221">Uganda</option><option value="220">Ukraine</option><option value="2">United Arab Emirates</option><option value="75">United Kingdom</option><option value="222">United States Minor Outlying Islands</option><option value="224">Uruguay</option><option value="225">Uzbekistan</option><option value="232">Vanuatu</option><option value="228">Venezuela</option><option value="231">Viet Nam</option><option value="229">Virgin Islands, British</option><option value="230">Virgin Islands, U.s.</option><option value="233">Wallis and Futuna</option><option value="64">Western Sahara</option><option value="235">Yemen</option><option value="238">Zambia</option><option value="239">Zimbabwe</option>\
+					</select>\
+				</div>\
+				<input type="hidden" id="new_member_temp_photo_name" name="data[User][profile_thumb_temp]" />\
+				<input type="hidden" name="data[User][id]" />\
+				<div style="float:right" class="me_hide member_info_form_buttons"><input id="member_cancel_info_button" class="filocity-modal-button pink" type="button" value="Cancel" style="display:none;" /> <input id="member_save_info_button" class="filocity-modal-button" type="button" value="Save" style="margin-left:10px;width:112px;" /><img class="loader_img me_hide" src="'+ _ROOT + 'img/ajax-loader.gif'+'" height="16" width="16" style="margin:20px 10px 0 0"></div>\
+			</div>\
+		</div>\
+	</div>\
+	</form>\
+	');
+	
+	$(document).on('click','.manager_members_edit_member',function(){
+		$('#member_info_title').html('Loading member info...');
+		$('#edit_member_pane_inputs').css('visibility','hidden');
+		var user_id = $(this).attr('data-user-id');
+		var editMember = $.ajax({
+			url:_ROOT+'users/edit_member_detail_info',
+			type:'POST',
+			dataType: 'JSON',
+			data: {'data[User][id]':user_id},
+			cache:false,
+			success:function(data){
+				var info = data[0]['User'];
+				var d = new Date();
+				$('#member_info_title').html('Edit <span style="color:#61819a;">'+$.trim(info['first_name'])+' '+$.trim(info['last_name'])+'</span>');
+				for(var xx in info){
+					$('#member_info_form [name="data[User]['+xx+']"]').val(info[xx]);
+				}
+				$('#member_info_form').attr('data-mode', 'edit');
+				$('#member_info_title').html('Personal Info');
+				$('#edit_member_photo_pane .filocity-modal-title').html('Member - Profile Picture');
+				$('#new_member_profile_photo').attr('src', _ROOT+'image/profile/'+info['id']+'/medium.jpg?' + d.getTime() ); 
+				$('#edit_member_photo_pane').show();
+				$('#manage_members_pane').hide();
+				$('#edit_member_pane_inputs').css('visibility','visible');
+				$('#member_cancel_info_button').val('Cancel');
+				$('#member_cancel_info_button').show();
+			},
+			error:function(err){
+				//alert(err.responseText);
+			}
+		});
+		$('#member_cancel_info_button').val('Cancel');
+		$('#member_cancel_info_button').hide();
+		$('#member_save_info_button').val('Save');
+		//ajax load member info
+		$('#member_cancel_info_button').click();
+		$('#edit_member_pane').show();
+		$('#member_info_form').attr('data-mode', 'edit');
+		/**
+		*	Add Validation to Form
+		*/
+		$.validateForm('#member_info_form');		
+		FilocityModal.alignCenter();
+		return false;
+	});
+	//load members list
+	var ajaxMembersListLoader=null;
+	var loadMembersList=function(){
+		ajaxMembersListLoader=$.ajax({
+			url: _ROOT+'users/manage_member_list',
+			dataType: 'JSON',
+			success:function(data){
+				$('#manage_members .members').html('');
+				// _ROOT+'image/profile/'+data[x]['User']['id']+'/small.jpg
+				for(var x in data){
+					$('#manage_members .members').append('\
+					<div class="member">\
+						<div class="photo">\
+							<img src="'+_ROOT+'image/profile/'+data[x]['User']['id']+'/small.jpg?'+ (new Date()).getTime() +'">\
+						</div>\
+						<div class="info">\
+							<a href="#" class="manager_members_edit_member" data-user-id="'+data[x]['User']['id']+'">'+data[x]['User']['first_name']+' '+data[x]['User']['last_name']+'</a> '+data[x]['User']['position']+'<br>\
+							7 tasks assigned, 3 active<br>\
+							Budget Spent: <strong>75%</strong> <a href="#" class="manager_members_edit_member" data-user-id="'+data[x]['User']['id']+'">edit</a>\
+						</div>\
+					</div>\
+					');
+				}
+				$('#manage_members input:hidden.total_member_added').val(data.length);
+			},
+			complete: function(){
+				FilocityModal.alignCenter();
+			}
+		});
+	};
+	var refesh_user_profile_thumb = function() {
+		$('#board_header .header_image img').attr('src', function(i, oldSrc) {
+			var d = new Date();
+			return oldSrc.replace(/\?(.*)/, d.getTime());
+		});
+	};
+	/*
+	var refreshInputOnType = function() {
+		$('body').on('keyup focusout', 'input.required', function() {
+			var value = $.trim(this.value),
+			type = this.name,
+			validate_email=/^([a-z0-9._%+-]+)\@([a-z0-9-]+\.)+([a-z0-9]{2,4})$/i,
+			input = this;
+			
+			if(value) {
+				if(type == 'data[User][email]' && !validate_email.test(value)) {
+					$(this).addClass('error');
+				} else if(type == 'data[User][email]' && validate_email.test(value)) {
+					$(this).removeClass('error');
+					checkEmailAlreadyUsed(input);
+				} else {
+					$(this).removeClass('error');
+				}
+			} else {
+				$(this).addClass('error');
+			}
+			if( isFormValid('#member_info_form')) {
+				$('.member_info_form_buttons').removeClass('me_hide');
+			} else {
+				$('.member_info_form_buttons').addClass('me_hide');
+			}
+		});
+	};
+	var checkEmailAlreadyUsed = function(input) {
+		$.post(_ROOT + 'users/is_user_exists', {'data[User][email]' : input.value}, function(response) {
+			if(response.status == 'y') {
+				$(input).val('').addClass('error').prop('placeholder', 'Email already used.');
+			}
+		}, 'json');
+	};
+	refreshInputOnType();
+	*/
+	
+	var isFormValid = function(form) {
+		return $('input.required', form).filter(function() {
+			return !$.trim(this.value);
+		}).length === 0;
+	};
+	//manage member information save and update
+	$('#member_save_info_button').on('click', function(){
+		$('#member_save_info_button, #member_cancel_info_button').hide(0);
+		$('img.loader_img').show(0);
+
+		if($('#member_save_info_button').val()=='Save'){
+
+			
+			var data=$('form#member_info_form').serialize();
+			$.ajax({
+				url:_ROOT+'users/edit_user',
+				data: data,
+				type: 'POST',
+				dataType: 'JSON',
+				cache:false,
+				success: function(response){
+					$('#member_cancel_info_button').click();
+					loadMembersList();
+					refesh_user_profile_thumb();
+					$('#member_save_info_button, #member_cancel_info_button').show(0);
+					$('img.loader_img').hide(0);
+				},
+				error: function(err){
+					//alert(err.responseText);
+				}
+			});
+			
+		} else {
+			var data=$('form#member_info_form').serialize();
+			
+			$.ajax({
+				url:_ROOT+'users/add_user',
+				data: data,
+				type: 'POST',
+				dataType: 'JSON',
+				cache:false,
+				success: function(response){
+					if(response['success']!=undefined){
+						FilocityDialogHelper.alert({
+							title:'Member Added',
+							message: 'The member was successfully added'
+						});
+					}else{
+						FilocityDialogHelper.alert({
+							title:'Member Not Added',
+							message: 'The member was not added'
+						});
+					}
+					$('#member_cancel_info_button').click();
+					loadMembersList();
+					refesh_user_profile_thumb();
+					$('#member_save_info_button, #member_cancel_info_button').show(0);
+					$('img.loader_img').hide(0);
+				},
+				error: function(err){
+					alert(err.responseText);
+				}
+			});
+		}
+		return false;
+	});
+	
+	FilocityModal.onClose=function(){
+		if(ajaxMembersListLoader!=null){
+			ajaxMembersListLoader.abort();
+		}
+	}
+	$('#members_add_button').click(function(){
+		var total_member_added = $('#manage_members input:hidden.total_member_added').val(),
+		max_member_allowed = $('input:hidden.package_max_member').val();
+		if( total_member_added == max_member_allowed) {
+			if( confirm('You can\'t add more member under this package. Please Update package.') ) {	
+				$('#filocity_modal_dialog:visible, #filocity_modal_dialog_outer:visible').fadeOut(200, function() {
+					$('.data_uses_title').click();
+				});	
+			} else {
+				$('#filocity_modal_dialog:visible, #filocity_modal_dialog_outer:visible').fadeOut(200);
+			}
+			return false;
+		}
+		$('#member_info_title').html('Personal Info');
+		$('#edit_member_photo_pane').show();
+		$('#manage_members_pane').hide();
+		$('#edit_member_pane').show();
+		$('#edit_member_pane input, #edit_member_pane select').each(function(){
+			$(this).val('');
+		});
+		$('#member_cancel_info_button').val('Cancel');
+		$('#member_cancel_info_button').show();
+		$('#member_save_info_button').val('Add New');
+		$('#member_info_form').attr('data-mode', 'add');
+		/**
+		*	Add Validation to Form
+		*/
+		$.validateForm('#member_info_form');
+		FilocityModal.alignCenter();
+		return false;
+	});
+
+	$('#member_cancel_info_button').click(function(){
+		$('#edit_member_pane input, #edit_member_pane select').each(function(){
+			$(this).val('');
+		});
+		$('#edit_member_photo_pane').hide();
+		$('#manage_members_pane').show();
+		$('#edit_member_pane').hide();
+		$('#member_cancel_info_button').hide();
+		$('#member_save_info_button').val('Save');
+		$('#new_member_profile_photo').attr('src',_ROOT+'img/resources_temp/default-photo.jpg');
+		FilocityModal.alignCenter();
+		return false;
+	});
+	
+	FilocityModal.show();
+	loadMembersList();
+	
+	return false;
+}
+
+
+/*date format*/
+var dateFormat = function () {
+	var	token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[LloSZ]|"[^"]*"|'[^']*'/g,
+		timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
+		timezoneClip = /[^-+\dA-Z]/g,
+		pad = function (val, len) {
+			val = String(val);
+			len = len || 2;
+			while (val.length < len) val = "0" + val;
+			return val;
+		};
+
+	// Regexes and supporting functions are cached through closure
+	return function (date, mask, utc) {
+		var dF = dateFormat;
+
+		// You can't provide utc if you skip other args (use the "UTC:" mask prefix)
+		if (arguments.length == 1 && Object.prototype.toString.call(date) == "[object String]" && !/\d/.test(date)) {
+			mask = date;
+			date = undefined;
+		}
+
+		// Passing date through Date applies Date.parse, if necessary
+		date = date ? new Date(date) : new Date;
+		if (isNaN(date)) throw SyntaxError("invalid date");
+
+		mask = String(dF.masks[mask] || mask || dF.masks["default"]);
+
+		// Allow setting the utc argument via the mask
+		if (mask.slice(0, 4) == "UTC:") {
+			mask = mask.slice(4);
+			utc = true;
+		}
+
+		var	_ = utc ? "getUTC" : "get",
+			d = date[_ + "Date"](),
+			D = date[_ + "Day"](),
+			m = date[_ + "Month"](),
+			y = date[_ + "FullYear"](),
+			H = date[_ + "Hours"](),
+			M = date[_ + "Minutes"](),
+			s = date[_ + "Seconds"](),
+			L = date[_ + "Milliseconds"](),
+			o = utc ? 0 : date.getTimezoneOffset(),
+			flags = {
+				d:    d,
+				dd:   pad(d),
+				ddd:  dF.i18n.dayNames[D],
+				dddd: dF.i18n.dayNames[D + 7],
+				m:    m + 1,
+				mm:   pad(m + 1),
+				mmm:  dF.i18n.monthNames[m],
+				mmmm: dF.i18n.monthNames[m + 12],
+				yy:   String(y).slice(2),
+				yyyy: y,
+				h:    H % 12 || 12,
+				hh:   pad(H % 12 || 12),
+				H:    H,
+				HH:   pad(H),
+				M:    M,
+				MM:   pad(M),
+				s:    s,
+				ss:   pad(s),
+				l:    pad(L, 3),
+				L:    pad(L > 99 ? Math.round(L / 10) : L),
+				t:    H < 12 ? "a"  : "p",
+				tt:   H < 12 ? "am" : "pm",
+				T:    H < 12 ? "A"  : "P",
+				TT:   H < 12 ? "AM" : "PM",
+				Z:    utc ? "UTC" : (String(date).match(timezone) || [""]).pop().replace(timezoneClip, ""),
+				o:    (o > 0 ? "-" : "+") + pad(Math.floor(Math.abs(o) / 60) * 100 + Math.abs(o) % 60, 4),
+				S:    ["th", "st", "nd", "rd"][d % 10 > 3 ? 0 : (d % 100 - d % 10 != 10) * d % 10]
+			};
+
+		return mask.replace(token, function ($0) {
+			return $0 in flags ? flags[$0] : $0.slice(1, $0.length - 1);
+		});
+	};
+}();
+
+// Some common format strings
+dateFormat.masks = {
+	"default":      "ddd mmm dd yyyy HH:MM:ss",
+	shortDate:      "m/d/yy",
+	mediumDate:     "mmm d, yyyy",
+	longDate:       "mmmm d, yyyy",
+	fullDate:       "dddd, mmmm d, yyyy",
+	shortTime:      "h:MM TT",
+	mediumTime:     "h:MM:ss TT",
+	longTime:       "h:MM:ss TT Z",
+	isoDate:        "yyyy-mm-dd",
+	isoTime:        "HH:MM:ss",
+	isoDateTime:    "yyyy-mm-dd'T'HH:MM:ss",
+	isoUtcDateTime: "UTC:yyyy-mm-dd'T'HH:MM:ss'Z'"
+};
+
+// Internationalization strings
+dateFormat.i18n = {
+	dayNames: [
+		"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat",
+		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+	],
+	monthNames: [
+		"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+		"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"
+	]
+};
+
+// For convenience...
+Date.prototype.format = function (mask, utc) {
+	return dateFormat(this, mask, utc);
+};
+
+

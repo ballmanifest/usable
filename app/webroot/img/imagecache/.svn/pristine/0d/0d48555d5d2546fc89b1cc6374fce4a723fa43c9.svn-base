@@ -1,0 +1,41 @@
+#DocViewer {     
+	bottom: 0;
+    left: 50%;
+    margin-left: -475px;
+    position: absolute;
+    right: 0;
+    top: 100px;
+    width: 950px;
+	height: 895px;
+	border: 1px solid rgba(127, 127, 127, 0.2)
+}
+.docviewer .doc {
+	background: transparent !important
+}
+.toolbar { 
+	background: transparent; 
+	height:30px; 
+	cursor:default;  
+	margin: 0 20px;
+}
+.zoom-btns { 
+	position:absolute; left:4px; top:2px; width:150px; z-index:2; 
+}
+.page-nav { 
+	position:absolute; top:2px; width:100%; text-align:center; 
+}
+button { 
+	line-height:18px; 
+}
+.label { 
+	display:inline-block; width:80px;
+}
+.doc_header_des h2 {
+	font-size: 25px;
+	color: #454040;
+	margin : 0px 0px 0px 20px;
+	font-weight: normal
+}
+.adeptol_viewer {
+	padding: 20px
+}

@@ -1,0 +1,794 @@
+var FilocityTasksHelper={
+	users:[],
+	newTaskData:{
+		task: {
+			id:0,
+			title:'New Task',
+			task_type:1,
+			points:1,
+			status:1
+		},
+                comment:[],
+		subtasks: [],
+		documents: [],
+		activities: []
+	},
+	iconsPositions:{
+		'task-type-1': '-7px -1px',
+		'task-type-2': '-2px -54px',
+		'task-type-3': '-21px -54px',
+		'task-type-4': '-2px -73px'
+	},
+	displayTask: function(data, container, options){
+		var task=data['task'];
+                var comment=data['comment'];
+		var subtasks=data['subtasks'];
+		var documents=data['documents'];
+		var activities=data['activities'];
+		var users=FilocityTasksHelper.users;		 
+		options=options==undefined?{}:options;
+		
+		var task_div=$('<li data-task-id="'+task['id']+'" class="fc-task status-'+task['status']+'">'+$('#task_template .fc-task').html()+'</li>').appendTo(container);
+		
+	//SUBTASK HTML TEMPLATE
+		var subtask_i=0;
+		var generateSubtaskHTML=function(subtask){
+			var subtask_html='\
+			<li class="view-mode'+(subtask['Subtask']['is_checked']?' checked':'')+'">\
+				<div style="position:relative;">\
+					<input type="hidden" name="data[subtasks]['+subtask_i+'][Subtask][id]" value="'+subtask['Subtask']['id']+'" class="subtask-id" />\
+					<input type="hidden" name="data[subtasks]['+subtask_i+'][Subtask][order]" class="subtask-order" value="0" />\
+					<input style="float:left;" type="checkbox" name="data[subtasks]['+subtask_i+'][Subtask][is_checked]" value="'+subtask['Subtask']['is_checked']+'"'+(subtask['Subtask']['is_checked']?' checked="checked"':'')+' />\
+					<div>\
+						<pre class="subtask-view-mode subtask-content subtask-description">'+subtask['Subtask']['description']+'</pre>\
+						<textarea class="subtask-edit-mode subtask-content mirroredText" name="data[subtasks]['+subtask_i+'][Subtask][description]" style="display:none;">'+subtask['Subtask']['description']+'</textarea>\
+					</div> \
+					<span style="position:absolute;top:0;right:0;">\
+						<a href="#" class="subtask-edit-link subtask-view-mode"></a>\
+						<a href="#" class="subtask-delete-link subtask-view-mode"></a>\
+						<a href="#" class="subtask-save-link subtask-edit-mode fc-button blue" style="display:none;">Save</a>\
+					</span>\
+				</div>\
+			</li>';
+			subtask_i++;
+			return subtask_html;
+		}
+		var generateDocHTML=function(documents){		    
+			var document_html='';
+			for(var x in documents){
+			var taskDoc=documents[x];
+			var imgsrc='/img/imagecache/'+taskDoc['Document']['file'];
+			var arr=Array('jpg', 'jpeg', 'png', 'gif');
+			var ext=taskDoc['Document']['ext'].toLowerCase();
+			if(jQuery.inArray(ext, arr)<0){
+			   imgsrc='/img/'+ext+'.png';
+			}
+			
+			document_html+='<div class="main_dv_t"><div class="home_icon"><img src="'+imgsrc+'" width="30px"/></div><div class="normal_txt">'+taskDoc['Document']['name']+'.'+taskDoc['Document']['ext']+'</div></div>';
+			}
+			$(task_div).find('#fileupoaddiv .main_dv_t').remove();
+			$(task_div).find('#fileupoaddiv').append(document_html);
+		}
+		
+	//SHOW TASK STATUS POSSIBLE ACTIONS
+		$(task_div).on('change','[name="data[Task][status]"]',function(){
+			$(task_div).find('.fc-task-status-action').hide();
+			$(task_div).find('.fc-for-task-status-'+$(this).val()).show();
+		});
+		
+	//EDIT SUBTASK
+		$(task_div).on('click','.subtask-edit-link',function(){
+			$(this).parent().parent().find('.subtask-edit-mode').show();
+			$(this).parent().parent().find('.subtask-view-mode').hide();
+			$(this).parent().parent().parent().removeClass('view-mode');
+			saveSubtasks();
+			return false;
+		});
+		
+	//DELETE SUBTASK
+		$(task_div).on('click','.subtask-delete-link',function(){
+			var task_id=$(this).parent().parent().parent().find('.subtask-id').val();
+			if(task_id>0){
+				$(task_div).find('form').append('<input type="hidden" name="data[delete_subtask][]" value="'+task_id+'" />');
+			}
+			$(this).parent().parent().parent().remove();
+			saveSubtasks();
+			return false;
+		});
+		
+	//SAVE SUBTASK
+		$(task_div).on('click','.subtask-save-link',function(){
+			$(this).parent().parent().find('.subtask-edit-mode').hide();
+			$(this).parent().parent().find('.subtask-view-mode').show();
+			$(this).parent().parent().find('.subtask-description').html($(this).parent().parent().find('textarea').val());
+			$(this).parent().parent().parent().addClass('view-mode');
+			saveSubtasks();
+			return false;
+		});
+		
+	//SAVE SUBTASKS
+		var saveSubtasks=function(){
+			if(task['id']==0){
+				return false;
+			}
+			setSubtasksOrder();
+			var data=$(task_div).find('form').serialize(); 
+			var save_task_ajax=$.ajax({
+				url: _ROOT+'tasks/save_subtasks',
+				data: data,
+				type: 'POST',
+				dataType: 'JSON',
+				success: function(data_){
+					
+				},
+				error: function(err){
+					alert(err.responseText);
+				}
+			});
+		}
+	
+	//TASK STATUS ACTION BUTTONS EVENTS
+		//for task row buttons {
+		$(task_div).find('.task_container .fc-task-status-action').click(function(){
+			for(var i=1;i<=6;i++){
+				if($(this).hasClass('fc-for-task-status-'+i)){
+					var new_status=i;
+					if(new_status==6){
+						new_status=2;
+					}else if(new_status==4){
+						if($(this).html()=='Reject'){
+							new_status=6;
+						}else{
+							new_status=5;
+						}
+					}else{
+						new_status=i+1;
+					}
+					$(this).parent().parent().find('[name="data[Task][status]"]').val(new_status).change();
+					break;
+				}
+			}
+			saveTask();
+			return false;
+		});
+		// }
+		//for buttons beside the task status dropdown {
+		$(task_div).find('.fc-task-status-action.fc-for-task-status-1').click(function(){
+			$(task_div).find('[name="data[Task][status]"]').val(2).change();
+			return false;
+		});
+		$(task_div).find('.fc-task-status-action.fc-for-task-status-2').click(function(){
+			$(task_div).find('[name="data[Task][status]"]').val(3).change();
+			return false;
+		});
+		$(task_div).find('.fc-task-status-action.fc-for-task-status-3').click(function(){
+			$(task_div).find('[name="data[Task][status]"]').val(4).change();
+			return false;
+		});
+		$(task_div).find('.fc-task-status-action.fc-for-task-status-4').click(function(){
+			if($(this).html()=='Reject'){
+				$(task_div).find('[name="data[Task][status]"]').val(6).change();
+			}else{
+				$(task_div).find('[name="data[Task][status]"]').val(5).change();
+			}
+			return false;
+		});
+		$(task_div).find('.fc-task-status-action.fc-for-task-status-6').click(function(){
+			$(task_div).find('[name="data[Task][status]"]').val(2).change();
+			return false;
+		});
+		// }
+	//ORDER SUBTASKS
+		var setSubtasksOrder=function(){
+			var subtasks_li=$(task_div).find('.subtasks-list .subtask-order');
+			for(var i=0;i<subtasks_li.length;i++){
+				$(subtasks_li[i]).val(i);
+			}
+		}
+	//SAVE TASK
+		var saveTask=function(save_options){  
+			save_options=save_options==undefined?{}:save_options;
+			save_options['open']=save_options['open']==undefined?false:save_options['open'];
+			setSubtasksOrder();
+			if(FilocityTasks.view=='project'){
+			$(task_div).find('form').find('*[name="data[Task][project_id]"]').val(FilocityTasks.viewed_id);
+			}
+			var data=$(task_div).find('form').serialize();
+			var save_task_ajax=$.ajax({
+				url: _ROOT+'tasks/save_task',
+				data: data,
+				type: 'POST',
+				dataType: 'JSON',
+				success: function(data_){
+					if(data_['success']!=undefined && data_['success']==1){
+						task=data_['data']['task'];
+						subtasks=data_['data']['subtasks'];
+						documents=data_['data']['documents'];
+						activities=data_['data']['activities'];
+						fillTaskFields();
+						$(task_div).removeClass('expanded');
+						if(options['updated']!=undefined){
+							options['updated'](task_div, data_['data']);
+						}
+					}
+					if(save_options['open']){
+						$(task_div).addClass('expanded');
+					}else{
+						$(task_div).removeClass('expanded');
+					}
+				},
+				error: function(err){
+					alert(err.responseText);
+				}
+			});
+		}
+	
+		
+	//FILL TASK FIELDS
+		var global_task_div=$('[data-task-id="'+task['id']+'"]');
+		var fillTaskFields=function(){  
+			$(task_div).attr('data-task-id',task['id']); //set element task_id
+			global_task_div=$('[data-task-id="'+task['id']+'"]'); //for changing all same tasks given a task_id in a page
+			$(global_task_div).removeClass('status-1 status-2 status-3 status-4 status-5').addClass('status-'+task['status']); //coloring the task row
+			
+			var users_options='';                        
+			for(i=0;i<users.length;i++){
+				users_options+='<option value="'+users[i]['User']['id']+'">'+users[i]['User']['first_name']+' '+users[i]['User']['last_name']+'</option>';
+			}
+			$(global_task_div).find('*[name="data[Task][ownerid]"],*[name="data[Task][requesterid]"]').html(users_options);
+			$(global_task_div).find('.title').html(task['title']);
+			$(global_task_div).find('.num').html(task['points']);                       
+                        if(task['comment_count']){ var commentCount=task['comment_count'];} else{ commentCount='0';}
+                        $(global_task_div).find('.noOfcomment').html(commentCount);
+			$(global_task_div).find('.star').css({
+				'backgroundPosition': FilocityTasksHelper.iconsPositions['task-type-'+task['task_type']]
+			});
+			$(global_task_div).find('.fc-task_id').html(task['id']==0?'n/a':task['id']);
+			$(global_task_div).find('[data-show-task-comments]').attr('data-show-task-comments',task['id']);
+			for(var x in task){
+				$(global_task_div).find('*[name="data[Task]['+x+']"]').val(task[x]);
+			}
+			
+			$(task_div).find('[name="data[Task][task_type]"]').off('change').on('change',function(){
+				$(this).parent().find('.task-type-icon').css({'backgroundPosition': FilocityTasksHelper.iconsPositions['task-type-'+$(this).val()]});
+			}).change();
+			
+
+			$(task_div).find('textarea').autosize({className:'mirroredText'});
+			
+			$(task_div).find('[name="data[Task][status]"]').change();
+			generateDocHTML(documents);
+		}
+				
+		fillTaskFields();
+	
+	//LIST SUBTASKS
+		var subtasks_html='';
+		for(var x in subtasks){
+			subtasks_html+=generateSubtaskHTML(subtasks[x]);
+		}
+		$(global_task_div).find('.subtasks-list ul').html(subtasks_html);
+		
+	//DRAG AND DROP SUBTASKS
+		$(task_div).find('.subtasks-list ul').sortable({
+			placeholder: "ui-state-highlight",
+			start: function(event, ui){
+				$(this).find('.ui-state-highlight').css({height:$(ui.item).height()});
+				$(ui.item).css({opacity:0.75});
+			},
+			stop: function(event, ui){
+				$(ui.item).css({opacity:1});
+				saveSubtasks();
+			}
+		});
+	
+	//SUBTASK CHANGE COLOR ON CHECK/UNCHECK
+		$(task_div).on('change','.subtasks-list input[type="checkbox"]',function(){
+			if($(this).is(':checked')){
+				$(this).parent().parent().addClass('checked');
+			}else{
+				$(this).parent().parent().removeClass('checked');
+			}
+			saveSubtasks();
+		});
+		
+	//HAS TASK CHANGES CHECKER
+		var hasChanges=function(){
+			for(var x in task){
+				var field=$(task_div).find('*[name="data[Task]['+x+']"]').val();
+				if(field==undefined){
+					continue;
+				}
+				if(field!=task[x]){
+					return true;
+				}
+			}
+			return false;
+		}
+		$(task_div).on('change','[name^="data[Task]"]',function(){
+			if(hasChanges()){
+				$(task_div).find('.task-save-link').removeClass('text-only').addClass('blue');
+				$(task_div).find('.task-cancel-link').html('Cancel');
+			}else{
+				$(task_div).find('.task-save-link').removeClass('blue').addClass('text-only');
+				$(task_div).find('.task-cancel-link').html('Close');
+			}
+		});
+		
+	//ARROW CLICKS EVENT
+		$(task_div).find('.arrow').click(function(){
+			if($(task_div).hasClass('expanded')){
+				$(task_div).removeClass('expanded');
+				saveTask();
+			}else{
+				$(task_div).addClass('expanded');
+			}
+			return false;
+		});
+        //TITLE CLICKS EVENT SAME AS ARROW
+                $(task_div).find('.title').click(function(){
+			if($(task_div).hasClass('expanded')){
+				$(task_div).removeClass('expanded');
+				saveTask();
+			}else{
+				$(task_div).addClass('expanded');
+			}
+			return false;
+		});
+	
+	//CANCEL BUTTON EVENT	
+		$(task_div).find('.fc-button.task-cancel-link').click(function(){
+			if($(this).html()=='Close'){
+				$(task_div).removeClass('expanded');
+				fillTaskFields();
+			}else{
+				FilocityDialogHelper.confirm({
+					title: 'Task',
+					message: 'Do you want to abandon your task changes?',
+					yes: function(){
+						$(task_div).removeClass('expanded');
+						fillTaskFields();
+					}
+				});
+			}
+			return false;
+		});
+	//CANCEL SUB TASK
+	$(task_div).find('.fc-button.cancel-subtask').click(function(){
+		if($(this).parent().parent().find('.fc-button.task-cancel-link').html()=='Close')
+		{
+		   if($(this).parent().parent().find('input[type=hidden]').val()> 0)
+		   {
+		   $(task_div).removeClass('expanded');
+		   }
+		   else
+		   {
+		   $(task_div).remove();
+		   }
+		   
+		}
+		else
+		{
+		      FilocityDialogHelper.confirm({
+					title: 'Task',
+					message: 'Do you want to abandon your task changes?',
+					yes: function(){
+						if($(this).parent().parent().find('input[type=hidden]').val()> 0)
+						{
+						$(task_div).removeClass('expanded');
+						}
+						else
+						{
+						$(task_div).remove();
+						}
+					}
+				});
+		}
+	});
+	//ADD SUBTASK EVENT
+		$(task_div).find('.fc-button.add-subtask').click(function(){ 
+			var text=$.trim($(task_div).find('.add-subtask-text').val());                        
+                        if(text==''){
+				return false;
+			}
+			
+			var temp_subtask_el=$(generateSubtaskHTML({
+				Subtask: {
+					id: 0,
+					description: text
+				}
+			})).appendTo($(task_div).find('.subtasks-list ul'));
+			$(temp_subtask_el).find('[name]').attr('disabled','disabled');
+				
+			var new_subtask_ajax=$.ajax({
+				url: _ROOT+'tasks/add_subtask',
+				data: {
+					data: {
+						Subtask: {
+							task_id: task['id'],
+							description: text,
+							order: $(task_div).find('.subtasks-list ul li').length
+						}
+					}
+				},
+				type:'POST',
+				dataType:'JSON',
+				success: function(data_){
+					$(temp_subtask_el).remove();
+					var new_subtask_el=$(generateSubtaskHTML({
+						Subtask: {
+							id: data_['id'],
+							description: text
+						}
+					})).appendTo($(task_div).find('.subtasks-list ul'));
+				}
+			});
+			
+			$(task_div).find('.add-subtask-text').val('');
+			$(task_div).find('textarea').autosize({className:'mirroredText'});
+			
+			return false;
+		});
+		$(task_div).find('.add-subtask-text').keydown(function(e) {
+			if($(this).is(':focus') && e.which == 13 && !e.shiftKey){
+				$(task_div).find('.fc-button.add-subtask').click();
+			}
+		});
+	//SAVE TASK EVENT
+		$(task_div).find('.fc-button.task-save-link').click(function(){
+			if($(this).hasClass('text-only')){
+				return false;
+			}
+			saveTask({open:false});
+			return false;
+		});
+	
+	//DISPLAYED CALLBACK
+		if(options['displayed']!=undefined){
+			options['displayed'](task_div);
+		}
+	},
+	
+	showTaskDialog:function(task_id){
+		var html='';
+		var dialog_id='task_'+task_id+'_dialog';
+		if($('#'+dialog_id).length>0){
+			$('#'+dialog_id).dialog('moveToTop');
+			return;
+		}
+		$('body').append('<li class="fc"><div id="'+dialog_id+'" style="background:#F3F2EE;"><ul class="single_task_div"></ul></div></li>');
+		FilocityDialogHelper.dialog('#'+dialog_id);
+		$('#'+dialog_id).dialog('option','title','Task');
+		$('#'+dialog_id).dialog('option','width',340);
+		$('#'+dialog_id).dialog('option','minHeight',400);
+		$('#'+dialog_id).dialog('option','maxHeight',500);
+		$('#'+dialog_id).dialog('open');
+		if(task_id==0){
+			FilocityTasksHelper.displayTask(FilocityTasksHelper.newTaskData, '#'+dialog_id+' .single_task_div',{
+				displayed: function(task_div){
+					$(task_div).find('.arrow').click();
+					$('#'+dialog_id).dialog('option','position','center');
+				},
+				updated: function(task_div){
+					$('#'+dialog_id).dialog('close');
+					location.href=location.href;
+				}
+			});
+		}else{
+			var load_task_ajax=$.ajax({
+				url: _ROOT+'tasks/get_task/'+task_id,
+				type: 'POST',
+				dataType: 'JSON',
+				success: function(data){
+					FilocityTasksHelper.users=data['users'];
+					FilocityTasksHelper.displayTask(data, '#'+dialog_id+' .single_task_div',{
+						displayed: function(task_div){
+							$(task_div).find('.arrow').click();
+							$('#'+dialog_id).dialog('option','position','center');
+						},
+						updated: function(task_div){
+							$('#'+dialog_id).dialog('close');
+						}
+					});
+				},
+				error: function(err){
+					//alert(err.responseText);
+				}
+			});
+		}
+		return false;
+	},
+	
+	prepareTaskTemplate:function(){
+		$(document).on('mouseenter','.subtasks-list li.view-mode',function(){
+			$(this).find('a.subtask-view-mode').css({display:'block',opacity:0.35});
+		});
+		$(document).on('mouseleave','.subtasks-list li.view-mode',function(){
+			$(this).find('a.subtask-view-mode').css({display:'none',opacity:0.35});
+		});
+		$(document).on('mouseenter','.subtasks-list li.view-mode a.subtask-view-mode',function(){
+			$(this).css({display:'block',opacity:1});
+		});
+		$(document).on('mouseleave','.subtasks-list li.view-mode a.subtask-view-mode',function(){
+			$(this).css({display:'block',opacity:0.5});
+		});
+		var html='\
+		<div id="task_template" style="width:300px;display:none;">\
+			<li class="fc-task">\
+				<form>\
+				<div class="task_container">\
+					<div class="icons">\
+						<a class="star" href="#" title="Task Type"></a>\
+						<a class="num" href="#" title="Points">5</a>\
+						<a data-show-task-comments="0" class="comment" href="#" title="Comments"></a>\n\
+                                                (<span  task-comments="0" class="noOfcomment" href="#" title="No of Comments"></span>)\
+					</div>\
+					<a href="#" class="fc-task-status-action fc-for-task-status-1 fc-button gray">Start</a>\
+					<a href="#" class="fc-task-status-action fc-for-task-status-2 fc-button blue">Finish</a>\
+					<a href="#" class="fc-task-status-action fc-for-task-status-3 fc-button orange">Deliver</a>\
+					<a href="#" class="fc-task-status-action fc-for-task-status-4 fc-button red">Reject</a>\
+					<a href="#" class="fc-task-status-action fc-for-task-status-4 fc-button green">Accept</a>\
+					<a href="#" class="fc-task-status-action fc-for-task-status-6 fc-button red">Restart</a>\
+					<span class="title"></span>\
+				</div>\
+				<div class="task_expanded_content" style="background:#F3F2EE;padding: 5px 10px 5px 16px;">\
+					<textarea name="data[Task][title]" style="width:100%;border:1px solid #ADB0B7;" cols="10" rows="1" class="mirroredText"></textarea>\
+					<div class="fc-button-container">\
+						<div style="font-size:10px;float:left;border:1px solid #c0c0c0;border-radius:3px;-webkit-border-radius:3px !important;-moz-border-radius:3px !important;overflow:hidden;"><a href="#" class="fc-task_id_label">ID</a><span class="fc-task_id">123456</span></div>\
+					</div>\
+					<div class="fc-button-container" style="margin-left:5px !important;">\
+						<a href="#" class="task-save-link fc-button text-only" style="margin-right:5px;width:35px;">Save</a>\
+						<a href="#" class="task-cancel-link fc-button text-only" style="width:35px;">Close</a>\
+					</div>\
+					<div class="clear"></div>\
+					<div class="selects">\
+						<input type="hidden" name="data[Task][id]" />\
+						<input type="hidden" name="data[Task][project_id]" />\
+						<div>\
+							<select name="data[Task][task_type]" style="margin-left:10px;">\
+								<option value="1">Feature</option>\
+								<option value="2">Bug</option>\
+								<option value="3">Shore</option>\
+								<option value="4">Release</option>\
+							</select>\
+							<a href="#" onclick="return false;" class="task-type-icon" style="float:right;width:16px;height:16px;margin-top:4px;"></a>\
+							TASK TYPE\
+						</div>\
+						<div>\
+							<select name="data[Task][points]">\
+								<option value="1">1 point</option>\
+								<option value="2">2 points</option>\
+								<option value="3">3 points</option>\
+								<option value="4">4 points</option>\
+								<option value="5">5 points</option>\
+							</select>\
+							POINTS\
+						</div>\
+						<div>\
+							<select name="data[Task][status]" style="margin-left:10px;">\
+								<option value="1">Not Yet Started</option>\
+								<option value="2">Started</option>\
+								<option value="3">Finished</option>\
+								<option value="4">Delivered</option>\
+								<option value="5">Accepted</option>\
+								<option value="6">Rejected</option>\
+							</select>\
+							<a href="#" class="fc-task-status-action fc-for-task-status-1 fc-button gray">Start</a>\
+							<a href="#" class="fc-task-status-action fc-for-task-status-2 fc-button blue">Finish</a>\
+							<a href="#" class="fc-task-status-action fc-for-task-status-3 fc-button orange">Deliver</a>\
+							<a href="#" class="fc-task-status-action fc-for-task-status-4 fc-button red">Reject</a>\
+							<a href="#" class="fc-task-status-action fc-for-task-status-4 fc-button green">Accept</a>\
+							<a href="#" class="fc-task-status-action fc-for-task-status-6 fc-button red">Restart</a>\
+							STATE\
+						</div>\
+						<div>\
+							<select name="data[Task][requesterid]">\
+							</select>\
+							REQUESTER\
+						</div>\
+						<div>\
+							<select name="data[Task][ownerid]">\
+							</select>\
+							ASSIGNED TO\
+						</div>\
+    					  <div>\
+							BUDGET\
+							<input type="text" name="data[Task][budget]" class="task_budget" style="margin-left:80px;"/>\
+							</div>\
+					</div>\<div class="task-description" style="margin-top:10px;" id="fileupoaddiv">\<input name="images[]"  class="file1" type="file" multiple="multiple" />&nbsp;<span class="loader" style="display: none;"><img src="/img/ajax-loader.gif"></span></div>\<div>&nbsp;</div><div class="task-description" style="margin-top:10px;">\
+						<b>Description</b>\
+						<textarea name="data[Task][description]" style="width:100%;border:1px solid #ADB0B7;" cols="10" rows="5" class="mirroredText"></textarea>\
+					</div>\
+					<div class="subtasks-list" style="margin-top:10px;">\
+						<div><b>Sub-tasks</b></div>\
+						<ul>\
+						</ul>\
+						<textarea class="add-subtask-text mirroredText" style="width:100%;float:left;border:1px solid #c0c0c0;" rows="1"></textarea>\n\
+                                              \
+					      <a href="#" style="float:right;width:35px;margin-top:1px" class="add-subtask fc-button gray">Add</a>\
+					      <a href="#" style="float:right;width:35px;margin-top:1px;margin-right:20px;padding-right:10px;" class="cancel-subtask fc-button gray">Cancel</a>\
+					</div>\
+					<div class="clear"></div>\
+				</div>\
+				<a class="arrow" href="#"></a>\
+				<div class="clear"></div>\
+				</form>\
+			</li>\
+		</div>\
+		';
+		$('body').append(html);
+	},
+	
+	generateTaskComment: function(data){
+		html='\
+		<li style="padding:10px 0;">\
+			<div style="float:left;width:46px;height:51px;padding:1px;background:#ffffff;border:1px solid #c0c0c0;" class="fc-comment-photo">\
+				<img alt="Photo" src="'+data['photo']+'" width="46" height="51" />\
+			</div>\
+			<div class="fc-comment">\
+				\
+				<div style="min-height:31px;color: #61819A !important;font-size:12px;" class="fc-comment-text">'+data['comment']+'</div>\
+				<div class="fc-comment-time" style="padding-top:5px;color:#9999CC;font-size:12px;"><a href="'+_ROOT+'users/resources/member/'+data['user_id']+'">'+data['first_name']+'</a> posted <span title="'+data['comment_time']+'" style="cursor:help;">'+$.timeago(data['comment_time'])+'</span></div>\
+			</div>\
+			<div class="clear"></div>\
+		</li>\
+		';
+		return html;
+	},
+	
+	prepareTaskCommentsTemplate: function(){
+		var html='\
+		<div id="task_comments_template" style="display:none;">\
+			<ul class="fc-comments-list" style="padding:10px;min-height:338px;">\
+			</ul>\
+			<div style="padding:0 10px 10px 10px;">\
+				<textarea class="fc-comment-box"></textarea>\
+			</div>\
+		</div>\
+		';
+		$('body').append(html);
+	},
+	
+	showTaskCommentsDialog: function(task_id){
+            var global_task_div=$('[data-task-id="'+task_id+'"]');
+          var comm=  $(global_task_div).find('.noOfcomment').html();
+            
+		var dialog_id='task_'+task_id+'_comments_div';
+		if(task_id<1 || $('#'+dialog_id).length>0){
+			$('#'+dialog_id).dialog('moveToTop');
+			return;
+		}
+		$('body').append('<div id="'+dialog_id+'">'+$('#task_comments_template').html()+'</div>');
+		FilocityDialogHelper.dialog('#'+dialog_id, {
+			positionFixed: true
+		});
+		$('#'+dialog_id).dialog('option','title','Task Comments');
+		$('#'+dialog_id).dialog('option','width',500);
+		$('#'+dialog_id).dialog('option','height',460);
+		$('#'+dialog_id).dialog('open');
+		
+		var first_load=true;
+		var listComments=function(){
+			var ajaxLoader=$.ajax({
+				url: _ROOT+'comments/view_by_task_id/'+task_id,
+				dataType: 'JSON',
+				success: function(data){
+					$('#'+dialog_id+' .fc-comments-list').html('');
+					var html='';
+					for(var i in data){
+						html+=FilocityTasksHelper.generateTaskComment({
+							user_id: data[i]['User']['id'],
+							first_name: data[i]['User']['first_name'],
+							photo: _ROOT+'image/profile/'+data[i]['User']['id']+'/small.jpg',
+							comment: data[i]['Comment']['comment'],
+							comment_time: data[i]['Comment']['created']
+						});
+					}
+					$('#'+dialog_id+' .fc-comments-list').append(html);
+					$('[data-count-task-comments="'+task_id+'"]').html(data.length);
+					$('[data-count-task-comments="'+task_id+'"]').val(data.length);
+
+					$('#'+dialog_id).mCustomScrollbar('update');
+					$('#'+dialog_id).mCustomScrollbar('scrollTo','bottom');
+					//$('#'+dialog_id).mCustomScrollbar().mCustomScrollbar('scrollTo','bottom');
+					
+				},
+				error: function(){
+					
+				},
+				complete: function(){
+					if(first_load){
+						$('#'+dialog_id).dialog('option','position','center');
+						first_load=false;
+					}
+					$('#'+dialog_id+' .fc-comment-box').removeAttr('disabled');
+				}
+			});
+		}
+		var addComment=function(){ 
+			var comment_text=$.trim($('#'+dialog_id+' .fc-comment-box').val());
+			if(comment_text==''){
+				return;
+			}
+			$('#'+dialog_id+' .fc-comment-box').val('');
+			$('#'+dialog_id+' .fc-comment-box').attr('disabled','disabled');
+			var data={
+				'data[Comment][comment]':comment_text,
+				'data[Comment][task_id]':task_id
+			};
+			var $ajaxSaver=$.ajax({
+				url: _ROOT+'comments/add',
+				type: 'POST',
+				data: data,
+				dataType: 'JSON',
+				complete: function(data){  
+                                    $(global_task_div).find('.noOfcomment').html(++comm);
+					listComments();
+				}
+			});
+		}
+		$(document).off('keypress','#'+dialog_id).on('keypress','#'+dialog_id,function(e) {
+			if($('#'+dialog_id+' .fc-comment-box').is(':focus') && e.which == 13 && !e.shiftKey) {
+				addComment();
+			}
+		});
+		
+		listComments();
+	},
+	validateBudget: function(ob) {
+			var val = $.trim(ob.value);			
+			if ((val.length && !$.isNumeric(val)) || ($.isNumeric(val) && val <= 0)) {
+				$(ob).val('');
+				return false;
+			}
+			return true;
+		},
+	
+	init: function(){
+		$(function(){
+		
+			FilocityTasksHelper.prepareTaskTemplate();
+			FilocityTasksHelper.prepareTaskCommentsTemplate();
+			
+			$(document).on('click','*[data-show-task]',function(){
+				var task_id=$(this).attr('data-show-task');
+				FilocityTasksHelper.showTaskDialog(task_id);
+				return false;
+			});
+		
+			$(document).on('click','*[data-show-task-comments]',function(){
+				var task_id=$(this).attr('data-show-task-comments');
+				FilocityTasksHelper.showTaskCommentsDialog(task_id);
+				return false;
+			});
+			
+			$('input.task_budget').live('blur keyup', function(e) {
+				FilocityTasksHelper.validateBudget(this);
+			});
+			
+			$('.file1').live('change',function() { 
+              //alert(_ROOT+'/tasks/add_documents');	
+             $(this).parent('#fileupoaddiv').find('.loader').show();			  
+			 $(this).upload(_ROOT+'/tasks/add_documents', function(res) { 
+             $(this).parent('#fileupoaddiv').find('.loader').hide();				
+			    $(this).parent('#fileupoaddiv').append(res);  
+			}, 'html');
+		  });	
+                  
+                  
+                  
+            $('.file2').live('change',function() {                  
+                //alert(_ROOT+'/tasks/add_documents');	
+           var    subtaskid=   $(this).parent.parent(".view-mode").find('.subtask-id').val();
+           alert(subtaskid);
+                $(this).parent('#fileupoaddiv2').find('.loader').show();			  
+                $(this).upload(_ROOT+'/tasks/add_subtasks_documents/'+subtaskid, function(res) { 
+                    $(this).parent('#fileupoaddiv2').find('.loader').hide();				
+                    $(this).parent('#fileupoaddiv2').append(res);  
+                }, 'html');
+            });
+		});
+	}
+	
+}
+FilocityTasksHelper.init();

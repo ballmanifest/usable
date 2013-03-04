@@ -1,0 +1,62 @@
+﻿<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>JavaPowUpload installation for ASP.NET</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <script type="text/javascript" language="javascript">
+        function toggleBlock(id) {
+            if (document.getElementById(id).style.display == 'none') {
+                document.getElementById(id).style.display = 'block';
+            }
+            else {
+                document.getElementById(id).style.display = 'none';
+            }
+        }
+    </script>
+    
+<h3>JavaPowUpload Installation (for PHP)</h3>
+
+
+
+    <ul style="list-style-type:decimal;">
+      <li><b>Extract JavaPowUpload distribution package</b> at web server:
+        <ul>
+        <li>For Windows: Open at Windows Explorer IIS server's root folder (by default it is <b>c:\Inetpub\wwwroot\</b>)</li>
+        <li>For Linux Apache open default webserver root folder, something like <b>/usr/local/apache/htdocs</b></li>
+        <li>Extract JavaPowUpload zip archive to new folder <b>JavaPowUpload</b> inside root folder. You can use any name for folder or place it not in the root. But we using such placement and name as default in this manual. 
+       <br />
+	<span onClick="toggleBlock('placefolder'); return false;" class="imglink">Screenshot</span>
+      <div id="placefolder" style="display: none;">
+        <p class="screenshot">
+            &nbsp;<img src="images/placefolder.png" style="width: 265px; height: 212px" /></p>
+      </div>
+       </li>
+       
+
+    </ul>
+    </li>
+
+    <li>For Windows: <b>Check NTFS permissions for <b>"FileProcessingScripts\PHP\UploadedFiles"</b> folder</b>
+    <ul><li>By default PHP application works under IUSR_&lt;MACHINENAME&gt; user.<br/>
+You should set <b>NTFS "Write", "Read and execute", "Read", "List folders content"</b> permissions for IUSR_&lt;MACHINENAME&gt; user  to <b>"UploadedFiles"</b> folder. <br />
+	<span onClick="toggleBlock('ntfs2000'); return false;" class="imglink">Screenshot</span>
+      <div id="ntfs2000" style="display: none;">
+        <p class="screenshot">
+            &nbsp;<img src="images/phpntfs2000.png" style="width: 480px; height: 593px" /></p>
+      </div></li>
+   
+    
+    </ul>
+    </li>    
+  <li>
+Open at your browser <b>http://localhost/JavaPowUpload/index.htm</b> to run samples
+</li>    
+
+  </ul><br />
+ Note! Remember that the folder <b>UploadedFiles</b> for placing uploaded files is a potential source of vulnerability, therefore always prohibit in server settings scripts execution in it, otherwise intruder can upload and execute malicious script.
+
+
+</body>
+</html>

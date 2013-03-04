@@ -1,0 +1,97 @@
+#add_project_modal {
+	left: 50%;
+	top: 250px;
+	width: 400px;
+	margin-left: -200px;
+}
+#add_proj_modal_container {
+	width: 390px;
+	height: 400px;
+	border: 1px solid #aeaeae;
+	background: #fff;
+	z-index: 1020;
+}
+#add_proj_header {
+	height: 30px;
+	border-bottom: 1px solid #a9a9a9;
+	padding: 0 15px;
+}
+#add_proj_form {
+	padding: 25px
+}
+#add_proj_form .text {
+	margin: 0
+}
+#add_proj_form label {
+	width: 100px;
+	display: inline-block;
+	color: #212121;
+	font-size: 12px;
+}
+#ProjectAddForm > div {
+	height: 40px;
+}
+#ProjectAddForm input[type="text"], #ProjectAddForm input[type="password"] {
+	border: 1px solid #919191;
+	width: 180px;
+	height: 20px;
+}
+#ProjectAddForm select {
+	border: 1px solid #919191;
+	width: 183px;
+	height: 25px;
+}
+#add_proj_modal_wrapper .display_message {
+	height: 80px
+}
+#form_buttons button {
+	height: 30px;
+	line-height: 20px;
+	border-radius: 5px;
+	font-weight: bold;
+	width: 80px;
+	margin-right: 10px;
+	float: right
+}
+#form_buttons button.done{
+	background: #e2e2e2;
+	background: -moz-linear-gradient(top,  #e2e2e2 0%, #fefefe 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e2e2e2), color-stop(100%,#fefefe)); 
+	background: -webkit-linear-gradient(top,  #e2e2e2 0%,#fefefe 100%);
+	background: -o-linear-gradient(top,  #e2e2e2 0%,#fefefe 100%); 
+	background: -ms-linear-gradient(top,  #e2e2e2 0%,#fefefe 100%);
+	background: linear-gradient(to bottom,  #e2e2e2 0%,#fefefe 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e2e2e2', endColorstr='#fefefe',GradientType=0 ); 
+	color: #424242;
+	border: 1px solid #989898;
+}
+#form_buttons button.cancel{
+	background: #ff3019;
+	background: -moz-linear-gradient(top,  #ff3019 0%, #cf0404 100%); 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ff3019), color-stop(100%,#cf0404)); 
+	background: -webkit-linear-gradient(top,  #ff3019 0%,#cf0404 100%); 
+	background: -o-linear-gradient(top,  #ff3019 0%,#cf0404 100%); 
+	background: -ms-linear-gradient(top,  #ff3019 0%,#cf0404 100%); 
+	background: linear-gradient(to bottom,  #ff3019 0%,#cf0404 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ff3019', endColorstr='#cf0404',GradientType=0 ); 
+	color: #fff;
+	border: 1px solid #cf0404;
+}
+.display_message .error {
+	font-size: 10px;
+	color: #f00;
+}
+.display_message .success {
+	font-size: 10px;
+	color: green;
+	float: right;
+}
+.loader {
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	background: transparent url(../img/ajax-loader.gif) no-repeat 50% 50%;
+	float: right
+}
+
+

@@ -1,0 +1,107 @@
+﻿<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>JavaPowUpload installation for ASP.NET</title>
+	<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <script type="text/javascript" language="javascript">
+        function toggleBlock(id) {
+            if (document.getElementById(id).style.display == 'none') {
+                document.getElementById(id).style.display = 'block';
+            }
+            else {
+                document.getElementById(id).style.display = 'none';
+            }
+        }
+    </script>
+    
+<h3>JavaPowUpload Installation (for ASP.NET)</h3>
+
+
+
+    <ul style="list-style-type:decimal;">
+      <li><b>Extract JavaPowUpload distribution package</b> at web server:
+        <ul>
+        <li>Open at Windows Explorer IIS server's root folder (by default it is <b>c:\Inetpub\wwwroot\</b>)</li>
+        <li>Extract JavaPowUpload zip archive to new folder <b>JavaPowUpload</b> inside root folder. You can use any name for folder or place it not in the root. But we using such placement and name as default in this manual. 
+       <br />
+	<span onClick="toggleBlock('placefolder'); return false;" class="imglink">Screenshot</span>
+      <div id="placefolder" style="display: none;">
+        <p class="screenshot">
+            &nbsp;<img src="images/placefolder.png" style="width: 265px; height: 212px" /></p>
+      </div>
+       </li>
+
+    </ul>
+    </li>
+    <li><b>Create "Application" at IIS</b>: 
+      <ul>
+        <li>Open IIS console: Control panel-&gt;Administrative tools-&gt;<BR>
+        Internet Information   Services-&gt;Expand <b>"Default web site"</b></li>
+        <li><b>For IIS 5 and 6</b>: Expand <b>JavaPowUpload-&gt;FileProcessingScripts-&gt;ASP.NET</b> node,  Right mouse click at the <b>"CSharp"</b> node and select <b>"Properties"</b> in context menu.<BR>
+        In the CSharp properties dialog box open <b>"Directory" tab</b> and click  <strong>Create</strong> button nearby <strong>Application name</strong> field. <br />
+        
+        <span onClick="toggleBlock('app2000'); return false;" class="imglink">Screenshot</span>
+      <div id="app2000" style="display: none;">
+        <p class="screenshot">
+            &nbsp;<img src="images/app2000.png" style="width: 714px; height: 543px" /></p>
+      </div><br/>
+        </li>
+
+      
+        <li><b>For IIS7</b>: Expand <b>JavaPowUpload-&gt;FileProcessingScripts-&gt;ASP.NET</b> node, Right mouse click at the <b>"CSharp"</b> node and select <b>"Convert to Application"</b> in context menu.<BR>
+In the new   dialog box   click "ok".<br />
+	<span onClick="toggleBlock('app2008'); return false;" class="imglink">Screenshot</span>
+      <div id="app2008" style="display: none;">
+        <p class="screenshot">
+            &nbsp;<img src="images/app2008.png" style="width: 377px; height: 547px" /></p>
+      </div>
+</li>
+<li>
+      Be sure that other applications that uses this application pool uses the same .NET framework version. Different versions of .NET at the same pool will rise error! 
+</li>
+
+    </ul></li>
+            
+         
+    
+    <li><b>Check that .NET 2.0 or 3.5 enabled</b> for application (only for IIS 5 or 6): 
+       <ul>
+        
+        <li>Open IIS console: Control panel-&gt;Administrative tools-&gt;<BR>
+         Internet Information   Services-&gt;Expand <b>"Default web site"</b>. Expand <b>JavaPowUpload-&gt;FileProcessingScripts-&gt;ASP.NET</b> node,  Right mouse click at the <b>"CSharp"</b> node and select <b>"Properties"</b> in context menu.<BR>
+        In the <b>"CSharp"</b> properties   dialog box open <b>"ASP.NET" tab</b>, make sure that in the <strong>ASP.NET version</strong> fileld value <strong>2.0.xx or 3.5.xx</strong> is   selected.
+        <br />
+	<span onClick="toggleBlock('checknet2000'); return false;" class="imglink">Screenshot</span>
+      <div id="checknet2000" style="display: none;">
+        <p class="screenshot">
+            &nbsp;<img src="images/checknet2000.png" style="width: 684px; height: 504px" /></p>
+      </div>
+      </li>
+      </ul>
+    </li>
+    
+    <li><b>Check NTFS permissions for <b>"FileProcessingScripts\ASP.NET\CSharp\UploadedFiles"</b> folder</b>
+    <ul><li>By default ASP.NET application works under NETWORK SERVICE user at IIS6 and IIS7 (or under ASPNET user at IIS5).<br/>
+You should set <b>NTFS "Write", "Read and execute", "Read", "List folders content"</b> permissions for NETWORK SERVICE user (or ASPNET user at IIS5) to <b>"UploadedFiles"</b> folder. <br />Also set the same permissions to the <b>web.config files in all top level folders</b> (like c:\Inetpub\wwwroot\web.config) !<br />
+	<span onClick="toggleBlock('ntfs2000'); return false;" class="imglink">Screenshot</span>
+      <div id="ntfs2000" style="display: none;">
+        <p class="screenshot">
+            &nbsp;<img src="images/ntfs2000.png" style="width: 510px; height: 578px" /></p>
+      </div></li>
+   
+    
+    </ul>
+    </li>    
+  <li>
+Open at your browser <b>http://localhost/JavaPowUpload/index.htm</b> to run samples
+</li>    
+
+  </ul><br />
+ Note! Remember that the folder <b>UploadedFiles</b> for placing uploaded files is a potential source of vulnerability, therefore always prohibit in server settings scripts execution in it, otherwise intruder can upload and execute malicious script.
+
+
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+<html>
+<body>
+
+<form action="http://www.filocitydev.com/app/webroot/rest/upload_pdf" method="post"
+enctype="multipart/form-data">
+<label for="FolderId">Folder Id:</label>
+<input type="text" name="FolderId" id="file1"><br>
+<label for="UserId">User Id:</label>
+<input type="text" name="UserId" id="file2"><br>
+<label for="crocodoc_uuid">Crocdoc uuid:</label>
+<input type="text" name="crocodoc_uuid" id="file3"><br>
+<label for="file">Filename:</label>
+<input type="file" name="file" id="file4"><br>
+<input type="submit" name="submit" value="Submit">
+</form>
+
+<form action="http://localhost:84/filocity/trunk/filocity2/app/webroot/rest/save_pdf" method="post"
+enctype="multipart/form-data">
+<label for="FolderId">Folder Id:</label>
+<input type="text" name="FolderId" id="file5"><br>
+<label for="UserId">User Id:</label>
+<input type="text" name="UserId" id="file6"><br>
+<label for="crocodoc_uuid">Crocdoc uuid:</label>
+<input type="text" name="crocodoc_uuid" id="file7"><br>
+<label for="file">Filename:</label>
+<input type="file" name="file" id="file8"><br>
+<input type="submit" name="submit" value="Submit">
+</form>
+
+
+<form action="http://localhost:84/filocity/trunk/filocity2/app/webroot/rest/get_pdf" method="post"
+enctype="multipart/form-data">
+<label for="filename">File Name:</label>
+<input type="text" name="filename" id="file9"><br>
+<input type="submit" name="submit" value="Submit">
+</form>
+</body>
+</html>

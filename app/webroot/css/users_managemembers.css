@@ -1,0 +1,133 @@
+#manage_members{
+	padding: 10px 20px;
+}
+h3.header{
+	color: #1f5175;
+	font-size: 16px;
+	margin-top: 0;
+}
+
+form{
+	font-family: "Verdana", "Geneva", sans-serif;
+	font-size: 11px;
+}
+
+img.profile_picture{
+	width: 64px;
+	height: 64px;
+	float: left;
+	padding: 5px;
+	margin-right: 15px;
+	margin-top: -2px;
+	border: 1px solid #DDD;
+}
+
+img.big_profile{
+	width: auto;
+	height: 128px;
+	display: block;
+	margin: 15px auto;
+}
+
+.clearfix{
+	display: block;
+}
+.member{
+	margin-bottom: 15px;
+	padding-bottom: 15px;
+	border-bottom: 1px solid #EEE;
+	line-height: 1.5em;
+	margin-right: 20px;
+}
+
+.member .role{
+	text-transform: uppercase;
+	font-size: 10px;
+}
+.member .administrator.role{
+	color: red;
+}
+.member .unactivated.role{
+	color: #AAA;
+}
+
+.resend_auth_mail{
+	color: #6ccae2;
+}
+
+.resend_auth_mail:hover{
+	color: #666;
+}
+
+.row-fluid > div[class^="span"]:first-child{
+	border-right: 1px solid #DDD;
+}
+
+form > div.input:nth-child(odd){
+	background: #EEE;
+}
+
+form input[type="text"]{
+	width: 48%;
+}
+
+form > div.input{
+	padding: 10px;
+}
+
+form div.input label{
+	width: 50%;
+	display: inline-block;
+}
+
+form select#UserCountryId{
+	width: 50%;
+}
+
+form .text, form .select{
+	margin: 0;
+}
+#frame_container{
+	width: 100%;
+}
+iframe#member_frame{
+	border: none;
+	width: inherit;
+	height: 100%;
+}
+
+a.add_member, a.edit{
+	transition: .3s;
+	-webkit-transition: .3s;
+	-o-transition: .3s;
+	-moz-transition: .3s;
+	text-decoration: none;
+}
+
+a.add_member{
+	text-align: center;
+	display: block;
+	padding: 20px;
+	margin: 0 20px;
+	border: 1px solid #DDD;
+	background: #42C0FB;
+	color: #FFF;
+}
+
+a.add_member:hover{
+	background: #38B0DE;
+}
+
+a.edit{
+	text-transform: uppercase;
+	background: #802A2A;
+	color: #FFF;
+	display: block;
+	padding: 5px 10px;
+	float: right;
+	border-radius: 4px;
+}
+
+a.edit:hover{
+	background: #333;
+}

@@ -1,0 +1,435 @@
+a {
+    color: #5DA1D1;
+}
+#contact_actions_container{
+	border-bottom:1px solid #CBE1F2;
+	padding:0;
+	margin:0 10px 10px 10px;
+	padding-bottom:10px;
+}
+#contact_actions_container a, a.button-link{
+	height:24px;
+	line-height:24px;
+	color:#ffffff;
+	float:left;
+	padding:0 5px 0 24px;
+	margin-right:5px;
+	text-decoration:none;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+a.button-link{
+	background:#5DA1D1;
+	padding-left:5px;
+}
+a.button-link:hover{
+	background:#A8D7FA;
+}
+
+#contact_actions_container #add_contact_link{
+	background:#5DA1D1 url("../img/contacts-tab-icons.png") no-repeat 0 -24px;
+}
+#contact_actions_container #add_group_link{
+	background:#5DA1D1 url("../img/contacts-tab-icons.png") no-repeat 0 0;
+}
+#contact_actions_container #import_contacts_link{
+	background:#5DA1D1 url("../img/contacts-tab-icons.png") no-repeat 0 -48px;
+}
+#contact_actions_container a:hover{
+	background-color:#A8D7FA !important;
+}
+.left-container{
+	border-top:1px solid #CBE1F2;
+	padding:5px 0;
+	clear:both;
+}
+.left-container.first{
+	border:0;
+}
+.left-container-title{
+	color: #1F5175;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 12px;
+	border-bottom:1px solid #CBE1F2;
+	padding:0 0 5px 0;
+	margin-bottom:5px;
+	clear:both;
+}
+.contact-group a{
+	padding:2px;
+	float:left;
+	width:176px;
+	display:block;
+}
+.contact-group li{
+	clear:both;
+}
+.current-contact-group{
+	background:#5DA1D1;
+	color:#ffffff;
+}
+#contact_left_container{
+	float:left;
+	width:180px;
+	padding:0 10px;
+	border-right:1px solid #CBE1F2;
+	min-height:895px;
+}
+#contact_list_container{
+	border-left:1px solid #CBE1F2;
+	border-right:1px solid #CBE1F2;
+	width:320px;
+	float:left;
+	margin-left:-1px;
+	padding:0 10px;
+}
+.right{
+	float:right;
+}
+.clear{
+	clear:both;
+}
+#contact_group_info_container{
+	float:left;
+	border-left:1px solid #CBE1F2;
+	margin-left:-1px;
+	padding:0 0 0 10px;
+	width:425px;
+	min-height:895px;
+}
+#contact_group_count{
+	clear:both;
+	font-weight:bold;
+}
+#contact_group_description{
+	padding: 10px 0;
+	clear:both;
+}
+#ajax_loading_indicator{
+	background:url(../img/ajax-loader-snake-white.gif);
+	width:16px;
+	height:16px;
+	position:absolute;
+	top:0;
+	left:0;
+	display:none;
+}
+.list-style-1 li{
+	height:20px;
+	line-height:20px;
+	padding:0 5px;
+	display:block;
+	clear:both;
+	color:#5DA1D1;
+	font-size:12px;
+	white-space:nowrap;
+	overflow:hidden;
+	position:relative;
+	border-bottom:1px solid #DDDDDD;
+    border-top:1px solid #FFFFFF;
+	background:#F4F4F4;
+}
+#contact_list{
+	border:1px solid #CBE1F2;
+	background:#f8f8f8;
+}
+#contact_list .scroller{
+	width:318px;
+	height:800px;
+	display:block;
+	position:relative;
+}
+#contact_list ul{
+	float:left;
+	display:block;
+	clear:both;
+}
+#contact_list ul li{
+	width:298px;
+	float:left;
+}
+#contact_list .mCS_no_scrollbar li{
+	width:308px;
+}
+#contact_list #contact_links{
+	right:12px;
+}
+#contact_list .mCS_no_scrollbar #contact_links{
+	right:2px;
+}
+#contact_list ul li.ui-selected,#contact_list ul li.ui-selecting{
+	background:#9ac5e5;
+	color:#ffffff;
+}
+#contact_list ul li.ui-unselecting{
+	background:transparent;
+}
+#contact_list ul li.mouseenter{
+	background:#a8d7fa;
+	color:#ffffff;
+	cursor:pointer;
+}
+#contact_links{
+	display:block;
+	position:absolute;
+	right:0;
+	top:0;
+}
+#contact_links a{
+	border:1px solid #ffffff;
+	background:#5DA1D1;
+	color:#ffffff;
+	text-decoration:none;
+	padding:0 2px;
+}
+#contact_links a:hover{
+	background:#9AC5E5;
+	color:#ffffff;
+}
+
+.ui-dialog{
+	background: url("../img/filocity-modal-bg.png") repeat-x scroll 0 0 #E6EFF6;
+	padding:10px;
+	overflow:visible;
+	/*
+	-moz-box-shadow: 0 0 15px #444;
+	-webkit-box-shadow: 0 0 15px #444;
+	box-shadow: 0 0 15px #444;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=15, Direction=0, Color='#444444')";
+	filter: progid:DXImageTransform.Microsoft.Shadow(Strength=15, Direction=0, Color='#444444');
+	*/
+	border:1px solid #5DA1D1;
+	position:fixed;
+	overflow:visible !important;
+	float:none;
+	color:#61819A;
+}
+.ui-dialog-content{
+	position:relative;
+}
+.ui-dialog-titlebar{
+	position:relative;
+	overflow:visible;
+	background:#5DA1D1;
+	padding:5px;
+	font-weight:bold;
+	font-size:14px;
+	font-family:arial;
+	color:#ffffff;
+	cursor:move;
+	overflow:visible !important;
+}
+a.ui-dialog-titlebar-close {
+	top:-30px;
+	right:-30px;
+	width:40px;
+	height:40px;
+	background:red;
+	overflow:hidden;
+	position:absolute;
+	text-align:center;
+	color:#ffffff;
+	background:transparent url('../img/modal-close-button.png') no-repeat 0 0;
+}
+a.ui-dialog-titlebar-close:hover{
+	background:transparent url('../img/modal-close-button.png') no-repeat -40px 0;
+}
+
+.contact_dialog p{
+	float:left;
+	width:220px;
+	padding-left:20px;
+}
+.group_dialog label,
+.add_to_a_group_dialog label,
+.import_contacts_dialog label,
+.contact_dialog label{
+	color: #61819A;
+	clear:both;
+    font-size: 13px;
+    font-weight: bold;
+	padding-top:10px;
+	display:block;
+}
+.group_dialog input,
+.group_dialog textarea,
+.add_to_a_group_dialog input,
+.import_contacts_dialog input,
+.add_to_a_group_dialog select,
+.import_contacts_dialog select,
+.contact_dialog input,
+.contact_dialog select{
+	padding:5px;
+	width:208px;
+	border: 1px solid #D8D9DB;
+    float: left;
+	outline:none;
+}
+
+.add_to_a_group_dialog label,
+.import_contacts_dialog label,
+.group_dialog .label{
+	width:66px;
+	padding:0;
+	line-height:28px;
+	padding-top:10px;
+    float: left;
+}
+.add_to_a_group_dialog label,
+.import_contacts_dialog label{
+	width:111px;
+}
+.add_to_a_group_dialog input,
+.import_contacts_dialog input,
+.add_to_a_group_dialog select,
+.import_contacts_dialog select{
+	margin-top:10px;
+}
+.group_dialog .input{
+	width:277px;
+	margin-top:10px;
+	float:left;
+}
+.group_dialog input,
+.group_dialog textarea{
+	float:none;
+	width:auto;
+}
+.filocity-modal-button{
+    background: url("../img/filocity-modal-button.png") repeat-x scroll 0 0 transparent;
+    border: 0 none;
+    color: #FFFFFF;
+    cursor: pointer;
+    float: left;
+    font-weight: bold;
+    height: 28px;
+    margin-top: 10px;
+    padding: 0 5px;
+	width:auto !important;
+}
+.filocity-modal-button.pink{
+	background: url("../img/filocity-modal-button.png") repeat-x scroll 0 -28px transparent;
+}
+.ui-widget-overlay{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background:#ffffff;
+}
+
+.import_contact_file_name{
+	border: 1px solid #D8D9DB;
+    color: #000000;
+    float: left;
+    font-size: 12px;
+    margin-right: 5px;
+    margin-top: 11px;
+    padding: 5px;
+    width: 121px;
+}
+.contacts-list-actions li{
+	display:none;
+}
+.contacts-list-actions li.active{
+	display:block;
+}
+.contact_info_dialog{
+	padding:10px 0;
+}
+.contact_info_dialog .left{
+	float:left;
+}
+
+.contact_info_dialog .label{
+	float:left;
+	font-weight:bold;
+	width:110px;
+	padding-right:5px;
+	text-align:left;
+}
+.contact_info_dialog .row{
+	padding-bottom:10px;
+	clear:both;
+	float:left;
+	width:500px;
+}
+.contact_info_dialog .link{
+	text-align:center;
+}
+.contact_info_dialog .info{
+	float:left;
+	width:380px;
+}
+.contact_info_dialog .photo{
+	width:120px;
+	height:120px;
+	line-height:120px;
+	vertical-align:middle;
+	background:blue;
+	margin-bottom:10px;
+}
+#contact_info_container .row{
+	clear:both;
+	float:left;
+	padding-bottom:5px;
+}
+#contact_info_container .label{
+	float:left;
+	width:110px;
+	font-weight:bold;
+}
+#contact_info_container .info{
+	float:left;
+	width:190px;
+}
+.contact_groups_dialog{
+	background:#ffffff;
+}
+#contacts-filter{
+	border: 1px solid #D8D9DB;
+    float: left;
+    outline: none;
+    padding: 3px;
+    width: 208px;
+}
+#contacts-filter-label{
+	float:left;
+	padding-right:10px;
+	height:24px;
+	line-height:24px;
+	font-weight:bold;
+}
+#new_user_group
+{
+display:none;
+position: relative;
+top: -13px;
+left: 150px;
+
+margin-right:1%;
+display:inline-block;
+text-decoration:none;
+color:black;
+font-size:10px;
+}
+.selected_contacts_action
+{
+font-size:10px;
+color:black;
+}
+#contact_group_links_container #groups_edit_links
+{
+margin-left: 67px;
+width: 124px;
+margin-top:6px;
+
+
+}
+#groups_edit_links a
+{
+color:black;
+}

@@ -1,0 +1,227 @@
+#share_modal_container {
+	background-color: #fff;
+	padding: 5px;
+	left : 0;
+}
+#contacts_and_groups_container  {
+	display: none;
+	background: #fff;
+	padding: 5px;
+	left: 0px;
+}
+#share_modal_header h2 {
+	color: #000000;
+    font-size: 25px;
+    font-weight: normal;
+    margin: 0 0 10px;
+}
+#share_modal_tabs {
+	border-bottom: 1px solid #a0a0a0;
+	height: 34px;
+}
+.share_modal_tabs_container {
+	height: 34px;
+}
+.share_modal_tabs_container li {
+	margin-right: 10px;
+	margin-top: 10px;	
+}
+.tabs_tab {
+	padding: 10px;
+	width: auto;
+	color: #fff;
+	text-align: center;
+	background: #cfcfcf;
+	background: -moz-linear-gradient(top,  #cfcfcf 0%, #cdcdcd 49%, #bebebe 100%); 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#cfcfcf), color-stop(49%,#cdcdcd), color-stop(100%,#bebebe)); 
+	background: -webkit-linear-gradient(top,  #cfcfcf 0%,#cdcdcd 49%,#bebebe 100%); 
+	background: -o-linear-gradient(top,  #cfcfcf 0%,#cdcdcd 49%,#bebebe 100%); 
+	background: -ms-linear-gradient(top,  #cfcfcf 0%,#cdcdcd 49%,#bebebe 100%);
+	background: linear-gradient(to bottom,  #cfcfcf 0%,#cdcdcd 49%,#bebebe 100%); 
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cfcfcf', endColorstr='#bebebe',GradientType=0 );
+	border-radius: 5px 5px 0 0;
+	text-decoration: none;
+	font-size: 11px;
+	text-decoration: none;
+	cursor: pointer;
+	font-weight: bold
+}
+.tabs_tab:hover {
+	text-decoration: none
+}
+.tabs_tab.active_tab {
+	background: #6ebffa;
+	background: -moz-linear-gradient(top,  #6ebffa 0%, #39a2ec 54%, #0980d6 100%); 
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#6ebffa), color-stop(54%,#39a2ec), color-stop(100%,#0980d6)); 
+	background: -webkit-linear-gradient(top,  #6ebffa 0%,#39a2ec 54%,#0980d6 100%);
+	background: -o-linear-gradient(top,  #6ebffa 0%,#39a2ec 54%,#0980d6 100%); 
+	background: -ms-linear-gradient(top,  #6ebffa 0%,#39a2ec 54%,#0980d6 100%); 
+	background: linear-gradient(to bottom,  #6ebffa 0%,#39a2ec 54%,#0980d6 100%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#6ebffa', endColorstr='#0980d6',GradientType=0 ); 
+}
+#quick_note_find_share_panel {
+	
+}
+#quick_note_panel h4, #find_share_panel h4, #display_selected_users h4, #existing_shares_tab_panel h4 {
+	color: #000;
+	margin: 10px 0 5px 0;
+	font-weight: bold;
+	width: 505px;
+}
+#quick_note_panel h4 {
+	margin-top: 8px;
+}
+.quick_note_box {
+	width: 550px;
+	height: 25px;
+	padding: 3px;
+	border: 1px solid #a8a8a8;
+	border-radius: 2px;
+}
+.share_target_input {
+	height: 25px;
+	padding: 3px;
+	border: 1px solid #a8a8a8;
+	border-radius: 2px;
+	width: 494px;
+}
+.add_share {
+	margin: 0 0 4px 2px;
+}
+.view_all_contacts_link {
+	color: #683eef;
+	font-size: 13px;
+}
+#display_selected_users {
+	height: 120px;
+	overflow: auto;
+	border-bottom: 1px dashed #e0e0e0;
+	margin-bottom: 5px;
+}
+#display_existing_users  {
+	overflow: auto;
+	border-bottom: 1px dashed #e0e0e0;
+	margin-bottom: 5px;
+}
+#display_existing_users {
+	height: 270px;
+	overflow: auto;
+}
+.file_name_to_share {
+	color: #5861CF;
+}
+.selected_users_list, .existing_users_list { 
+	border-collapse:collapse 
+}
+.selected_users_list thead {
+	background-color: #fff;
+}
+.selected_users_list thead tr {
+	border-bottom: 1px dashed #e0e0e0;
+	height: 20px;
+}
+.existing_users_list thead {
+	background-color: #ebebeb;
+	height: 30px;
+}
+.existing_users_list thead tr {
+	height: 30px;
+}
+.selected_users_list thead th input{
+	margin-top: 5px;
+	margin-left:0;
+}
+.selected_users_list tbody tr, .existing_users_list tbody tr {
+	height: 15px;
+	vertical-align: middle;
+	border-bottom: 1px dashed #e0e0e0
+}
+.selected_users_list tbody td, .existing_users_list tbody td {
+	text-align: center;
+	vertical-align: middle;
+	font-size: 12px;
+}
+.selected_users_list tbody td input {
+	margin-left: 0px
+}
+.delete_icon {
+	margin-top: 5px;
+	text-decoration: none;
+	cursor: pointer;
+	color: #f00;
+	background: transparent url(../img/minus_icon.png) no-repeat 0 0;
+	width: 16px;
+	height: 16px;
+	display: inline-block
+}
+.delete_icon.deleting, #display_existing_users.loading_content {
+	background: transparent url(../img/ajax-loader.gif) no-repeat 50% 50% !important;
+}
+.email_icon {
+	margin-top: 5px;
+	margin-left: 3px;
+	text-decoration: none;
+	cursor: pointer;
+	width: 22px;
+	height: 18px;
+	display: inline-block;
+	background: transparent url(../img/mail_icon.png) no-repeat 0 0;
+}
+.selected_users_list tbody td.user_name, .existing_users_list tbody td.user_name {
+	text-align:left;
+	padding-left:3px
+}
+.share_btn, .cancel_btn {
+	width: 60px;
+	height: 30px;
+	background-color: #3099e5;
+	border-radius: 5px;
+	border: 1px solid transparent;
+	color: #fff;
+	cursor: pointer;
+}
+.cancel_btn, .inactive_button {
+	background-color: #666666;
+	margin-left: 10px;
+}
+span.add-on {
+	font-size: 14px
+}
+.notification_share_cancel_panel {
+	width: 100%
+}
+.notification_share_cancel_panel label {
+	margin-top: 5px;
+	display: inline-block;
+}
+#share_modal_container ul.search_result_container {
+	background-color: #FFFFFF;
+	border: 1px solid #CCCCCC;
+	height: 162px;
+	left: 5px;
+	overflow-y: scroll;
+	position: absolute;
+	top: 226px;
+	width: 511px;
+	max-height: 196px;
+}
+#find_share_panel {
+	height: 65px;
+	clear: both;
+}
+li.add_to_share {
+	display: none !important;
+}
+p.error_message {
+	color: #f00;
+	font-size: 12px;
+}
+h4.share_with a {
+	color:#414dfb;
+	text-decoration: underline;
+	cursor: pointer;
+	font-weight: bold;
+}
+#fancybox-content > div {
+	overflow: hidden !important;
+}

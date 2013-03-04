@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+File containing files to download information for some samples.
+Can be assigned inside <APPLET>...</APPLET> tag using following HTML code:
+<param name="Download.DataURL" value="download.xml" /> 
+
+-->
+<download>
+	<folder name="Images">
+		<folder name="Monkeys">
+			<file name="monkey.jpg" id="1" length="140839" description="Monkey photo1">
+				<url>images/monkey.jpg</url>
+			</file>
+			<file name="monkey2.jpg" id="2" length="465202" description="Monkey photo2">
+				<url>images/monkey2.jpg</url>
+			</file>			
+		</folder>
+		<file name="Fish.zip" id="3" length="398549" uncompress="true" delete="true" description="Archive will be uncopressed and removed after download" >
+			<url>Extra/fish.zip</url>
+		</file>		
+	</folder>	
+</download>

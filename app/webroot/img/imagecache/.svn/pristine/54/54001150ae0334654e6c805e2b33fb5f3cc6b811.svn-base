@@ -1,0 +1,8 @@
+body{
+	background: none;
+	font-family: "lucida grande",tahoma,verdana,arial,sans-serif;
+}
+
+.clearfix{
+	display: block;
+}

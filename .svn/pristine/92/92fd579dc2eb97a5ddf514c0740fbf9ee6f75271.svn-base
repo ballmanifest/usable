@@ -1,0 +1,29 @@
+.purchaseLogs{
+	padding:10px;
+}
+th{
+	background:#F2F2F2;
+	padding:4px;
+	border-color:#D0D0D0;
+	border-style:groove;
+}
+tbody tr th a, td a{
+	text-decoration:none;
+	color:#000 !important;
+} 
+tbody tr td{
+	padding:4px;
+	border-color:#D0D0D0;
+	border-style:groove;
+}
+.records{
+	float:left;
+}
+.paging{
+	display:inline-block;
+	margin-left:500px;
+}
+.actions a{
+	text-decoration:none;
+	color:#000 !important;
+}

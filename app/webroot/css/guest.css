@@ -1,0 +1,40 @@
+#interactive  {
+	width: 990px;
+	height: 560px;
+}
+.nav_section_title {
+	margin: 0;
+	margin: 10px 15px;
+	color: #454040;
+	padding: 3px;
+	background-color: rgba(180, 215, 241, 0.5);
+}
+.document_section_title {
+	color: #454040;
+	padding: 3px;
+	background-color: rgba(180, 215, 241, 0.5)
+}
+.document_list {
+	width: 100%
+}
+#detail_view, #directory_dd_n_explorer {
+	height: 525px;
+	min-height: 0 !important;
+}
+#gallery_item_container {
+	height: 425px;
+}
+.shared_document_list_container {
+	margin: 0px 20px;
+	background: #fff;
+	overflow: auto
+}
+a {
+	text-decoration: none !important;
+}
+.list_view_each_item .rolling_container .roll_over_file_processing span {
+	visibility: hidden;
+}
+#detail_view_content_wrapper {
+	padding-right: 15px !important;
+}

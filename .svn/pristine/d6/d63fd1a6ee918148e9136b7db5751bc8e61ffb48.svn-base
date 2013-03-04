@@ -1,0 +1,4 @@
+.upload-file{
+	opacity:100px;
+    width: 170px;
+}

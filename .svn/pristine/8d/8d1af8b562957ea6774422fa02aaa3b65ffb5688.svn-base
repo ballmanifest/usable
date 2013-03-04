@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+XML scheme of XML file that contains files to download info.
+
+-->
+
+<!ELEMENT download (folder,file)>
+<!ATTLIST download
+	totalFileSize NMTOKEN #IMPLIED
+>
+<!ELEMENT file (url)>
+<!ATTLIST file
+	name NMTOKEN #REQUIRED
+	length NMTOKEN #IMPLIED
+	id ID #IMPLIED
+	uncompress NMTOKEN #IMPLIED
+	delete NMTOKEN #IMPLIED>
+<!ELEMENT folder (file|folder)*>
+<!ATTLIST folder name NMTOKEN #REQUIRED>
+<!ELEMENT url (#PCDATA)>

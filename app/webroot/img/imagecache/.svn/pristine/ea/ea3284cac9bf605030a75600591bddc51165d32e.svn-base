@@ -1,0 +1,99 @@
+.pricing_modal_container {
+	margin: 10px;
+}
+.no_records_found {
+	background: #bce5f9 url(../img/info-icon.png) no-repeat 20px 10px;
+	border: 1px solid #D4BA1F;
+    border-radius: 8px 8px 8px 8px;
+    color: #0050A9;
+    height: 30px;
+    line-height: 30px;
+    padding: 10px 60px;
+}
+.customer_support {
+	margin-top: 12px;
+	color: #3673ac;
+}
+.customer_billing_info p, .customer_support p {
+	margin: 5px;
+}
+.customer_billing_info p a, .customer_support p a {
+	color: #3673ac;
+}
+.customer_billing_info p a:hover, .customer_support p a:hover {
+	text-decoration: underline
+}
+/**
+*	Confirm Block CSS Start
+*/
+#modal_overlay {
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	background-color: rgba(0, 0, 0, 0.4);
+	z-index: 200;
+}
+.confirm_window {
+	width: 280px;
+	left: 50%;
+	margin-left: -140px;
+	top: 30px;
+	border: 1px solid rgba(0,0,0,0.5);
+	height: 100px;
+	z-index: 2000;
+	overflow: hidden;
+	background: #fff;
+	text-align: center;
+	font-size: 13px;
+	border-radius: 5px;
+}
+.confirm_window h5 {
+	background: #376599;
+	margin: 0;
+	height: 25px;
+	line-height: 25px;
+	color: #fff;
+	padding-left: 10px;
+	margin-bottom: 10px;
+	text-align: left;
+	font-size: 13px;
+}
+.confirm_window h5 span {
+    background-color: #1F395A;
+    border-radius: 16px 16px 16px 16px;
+    float: right;
+    font-size: 8px;
+    height: 16px;
+    line-height: 15px;
+    margin: 3px;
+    text-align: center;
+    width: 16px;
+	cursor: pointer;
+}
+.confirm_window .btn-danger {
+    background-color: #CC4036;
+    background-image: linear-gradient(to bottom, #DC4E44, #B32B21);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    color: #FFFFFF;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	padding: 2px 15px;
+	margin-top: 10px;
+	font-size: 12px;
+}
+.confirm_window .btn-success {
+    background-color: #5BB75B;
+    background-image: linear-gradient(to bottom, #62C462, #51A351);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    color: #FFFFFF;
+    font-size: 12px;
+    margin-top: 10px;
+    padding: 2px 15px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+	font-size: 12px;
+}
+.confirm_window .btn-success {
+	float: none
+}

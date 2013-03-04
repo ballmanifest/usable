@@ -1,0 +1,14 @@
+<div id="registration_panel_package_info">
+	<div class="heading_about"><?php echo strtoupper($package['Package']['public_name']);?><p class="small_heading">ACCOUNT</p></div>
+	<div class="package_size"><?php echo $package['Package']['storage'];?>GB</div>
+	<div class="descritions_paragraph">
+		<p><?php echo $package['Package']['description'];?></p>
+	</div>
+	<ul class="features">
+		<li>This is a <?php echo $package['Package']['max_member'];?> user account.</li>
+		<li>Unlimited projects.</li>
+	</ul>
+	<div class="change_package">
+		<?php echo $this->Html->link('CHANGE<br>PACKAGE', 'http://www.filocity.com/pricing/', array('escape' => false));?>
+	</div>
+</div>

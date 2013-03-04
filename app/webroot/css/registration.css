@@ -1,0 +1,403 @@
+#wrapper_to_container_elements {
+	min-height : 705px !important;
+}
+#flashMessage.message {
+	/*display: none*/
+}
+#wrapper_to_container_elements {
+	padding-top: 0 !important;
+}
+#registration_form_container {
+	margin: 0 25px;
+	width: 700px
+}
+#link_header a.highlight, #link_header ul {
+    position: absolute;
+    top: 13px;
+}
+a.highlight {
+    color: #225478;
+    font-family: Arial,Verdana;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+}
+.registration_form_wrapper {
+	background: transparent url(../img/features-text-bg.png) repeat-y 100% 0;
+}
+.reg_form_header {
+	height : 100px;
+	padding-top: 20px
+}
+.reg_form_header h1 {
+	font-size: 20px;
+	font-weight: bold;
+	word-spacing: -2px;
+	margin: 3px 0;
+}
+.reg_form_heading {
+	color: #204A68;
+}
+.reg_form_title {	
+	color: #6AA9D6;
+}
+.reg_form_note, .note_to_login_info {
+	font-size : 12px;
+	color: gray
+}
+.reg_form_note strong, .form_section label, .caption a {
+	color: #5A5A5A;
+}
+.reg_form_sections .form_section {
+	float: left;
+	width:340px;
+}
+.login_info, .personal_info_section {
+	height: 170px;
+}
+.form_section div.input {
+	height: 40px;
+	position: relative;
+}
+.note_to_login_info {
+	margin-bottom: 28px
+}
+.form_section label {
+	font-size: 12px;
+	width: 125px;
+	display: inline-block;
+	font-weight: bold
+}
+.form_section input[type="text"], .form_section input[type="password"], .form_section select {
+	border: 1px solid #CCC;
+	height: 20px;
+	width: 188px;
+	/*position: absolute*/
+}
+.form_section select {
+	height : 23px
+}
+#UserSecurityCode {
+	width: 100px;
+	display: inline
+}
+#UserCardExpirationDateMonth, #UserCardExpirationDateYear {
+	width: 58px;
+	display: inline
+}
+div.password label {
+	line-height: 12px;
+}
+.security_code_holder {
+	width: 310px;
+	height: 40px
+}
+.security_code_img {
+	float: right
+}
+.section_header {
+	color: #333;
+	margin-bottom: 25px;
+	font-size:14px;
+	font-weight:bold;
+}
+.has_personal_address {
+	width: 250px;
+}
+.is_corporate_account {
+    margin-top: 15px;
+    text-align: center;
+    width: 314px;
+}
+.is_agreed {
+	bottom: 0;
+    clear: both;
+    height: 15px;
+    left: 0;
+    padding-top: 15px;
+    position: absolute;
+    text-align: center;
+    width: 340px;
+}
+.form_section .input.checkbox {
+	height: 40px;
+	line-height: 16px;
+}
+.caption {
+	color: gray;
+    font-size: 11px;
+    font-style: italic;
+}
+div.submit input[type="submit"] {
+	background: transparent url(../img/reg_submit.png) no-repeat 0 0;
+	color: #fff;
+	border : none;
+	width: 105px;
+	height: 28px;
+	font-family: Arial;
+	font-size: 14px;
+	text-transform: uppercase;
+	margin: 15px 25px 5px 10px;
+	float: right;
+}
+div.error-message {
+	color: #f00;
+	height: 20px;
+	line-height: 20px;
+	text-align: center;
+	width: 376px;
+}
+div.input.error div.error-message {
+	left: 125px;
+    position: absolute;
+    text-align: left;
+    top: 17px;
+    width: 188px;
+}
+input.error.registration_notice{ 
+	text-align: center;
+	margin:10px;
+}
+
+#registration_panel_package_info {
+	width: 270px;
+	background: transparent url(../img/features-text-bg-reverse.png) repeat-y 0 0;
+	float: right;
+	height: 775px;
+	text-align: center;
+	font-family: Arial,Helvetica,sans-serif !important;
+}
+#registration_panel_package_info .heading_about {
+	color: #39BFEB;
+	font-size: 38px;
+    font-weight: bold;
+    line-height: 32px;
+    margin-top: 25px;
+	font-family: Hoefler Text, Garamond, Georgia, Times New Roman, Times, serif !important;
+}
+p.small_heading {
+    color: #909090;
+    font-size: 14px;
+    letter-spacing: 20px;
+    text-align: center;
+    text-indent: 15px;
+}
+div.package_size {
+    color: #ABBC34;
+	font-family: Futura, Impact, Helvetica, Arial, sans-serif !important;
+	font-size: 100px;
+	text-align: center;
+	margin-top: 10px;
+}
+div.trial_period {
+	color : #d38686;
+	font-size: 50px;
+}
+div.free_trial {
+	color : #1f4766;
+	font-size: 35px;
+}
+div.descritions_paragraph {
+	margin-left: 33px;
+    text-align: left;
+    width: 207px;
+	color:#535353;
+	margin-bottom: 30px;
+	font-size: 13px;
+}
+div.descritions_paragraph p {
+	margin: 15px 0;
+	line-height: 18px;
+}
+ul.features li {
+	color: #363636;
+	font-weight: bold;
+	text-align: left;
+	background: url(../img/package_features_icon.png) no-repeat 0 0;
+	margin-left: 33px;
+	padding: 0 0 15px 25px;
+	font-size: 13px;
+}
+div.change_package {
+	margin-top: 20px;
+	height: 70px;
+	background: url(../img/change_package_button.png) no-repeat 50% 50%;
+	padding-top: 15px
+}
+div.change_package a {
+    color: #FFFFFF;
+    display: inline-block;
+    font-size: 19px;
+    line-height: 23px;
+    padding: 3px 40px;
+    text-decoration: none;
+}
+div.change_package a:hover {
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+#filocity_registration_no_cc_form {
+	background: transparent url(../img/signup-free-cc2.png) no-repeat 0 0;
+	background:  url(../img/logo.png) no-repeat 290px 5px, 
+				transparent url(../img/signup-free-cc2.png) no-repeat 0 0;
+	width : 469px;
+	height: 618px;
+	position: absolute;
+	left: 50%;
+	margin-left: -230px;
+	top: 40px];
+	z-index: 20000;
+}
+#filocity_registration_no_cc_form.step2 {
+	background: transparent url(../img/signup-free-cc2.png) no-repeat -469px 0;
+	width: 466px;
+}
+#filocity_registration_no_cc_form_wrapper {
+	background: transparent;
+	margin-top: 175px;
+}
+#filocity_registration_no_cc_form_wrapper.step2 {
+	margin-top: 65px;
+}
+
+#filocity_registration_no_cc_form_wrapper p.no_cc_req {
+	color: #bbb;
+	text-align: center;
+	margin-bottom: 0;
+	font-size: 14px;
+}
+#filocity_registration_no_cc_form_wrapper div.submit {
+	position: relative;
+	margin: 0 auto;
+}
+#filocity_registration_no_cc_form_wrapper div.submit input[type="submit"] {
+	background: transparent url(../img/get-started-blue.png) no-repeat 50% 50%;
+	float: none;
+	width: 160px;
+	height: 48px;
+	position: absolute;
+	left: 50%;
+	margin-left: -80px;
+}
+#filocity_registration_no_cc_form_wrapper input[type="text"], 
+#filocity_registration_no_cc_form_wrapper input[type="password"],
+#filocity_registration_no_cc_form_wrapper input[type="email"] {
+    background: none repeat scroll 0 0 transparent;
+    border: 1px solid #CCCCCC;
+    border-radius: 5px 5px 5px 5px;
+    color: #91989D;
+    font-family: Arial;
+    font-size: 15px;
+    height: 30px;
+    margin: 12px 0 0 45px;
+    padding: 2px 10px;
+    width: 378px;
+}
+#filocity_registration_no_cc_form_wrapper input {
+    vertical-align: top;
+}
+#filocity_registration_no_cc_form_wrapper input.error, select.error {
+	border-color: rgba(255,0,0,0.3) !important;
+	-moz-box-shadow: 0px 0px 3px 0px rgba(255, 0, 0, 0.5);
+	-webkit-box-shadow: 0px 0px 3px 0px rgba(255, 0, 0, 0.5);
+	box-shadow: 0px 0px 3px 0px rgba(255, 0, 0, 0.5);
+}
+.registration_select_container {
+	background: none repeat scroll 00 transparent;
+	color: #aeaeaf;
+	font-family: Arial;
+	font-size: 16pt;
+	height: 25px;
+	margin: 10px 0 0 45px;
+	padding: 2px 10px;
+	width: 378px;
+}
+.registration_select_container select {
+	border: 1px solid #CCCCCC;
+    border-radius: 5px 5px 5px 5px;
+    float: right;
+    font-size: 16px;
+    height: 28px;
+    margin-right: 11px;
+    margin-top: 10px;
+    padding: 3px;
+    width: 100%;
+}
+.state, .expdate input {
+	width: 35% !important;
+	float: left !important;
+}
+.zip input, .cvv input  {
+	width: 147px !important;
+	float: left !important;
+}
+.registration_select_container.country {
+	clear: both;
+	margin-top: 45px;
+}
+#trial_cc_no_bill_notice {
+	bottom: 100px;
+    clear: both;
+    font-size: 8px;
+    left: 40px;
+    margin-top: 5px;
+    position: absolute;
+    text-align: center;
+}
+.bg_for_no_cc #logo {
+	display: none; 
+}
+/* class 'focus' is added by registration.js when child input element has focus */
+.cvv.focus:after {
+	content: "";
+	width: 60px;
+	height: 37px;
+	position: absolute;
+	margin-left: 10px;
+	margin-top: 5px;
+	float: right !important;
+	background: transparent url(../img/signup_creditcart_code.png) no-repeat 0 0;
+}
+/* additions of DSC */
+#stateholder {
+	width: 200px;
+	margin-left:20px !important;
+}
+#14-day-free-trial-cc #UserZip{
+	margin-left:54px !important;
+}
+#UserIsAgreed, #UserIsCorporateAccount {
+	margin-right: 5px;
+	margin-top: 0px;
+	float: left;
+}
+img.loader_to_modal {
+	position: absolute;
+	left: 50%;
+	margin-left: -10px;
+	bottom: 135px;
+	display: none
+}
+div.input.error.is_agreed div.error-message {
+	width: 205px;
+	left: 43px;
+	top: 27px
+}
+div.cc-validity-error-message {
+	position: absolute;
+	left: 45px;
+	top: 60px;
+	font-size: 11px;
+	color: #f00;
+}
+div.input.date {
+	line-height: 22px;
+}
+#UserCardExpirationDateMonth {
+	width: 120px;
+	margin-right: 2px;
+	padding: 2px;
+}
+#UserCardExpirationDateYear {
+	margin-left: 2px;
+	padding: 2px;
+}

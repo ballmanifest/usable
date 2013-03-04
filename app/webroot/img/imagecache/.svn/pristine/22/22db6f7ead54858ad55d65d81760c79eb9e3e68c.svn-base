@@ -1,0 +1,1 @@
+<div id="flashMessage" class="flash_error message"><i class="icon-exclamation-sign"></i><?php echo $message; ?></div>

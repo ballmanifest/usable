@@ -1,0 +1,162 @@
+@charset "UTF-8";
+.TabbedPanels {
+	overflow: hidden;
+	margin: 0px;
+	padding: 5px;
+	clear: none;
+	width: 474px;
+	background:#e5e5e4;
+}
+.TabbedPanelsTabGroup {
+	margin: 0px;
+	padding: 0px;
+}
+.TabbedPanelsTab {
+	position: relative;
+	top: 0px;
+	float: left;
+	padding: 4px 7px;
+	margin: 0px 0px 0px 0px;
+	font: bold 11px 'allerregular';
+	color:#2f5673;
+	list-style: none;
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	cursor: pointer;
+	outline:none;
+}
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.TabbedPanelsTab {
+	font: bold 11px 'allerregular';
+	padding: 4px 7px;
+}
+}
+.TabbedPanelsTabHover {
+	background-color:none;
+}
+.TabbedPanelsTabSelected {
+	background-color: #fff;/*-webkit-box-shadow:  -1px -1px 5px 0px rgba(0, 0, 0, .30);
+    box-shadow:  -1px -1px 5px 0px rgba(0, 0, 0, .30);
+  	-moz-box-shadow:  -1px -1px 5px 0px rgba(0, 0, 0, .30);*/
+}
+.TabbedPanelsTab a {
+	color: black;
+	text-decoration: none;
+}
+.TabbedPanelsContentGroup {
+	clear: both;
+	background-color: #fff;
+	font-size:11px;
+}
+.TabbedPanelsContent {
+	overflow: hidden;
+	padding: 5px 6px;
+}
+.TabbedPanelsContentVisible {
+}
+.VTabbedPanels {
+	overflow: hidden;
+	zoom: 1;
+}
+.VTabbedPanels .TabbedPanelsTabGroup {
+	float: left;
+	width: 10em;
+	height: 20em;
+	background-color: #EEE;
+	position: relative;
+	border-top: solid 1px #999;
+	border-right: solid 1px #999;
+	border-left: solid 1px #CCC;
+	border-bottom: solid 1px #CCC;
+}
+.VTabbedPanels .TabbedPanelsTab {
+	float: none;
+	margin: 0px;
+	border-top: none;
+	border-left: none;
+	border-right: none;
+}
+.VTabbedPanels .TabbedPanelsTabSelected {
+	background-color: #EEE;
+	border-bottom: solid 1px #999;
+}
+.VTabbedPanels .TabbedPanelsContentGroup {
+	clear: none;
+	float: left;
+	padding: 0px;
+	width: 30em;
+	height: 20em;
+}
+.content1 {
+	overflow: hidden;
+	padding: 2px 5px 3px 5px;
+	background:#e5e5e4;
+	font-size:11px;
+	color:#2f5673;
+	font-weight:bold;
+}
+.content1 .type {
+	color:#2f5673 !important;
+}
+.content1 .topic {
+	color:#2f5673 !important;
+}
+.content1 .video {
+	color:#2f5673 !important;
+}
+.content2 {
+	overflow: hidden;
+	padding: 2px 5px 3px 5px;
+	background:#fff;
+}
+.content3 {
+	overflow: hidden;
+	padding: 2px 5px 3px 5px;
+	background:#f5f6f6;
+}
+.content3 {
+	padding: 2px 5px 3px 5px;
+	background:#f5f6f6;
+}
+.TabbedPanelsContentGroup .topic {
+	float:left;
+	width:270px;
+	color:#6d903c;
+	font-size:11px;
+	font-weight:normal;
+}
+.TabbedPanelsContentGroup .type {
+	float:left;
+	width:120px;
+	color:#646565;
+	font-size:11px;
+	font-weight:normal;
+}
+.TabbedPanelsContentGroup .video {
+	float:left;
+	width:50px;
+	color:#646565;
+	font-size:11px;
+	font-weight: normal;
+}
+/* Styles for Printing */
+@media print {
+.TabbedPanels {
+	overflow: visible !important;
+}
+.TabbedPanelsContentGroup {
+	display: block !important;
+	overflow: visible !important;
+	height: auto !important;
+}
+.TabbedPanelsContent {
+	overflow: visible !important;
+	display: block !important;
+	clear:both !important;
+}
+.TabbedPanelsTab {
+	overflow: visible !important;
+	display: block !important;
+	clear:both !important;
+}
+}

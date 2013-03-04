@@ -1,0 +1,226 @@
+<?php
+	echo $this->Html->scriptBlock('var user_id = ' . $this->Session->read('Auth.User.id') . '; users_ids= [];');
+	echo $this->Html->css( array('jstree.layout', 'ui-lightness/jquery-ui-1.8.23.custom', 'fancybox/jquery.fancybox.css', 'cabinet')) ;
+	echo $this->Html->script(array('jquery.hotkeys', 'jquery.cookie', 'jquery.client', 'utils', 'jquery.jstree','jquery.form', 'jquery-ui-1.8.23.custom.min', 'fancybox/jquery.fancybox', 'multiselect', '../multipowupload/Extra/swfobject.js', 'share_modal', 'common', 'cabinet'));
+	echo $this->Html->css( array('ui-lightness/jquery-ui-1.8.23.custom', 'monthcalendar', 'timepicker', 'calendar') );
+	echo $this->Html->script( array('monthcalendar', 'jquery-ui-1.8.23.custom.min', 'https://maps.google.com/maps/api/js?sensor=false', 'jquery.ui.addresspicker.js', 'timepicker', 'date', 'eventsList', 'calendar') );
+	$role = intval($this->Session->read('Auth.User.role'));
+?>
+<input type="hidden" readonly="readonly" value="<?php echo $this->Session->read('Auth.User.id');?>" class="auth_user_id">
+<!-- Add Tesk section {Add Calendar event} -->
+<?php
+	echo $this->element('calendar_event_edit');
+?>
+<!--<script type="text/javascript" src="multipowupload/Extra/swfobject.js"></script>-->
+<!--[if IE 8]> 
+    <?php echo $this->Html->css( array('cabinet.ie8'))?>
+<![endif]>
+
+<!-- popup link on More... hover -->
+<div class="popup_for_more_link me_absolute">
+	<div class="upper_arrow me_absolute">&nbsp;</div>
+	<div class="popup_for_more_link_wrapper me_absolute">
+		<span>File Delete</span>
+		<span>Tasks</span>
+		<span>History</span>
+		<span class="more_link_delete">Delete</span>
+	</div>
+</div>
+
+<div id="interactive">
+<div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix manFolder hide" style="padding:5px;margin-bottom:30px">
+    <span class="ui-dialog-title" id="ui-dialog-title-dialog">
+        <?php 
+            echo __("Manage Folder");
+        ?>
+    </span>
+    <a href="#" class="ui-dialog-titlebar-close ui-corner-all" role="button"></a></div>	
+    
+	<div class="manage-folder manageFolder"> 
+      <h3>Manage Folders</h3>
+      <button type="button" id="add_folder"><?php echo $this->Html->image("folder_create.png");?> New Folder</button>
+      <button type="button" id="rename"><?php echo $this->Html->image("folder_rename.png");?> Rename Folder</button>
+      <button type="button" id="remove"><?php echo $this->Html->image("folder_delete.png");?> Delete Folder</button> 
+    </div>
+    
+    <div id="directory_dd_n_explorer" class="me_left">    
+        <!------------------------------------------------------ 
+            Parent Directory Drop Down - start 
+        ------------------------------------------------------->
+        <div id="directory_dd_container">
+            <div id="directory_dd" class="me_relative">
+            <?php 
+				$temp = $folders['spaces'];
+				$keys = array_keys($temp);
+				$values = array_values($temp);
+                echo $this->Form->hidden("", array("value"=>$keys[0], "class"=>"selected_category"));
+                echo $this->Html->link($values[0], "javascript:void(1)", array("class"=>"dd_selected"));
+            ?>
+            <span class="me_absolute dd_pointer dd_pointer_down"></span>
+           </div>
+            <ul id="directory_dd_options">
+              <?php foreach ($folders['spaces'] as $id => $name):?>     
+                <li class="<?php echo strtolower(str_replace(" ","",$name));?>">
+                    <?php 
+                        echo $this->Html->link($name, "javascript:void(0)", array("class"=>"dd_option no_border", "data-projfldr" => $id));
+                        echo $this->Form->hidden($id, array("value"=>$id));
+                    ?>
+                </li>
+              <?php endforeach; ?>
+			  <li><hr/></li>
+			  <?php foreach($folders['projects'] as $pid => $pname) :?>
+				<li class="<?php echo strtolower(str_replace(" ","",$pname));?>">
+                    <?php 
+                        echo $this->Html->link($pname, "javascript:void(0)", array("class"=>"dd_option no_border", "data-projfldr" => $pid));
+                        echo $this->Form->hidden($pid, array("value"=>$pid));
+                    ?>
+                </li>
+			  <?php endforeach;?>
+           </ul> 
+        </div>
+        <!------------------------------------------------------ 
+            Parent Directory Drop Down - end 
+        ------------------------------------------------------->
+        <!-- Add item to selected folder (AY)-->
+		<div class="add_item_to_selected_folder">
+			<a class="add_folder tool_link fancyboxFolder" href="#interactive">
+				<i class="icon-plus-sign"></i>&nbsp;new
+			</a>
+		</div>
+        <!------------------------------------------------------ 
+            Tree View Explorer - start 
+        ------------------------------------------------------->
+     
+        <div id="explorer">
+            <span class="loader" style="display:block"><?php echo $this->Html->image("ajax-loader.gif");?> Loading...</span>
+            <ul id="explorer_tree">
+                
+            </ul>
+        </div>
+     
+        <!------------------------------------------------------ 
+            Tree View Explorer - end 
+        ------------------------------------------------------->
+       
+     
+        
+    </div>
+</div>
+    
+<!--nocache-->    
+<div id="detail_view" class="me_left">
+	<div id="detail_view_content_wrapper">
+		
+        <!------------------------------------------------------ 
+    		Header Info Section - start 
+    	------------------------------------------------------->
+        <div id="info_n_tools">
+			<div id="directory_avatar" class="me_left">
+			  <div class="folder_img"></div>
+			</div>
+			<div id="directory_details" class="me_left">
+			  <div class="directory_heading directoryHeader">Loading...</div>
+			  
+			</div>
+			
+			<div class="directory_upload_button">
+				<a class="share tool_link fancyboxUpload btn btn-success" href="#multipleUpload"><i class="icon-upload-alt"></i> Upload</a>
+				<?php if($role != 2): ?><a class="share tool_link fancyboxUpload btn btn" href="#multipleUpload"><i class="icon-wrench"></i> Tools</a><?php endif;?>
+			</div>
+
+			<!--
+			<div id="directory_tools" class="me_left clearfix">
+			  <div class="col_1 me_left"> 
+				<a class="share tool_link fancyboxUpload" href="#multipleUpload"><?php echo __('Upload');?></a> 
+                <a href="javascript:void(1)" class="fancyboxComment showFolderComment"></a>
+				<a class="access tool_link"><?php //echo __('Access');?></a> 
+			  </div>
+              
+			  <div class="directory_tools_divider me_left">&nbsp;</div>
+			  <div class="col_1 me_left"> 
+				<a class="comment tool_link" href=""><?php echo __('Comments');?></a> 
+				<a class="add_folder tool_link fancyboxFolder" href="#interactive"><?php //echo __('Folders');?></a>  
+			  </div>
+              <div class="directory_tools_divider me_left">&nbsp;</div>
+			  <div class="col_2 me_left"> 
+				<a class="tasks tool_link"><?php //echo __('Tasks');?></a> 
+				<a class="more tool_link"><?php //echo __('More....');?></a> 
+			  </div>
+              
+			</div>
+			-->
+			
+		</div>
+        <!------------------------------------------------------ 
+    		Header Info Section - end 
+    	------------------------------------------------------->
+        
+		<!-- GALLERY -->
+		<div id="gallery">
+			<!-- View Changer -->
+			<div id="view_changer_icons" class="me_relative">
+				<div id="search_container" class="me_absolute">
+					<div class="search_input">
+						<input type="text" name="file_search" placeholder="Search" class="search_input_box" >
+                        <a href="javascript:void(1)" class="cancelSearch hide"><?php echo $this->Html->image('search_cancel.png');?></a>
+						<span class="search_result_display hide"><b>0</b> results</span>
+					</div>
+				</div>
+				<span class="list_view me_absolute view_change_icon current_view" data-target="gallery_item_listview" data-hide="image_holder" style="font-size:16px"><i class="icon-list"></i></span>
+				<span class="thumbnail_view me_absolute view_change_icon" data-target="image_holder" data-hide="gallery_item_listview" style="font-size:16px"><i class="icon-th"></i></span>
+			</div>
+			<!-- Gallery Item container -->
+			<div id="gallery_item_container" class="me_relative"><!-- Ajax--></div>
+		</div>
+	 </div>
+     
+</div>
+<!--/nocache-->
+
+<!------------------------------------------------------ 
+    Dialog
+------------------------------------------------------->
+<div id="dialog" title="Dialog" class="dialog hide">
+    <p></p>
+</div>
+
+<?php echo $this->element('multiple_upload', array('params' => $params));?>  
+<?php
+	/* minified JS and put them into 1 generated file for faster and optimized page loading*/
+	//$this->loadHelper("Jquery");
+	//echo $this->Jquery->link();
+
+?>
+<!-- GMAP form for manage event -->
+<div id="map_picker_container" class="me_absolute the_popup" style="display:none;">
+	<div class='input'>
+	    <label>Address : </label> <input id="addresspicker_map" />   <br/>
+			<label>Locality: </label> <input id="locality" disabled=disabled> <br/>
+			<label>District: </label> <input id="administrative_area_level_2" disabled=disabled> <br/>
+			<label>State/Province: </label> <input id="administrative_area_level_1" disabled=disabled> <br/>
+			<label>Country:  </label> <input id="country" disabled=disabled> <br/>
+			<label>Postal Code: </label> <input id="postal_code" disabled=disabled> <br/>
+			<label>Lat:      </label> <input id="lat" disabled=disabled> <br/>
+			<label>Lng:      </label> <input id="lng" disabled=disabled> <br/>
+      <label>Type:     </label> <input id="type" disabled=disabled /> <br/>
+    </div>
+    <div id="map"></div>
+	<div style="text-align:right;">
+		<a id="map_picker_ok_button" href="#">ok</a>
+		<a id="map_picker_cancel_button" href="#">cancel</a>
+	</div>
+</div>
+<!-- File Cabinet Fist visit popup-->
+<?php if(!$this->Session->read('Auth.User.cabinet_visited') && intval($this->Session->read('Auth.User.role')) != 2):?>
+<div id="file_cabinet_first_visit_popup_container" class="me_absolute">
+	
+	<div id="file_cabinet_first_visit_popup_wrapper">
+		<p class="first_visit_header"><strong>Welcome to Filocity!</strong> To Begin, start uploading your documents.</p>
+		<div class="first_visit_placeholders" style="padding-left: 45px">
+			<div class="place_holder_each me_relative"><a href="#multipleUpload" class="fancyboxUpload click_here" style="left:85px" data-uploadtype="documents"><?php echo $this->Html->image('welcome-to-gray-click-here.png');?></a><div class="place_holder_each_overlay me_absolute" style="left:2px;top:4px"></div><a class="upload_your_files_placeholder me_left" style="margin-right: 20px"><?php echo $this->Html->image('filecabpop_btn2.png');?></a></div>
+			<div class="place_holder_each me_relative"><a href="#multipleUpload" class="fancyboxUpload  upload_your_folder_placeholder upload_placeholder" data-uploadtype="folders"><?php echo $this->Html->image('filecabpop_btn1.png', array('style' => 'margin-top:4px'));?></a></div>
+		</div>
+	</div>
+</div>
+<!-- File Cabinet Fist visit popup end-->
+<?php endif;?>
