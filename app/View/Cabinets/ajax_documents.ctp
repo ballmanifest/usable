@@ -211,7 +211,7 @@
 		}
 	?>  
 	
-		<div class="list_view_each_item sharing_pan clearfix" searchdata="<?php echo $document["name"]?>">
+		<div class="list_view_each_item sharing_pan clearfix" searchdata="<?php echo $document["name"]?>" data-info='{"id":<?php echo $document['id']?>,"type":"document","parent_id":<?php echo $folderId?>}'>
 		
 			<!-- Docuement Row Left Panel -->
 			<div class="sharing_pan1">
@@ -271,8 +271,8 @@
 					<li class="nrm"><a href="#">EDT</a></li>
 				</ul>
 				<ul class="icons2 clearfix rolling_container">
+					<!-- File View Icon -->
 					<li>
-						<!-- File View Icon -->
 						<?php if($is_readonly || $is_downloadable) {?>
 							<?php 
 								if(in_array(strtolower($ext), array('jpg', 'jpeg', 'png', 'gif'))) {   
@@ -285,8 +285,9 @@
 							echo $this->Html->link($this->Html->image('eye.png'), 'javascript::void(0)', array('escape' => false));
 						} ?>
 					</li>
+					
+					<!-- Comment Icon -->
 					<li>
-						<!-- Comment Icon -->
 						<?php if($is_readonly || $is_downloadable) {?>
 							<?php if($documentComments > 0): ?><a class="counter"><?php echo $documentComments;?></a><?php endif;?>
 							<?php 
@@ -296,8 +297,9 @@
 							echo $this->Html->link($this->Html->image('comments.png'), 'javascript::void(0)', array('escape' => false));
 						} ?>
 					</li>
+					
+					<!-- File Share -->
 					<li>
-						<!-- File Share -->
 						<?php if($is_readonly && $is_downloadable && $is_printable & $is_writable) {?>
 						<span class="file_share me_relative" style="font-size: 16px;" title="Share">
 							<?php if($documentShares > 0) : ?><a class="counter"><?php echo $documentShares;?></a> <?php endif;?>
@@ -307,8 +309,9 @@
 							echo $this->Html->link($this->Html->image('share2.png'), 'javascript::void(0)', array('escape' => false));
 						} ?>
 					</li>
+					
+					<!-- Task Icon -->
 					<li>
-						<!-- Task Icon -->
 						<?php if($is_readonly && $is_downloadable && $is_printable & $is_writable) {?>
 							<?php if($documentCalendarEventCount > 0) : ?><a class="counter"><?php echo $documentCalendarEventCount;?></a> <?php endif;?>
 							<a class="file_task" data-type="document" data-id="<?php echo $document["id"];?>" data-show-task="1" data-calevent="document_<?php echo $document['id'];?>" title="Task" data-itemname="<?php echo $document["name"];?>"><?php echo $this->Html->image('calendar.png');?></a>
@@ -316,8 +319,9 @@
 							echo $this->Html->link($this->Html->image('calendar.png'), 'javascript::void(0)', array('escape' => false));
 						} ?>
 					</li>
+					
+					<!-- Subscription Icon -->
 					<li>
-						<!-- Subscription Icon -->
 						<?php if($role != 2) { 
 								$iname = 'star.png';
 								$class= '';
@@ -335,16 +339,16 @@
 							echo $this->Html->link($this->Html->image('star.png'), 'javascript::void(0)', array('escape' => false));
 						} ?>
 					</li>
+					
+					<!-- PDF Tool -->
 					<?php if($ext == 'pdf'): ?>
 					<li>
-						<!-- PDF Tool 
-						<a href="javascript::void(0)"><?php //echo $this->Html->image('pdf.png');?></a> -->
-                                               <?php  echo $this->Html->link($this->Html->image('pdf.png'),array('controller' => 'documents', 'action' => 'pdfeditor', 'id' => $document['id']), array('escape' => false, 'target' => '_blank', 'data-relatedthumb' => $ext . '_' . $document['id'] )); ?>
-								
+						<?php  echo $this->Html->link($this->Html->image('pdf.png'),array('controller' => 'documents', 'action' => 'pdfeditor', 'id' => $document['id']), array('escape' => false, 'target' => '_blank', 'data-relatedthumb' => $ext . '_' . $document['id'] )); ?>
 					</li>
 					<?php endif;?>
+					
+					<!-- File info / More Icon -->
 					<li>
-						<!-- File info / More Icon -->
 						<span class="file_info" style="font-size: 16px;" title="Info" title="More">
 							<a class="showInfo" href="javascript:void(1)" paramId="info<?php echo $document["id"]?>" style="color: #5e5e5e"><?php echo $this->Html->image('list_icon.png');?></a>
 						</span>
@@ -354,6 +358,19 @@
 			<!-- More Icons -->
 			<div id="info<?php echo $document["id"]?>" class="doc-info hide me_hide corner shadow">
 				<ul>
+					<!-- Edit Icon -->
+                                        <?php if( !in_array(strtolower($ext), array('gif', 'jpg', 'jpeg', 'png')) ):?>
+					<?php if($role == 1 || $is_writable) { ?>
+                                           <?php if($ext == 'pdf'){?>
+                                        <li> <?php echo $this->Html->link('<i class="icon-edit"></i>' . __('Edit'), array('controller' => 'documents', 'action' => 'pdfeditor', 'id' => $document['id']), array('target' => '_blank', 'paramId' => $document['id'], 'class' => 'editDoc', 'escape' => false));?></li>
+                                            <?php } else { ?>
+					<li> <?php echo $this->Html->link('<i class="icon-edit"></i>' . __('Edit'), array('controller' => 'documents', 'action' => 'edit', $document['id']), array('target' => '_blank', 'paramId' => $document['id'],'class' => 'editDoc', 'escape' => false));?></li>
+					<?php } ?>
+                                        <?php } else { ?>
+					<li class="inactive_icon"><a href="javascript:void(0)"><i class="icon-edit"></i><?php echo __("Edit");?></a></li>
+					<?php } ?>
+                                        <?php endif;?>
+					
 					<!-- Remane Icon -->
 					<?php if($role == 1) { ?>
 					<li> <a href="javascript:void(0)" class="renameFile" paramId="edit<?php echo $document["id"]?>"><i class="icon-pencil"></i><?php echo __("Rename");?></a></li>
@@ -361,25 +378,20 @@
 					<li class="inactive_icon"> <a href="javascript:void(0)"><i class="icon-pencil"></i><?php echo __("Rename");?></a></li>
 					<?php } ?>
 					
-					<!-- Print Icon -->
-					<?php if($is_printable) { ?>
-					<li> <a href="javascript:void(0)" class="renameFile" paramId="edit<?php echo $document["id"]?>"><i class="icon-print"></i><?php echo __("Print");?></a></li> 
+					<!-- Move Icon -->
+					<?php if($role == 1 || $role == 0) { ?>
+					<li> <?php echo $this->Html->link('<i class="icon-move"></i>' . __('Move'), 'javascript:void(0)', array('paramId' => $document['id'],'class' => 'fancyMoveDoc', 'escape' => false));?></li>
 					<?php } else { ?>
-					<li class="inactive_icon"> <a href="javascript:void(0)"><i class="icon-print"></i><?php echo __("Print");?></a></li> 
+					<li class="inactive_icon"><a href="javascript:void(0)"><i class="icon-move"></i><?php echo __("Move");?></a></li>
 					<?php } ?>
 					
 					<!-- Download Icon -->
 					<?php if($is_downloadable) { ?>
-					<li><?php echo $this->Html->link('<i class="icon-download-alt"></i>Download', array('controller' => 'documents', 'action' => 'download', $document["id"]), array('escape' => false, 'title' => 'Download', 'target'=> '_blank'));?></li>
+					<li><?php echo $this->Html->link('<i class="icon-download-alt"></i>Download', array('controller' => 'documents', 'action' => 'download', $document["id"]), array('escape' => false, 'title' => 'Download'));?></li>
 					<?php } else { ?>
 					<li class="inactive_icon"><a href="javascript:void(0)"><i class="icon-download-alt"></i><?php echo __("Download");?></a></li>
 					<?php } ?>
 					
-					<!-- Version Icon --> 
-					<li>
-					<?php echo $this->Html->link('<i class="icon-file"></i>' . __('Versions'), array('controller' => 'cabinets', 'action'=> 'versions', $document["version_document_id"]), array('class' => 'fancyboxUpload', 'escape' => false));?>
-					</li> 
-					 
 					<!-- Delete Icon -->
 					<?php if($role != 2) { ?>
 					<li> <a href="javascript:void(0)" class="delete deleteDoc" paramId="<?php echo $document["id"]?>"><i class="icon-trash"></i><?php echo __("Delete");?></a> </li>
@@ -387,14 +399,21 @@
 					<li class="inactive_icon"><a href="javascript:void(0)"><i class="icon-trash"></i><?php echo __("Delete");?></a></li>
 					<?php } ?>
 					
-					<!-- Edit Icon -->
-					<?php if( !in_array(strtolower($ext), array('gif', 'jpg', 'jpeg', 'png')) ):?>
-					<?php if($role == 1 || $is_writable) { ?>
-					<li> <?php echo $this->Html->link('<i class="icon-edit"></i>' . __('Edit'), array('controller' => 'documents', 'action' => 'edit', $document['id']), array('target' => '_blank', 'paramId' => $document['id'],'class' => 'editDoc', 'escape' => false));?></li>
+					<!-- Permalink Icon -->
+					<?php if($role == 1 || $role == 0) { ?>
+					<li> 
+						<input type="hidden" class="permalink_holder" value="">
+						<?php echo $this->Html->link('<i class="icon-globe"></i>' . __('Permalink'), 'javascript:void(1)', array('data-type' => 'documents', 'paramId' => $document['id'],'class' => 'doc_permalink fancyboxPermalink', 'escape' => false));?>
+					</li>
 					<?php } else { ?>
-					<li class="inactive_icon"><a href="javascript:void(0)"><i class="icon-edit"></i><?php echo __("Edit");?></a></li>
+					<li class="inactive_icon"><a href="javascript:void(0)"><i class="icon-globe"></i><?php echo __("Permalink");?></a></li>
 					<?php } ?>
-					<?php endif;?>
+					
+					<!-- Version Icon --> 
+					<li>
+					<?php echo $this->Html->link('<i class="icon-file"></i>' . __('Versions'), array('controller' => 'cabinets', 'action'=> 'versions', $document["version_document_id"]), array('class' => 'fancyboxUpload', 'escape' => false));?>
+					</li> 
+					
 				</ul>
 			</div>
 			<!-- Edit Section-->
@@ -453,11 +472,9 @@
 		}
 	?>
 <?php endforeach; ?>   
-	<!-- Temporarily Stop -->
-	<?php if($role == 10) : ?>
 	<li class="each_item me_left me_relative upload-holder">
 		<?php 
-			$url = "/cabinets/uploadToS3?folderId=" . $this->params->query["sourceId"];
+			$url = $this->Html->url(array('controller' => 'cabinets', 'action' => 'uploadToS3'), true);
 			$agent = env('HTTP_USER_AGENT');
 			$style = "";
 			if(strlen(strstr($agent,"Firefox")) > 0 ): 
@@ -465,17 +482,35 @@
 			endif;
 		?>
 		<form class="formUpload" accept-charset="utf-8" method="post" enctype="multipart/form-data" action="<?php echo $url?>">
-		<?php	
-			foreach ($params as $p => $v):
-				echo $this->Form->hidden("{$p}", array("value"=>"{$v}", "name"=>"{$p}"));
-			endforeach;
-			echo $this->Form->file('fileUpload', array("class"=>"upload-file","name"=>"data[file]","style"=>$style));
-			
-			echo $this->Html->tag("span", "", array("class"=>"ajaxTarget hide me_hide"));
-			echo $this->Form->submit("Upload", array("class"=>"hide me_hide"));
-		 ?>
-		<span class="loader upl"><?php echo $this->Html->image('ajax-loader-transparent.gif');?> Uploading...</span>
-		 </form>
+			<?php	
+				foreach ($params as $p => $v):
+					echo $this->Form->hidden("{$p}", array("value"=>"{$v}", "name"=>"{$p}"));
+				endforeach;
+				echo $this->Form->hidden('folder_id', array('value'=> CakeSession::read('currentFolderId'), 'name' => 'folder_id'));
+				echo $this->Form->file('fileUpload', array("class"=>"upload-file","name"=>"data[file]","style"=>$style));
+				echo $this->Html->tag("span", "", array("class"=>"ajaxTarget hide me_hide"));
+				echo $this->Form->submit("Upload", array("class"=>"hide me_hide", "div" => "me_hide"));
+			 ?>
+			<span class="loader upl"><?php echo $this->Html->image('ajax-loader-transparent.gif');?> Uploading...</span>
+		</form>
 	</li>
-	<?php endif;?>
 </ul>
+<!-- Permalink Display Box -->
+<div class="me_hide">
+	<div id="fancyboxPermalink" class="fancyboxPermalink">
+		<h2>Permalink</h2>
+		<div class="fancyboxPermalink_wrapper">
+			<div>You can share this file with your associates using this link and they can download it without any restriction</div>
+			<input type="text" class="permalink_container me_hide">
+			<?php echo $this->Html->image('ajax-loader.gif', array('style' => 'margin: 10px auto'))?>
+		</div>
+	</div>
+</div>
+
+<!-- Alert Box -->
+<div class="me_hide">
+	<div id="fancyAlertBox" class="fancyAlertBox">
+		<h5>Message</h5>
+		<div class="alert_message"></div>
+	</div>
+</div>

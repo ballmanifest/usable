@@ -1,0 +1,4 @@
+#AuthType Basic
+#AuthName "Restricted access"
+#AuthUserFile /mnt/htpasswd
+#require valid-user

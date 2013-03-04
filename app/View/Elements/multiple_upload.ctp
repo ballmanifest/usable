@@ -8,7 +8,7 @@ echo $this->Html->css('plupload/jquery.ui.plupload.css');
     Multiple Upload 
 ------------------------------------------------------->
 <div class="hide">
-    <div id="multipleUpload" title="multipleUpload" class="multipleUpload" style="width:600px" >
+    <div id="multipleUpload" title="multipleUpload" class="multipleUpload" style="width:630px" >
         <div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix" style="padding:5px;margin-bottom:5px">
             <span class="ui-dialog-title" id="ui-dialog-title-dialog">
                 <?php   echo __("Multiple Upload"); ?>
@@ -48,7 +48,7 @@ echo $this->Html->css('plupload/jquery.ui.plupload.css');
 							runtimes : 'gears,flash,silverlight,browserplus,html5',
 							url : _ROOT +'cabinets/uploader',
 							max_file_size : '1000mb',
-							chunk_size : '1mb',
+							//chunk_size : '1mb',
 							unique_names : true,
 							multipart: true,
 							urlstream_upload:true,
@@ -65,8 +65,21 @@ echo $this->Html->css('plupload/jquery.ui.plupload.css');
 							flash_swf_url : "<?php echo $this->Html->url('/js/plupload/js/plupload.flash.swf');?>",
 							silverlight_xap_url : "<?php echo $this->Html->url('/js/plupload/js/plupload.silverlight.xap'); ?>"
 						});
-
+						
 						var uploader = $('#uploader').plupload('getUploader');
+						uploader.bind('BeforeUpload', function(up, files) {
+							if (files.lenggth == 0) {
+								$.fancybox({
+									href: '#fancyAlertBox',
+									width: 300,
+									height: 150,
+									autoDimensions: false,
+									onComplete : function() {
+										$('#fancyAlertBox .alert_message').html('You must at least upload one file..');
+									}
+								});
+							}
+						});
 						uploader.bind('FilesAdded', function(up, files) {
 							for(var i=0; i <= files.length; i++) {
 								if(files[i] && files[i] != undefined) {
@@ -80,12 +93,24 @@ echo $this->Html->css('plupload/jquery.ui.plupload.css');
 						});
 						uploader.bind('StateChanged', function() {
 							if (uploader.files.length === (uploader.total.uploaded + uploader.total.failed)) {
-							   $('#uploadform').submit();
+								$('#uploadform').submit();
 							}
 						});
-						uploader.bind('Error', function(self, error) {
-							window.location.reload();
+						uploader.bind('Error', function(up, err) {
+							$.fancybox({
+								href: '#fancyAlertBox',
+								width: 300,
+								height: 150,
+								autoDimensions: false,
+								onComplete : function() {
+									$('#fancyAlertBox .alert_message').html("Message: " + err.message + (err.file ? ", File: " + err.file.name : ""));
+								},
+								onClosed : function() {
+									up.refresh();
+								}
+							});
 						});
+						uploader.refresh();
 						uploader.start();
 					});
 				</script> 

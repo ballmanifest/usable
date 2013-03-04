@@ -12,7 +12,8 @@
 		}
                 $file_id = $viewer_info['doc_detail']['Document']['id'];
 		$secret = $viewer_info['doc_detail']['User']['auth_key'];
-		$share = count($viewer_info['doc_detail']['Share']);
+                $space = $viewer_info['doc_detail']['Folder']['name'];
+		//$share = $viewer_info['doc_detail']['Share']['id'];
                 $folder_id = $viewer_info['doc_detail']['Document']['folder_id'];
                 $is_subscribed = count($viewer_info['doc_detail']['Subscription']);
 		$version = $viewer_info['doc_detail']['Document']['version'];
@@ -44,7 +45,7 @@
 			</p>
 		</div>
 <div class="adeptol_viewer">
-				<iframe name="ajaxdocumentviewer" src="http://www.filocitydev.com/app/webroot/pdfeditor/Main.html?id=<?php echo $file_id;?>&space=company&secret=<?php echo $secret;?>&share=0&folder=<?php echo $folder_id;?>" border="1" height="870" width="940" scrolling="no" align="left" frameborder="0" marginwidth="1" marginheight="1" style="border: 1px solid #ccc;padding:5px;border-radius: 5px;margin-bottom:20px;">Your browser does not support inline frames or is currently configured not to display inline frames.</iframe>
+				<iframe name="ajaxdocumentviewer" src="http://www.filocitydev.com/app/webroot/pdfeditor/Main.html?id=<?php echo $file_id;?>&space=<?php echo "company";//echo $space;?>&secret=<?php echo $secret;?>&share=<?php echo  $shares;?>&folder=<?php echo $folder_id;?>" border="1" height="870" width="940" scrolling="no" align="left" frameborder="0" marginwidth="1" marginheight="1" style="border: 1px solid #ccc;padding:5px;border-radius: 5px;margin-bottom:20px;">Your browser does not support inline frames or is currently configured not to display inline frames.</iframe>
 </div>
 
 <?php

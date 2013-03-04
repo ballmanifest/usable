@@ -63,8 +63,7 @@ class ZohoHelper extends AppHelper {
 			'lang' => 'en',
 			'id' => $docId,
 			'format' => $ext,
-			'saveurl' => $saveUrl,
-			'agentname' => 'ZRemoteAgent'
+			'saveurl' => $saveUrl
 		);
 		
 		$HttpSocket = new HttpSocket(array(
@@ -74,7 +73,7 @@ class ZohoHelper extends AppHelper {
 		));
 		
 		$response = $HttpSocket->post($url, $fields);
-		
+
 		if($response->code == '200') {
 			$arr = explode("\n", $response->body);
 			foreach ($arr as $v) {
