@@ -2,68 +2,69 @@
 *	Action on Folder(breadcrumb) row hover (AY)
 */
 $(function() {
-	var $share_modal_fancybox = null,
-		handlerToThisComment = null,
-		handlerToThisShare = null;
-	$.FolderAction = {
-		setMask: function() {
-			var height = $('#main_container').height() + 10;
-			$('body').append('<div class="my-overlay-info me_hide" style="opacity: 0; display: none;height: ' + height + 'px"></div>');
-		},
-		showMask: function() {
-			if ($('.my-overlay-info').is('visible')) {
-				$('.my-overlay-info').fadeOut(50,
-				function() {
-					$('.my-overlay-info').fadeIn(50);
-				});
-			} else $('.my-overlay-info').fadeIn(50);
-		},
-		hideMask: function() {
-			if( $('#file_cabinet_first_visit_popup_container:visible').length ) { return false;}
-			$.FolderAction.hideVisibleModal();
-			$('.my-overlay-info:visible, div.manage_event:visible, div.folder-info').fadeOut(0);
-			
-		},
-		hideVisibleModal: function() {
-			if ($('.the_folder_active_modal:visible').length) {
-				$('.the_folder_active_modal:visible').fadeOut(0);
-			}
-			return 1;
-		},
-		getTargetModal: function(el) {
-			return $('#' + $(el).data('target'));
-		},
-		onMaskClick: function() {
-			$('body').on('click', '.my-overlay-info:visible', $.FolderAction.hideMask);
-		},
-		onFolderViewClick: function() {},
-		onFolderTaskClick: function() {},
-		onFolderShareClick: function() {
-			$('body').on('click', '.shareFolder',
+var $share_modal_fancybox = null,
+	handlerToThisComment = null,
+	handlerToThisShare = null,
+	documentMoveActivate = false;
+$.FolderAction = {
+	setMask: function() {
+		var height = $('#main_container').height() + 10;
+		$('body').append('<div class="my-overlay-info me_hide" style="opacity: 0; display: none;height: ' + height + 'px"></div>');
+	},
+	showMask: function() {
+		if ($('.my-overlay-info').is('visible')) {
+			$('.my-overlay-info').fadeOut(50,
 			function() {
-				$.FolderAction.hideVisibleModal();
-				$.FolderAction.showMask();
-				$('div.step2 form div.row:gt(1)').remove();
-				$.FolderAction.getTargetModal(this).fadeIn(50);
+				$('.my-overlay-info').fadeIn(50);
 			});
-		},
-		onShowFolderInfoClick: function() {
-			$('body').on('click', 'a.showFolderInfo',
-			function(e) {
-				$.FolderAction.hideVisibleModal();
-				$.FolderAction.showMask();
-				$.FolderAction.getTargetModal(this).fadeIn(50);
-			});
-		},
-		init: function() {
-			$.FolderAction.onShowFolderInfoClick();
-			$.FolderAction.onFolderShareClick();
-			$.FolderAction.setMask();
-			$.FolderAction.onMaskClick();
+		} else $('.my-overlay-info').fadeIn(50);
+	},
+	hideMask: function() {
+		if( $('#file_cabinet_first_visit_popup_container:visible').length ) { return false;}
+		$.FolderAction.hideVisibleModal();
+		$('.my-overlay-info:visible, div.manage_event:visible, div.folder-info').fadeOut(0);
+		
+	},
+	hideVisibleModal: function() {
+		if ($('.the_folder_active_modal:visible').length) {
+			$('.the_folder_active_modal:visible').fadeOut(0);
 		}
-	};
-	$.FolderAction.init();
-});
+		return 1;
+	},
+	getTargetModal: function(el) {
+		return $('#' + $(el).data('target'));
+	},
+	onMaskClick: function() {
+		$('body').on('click', '.my-overlay-info:visible', $.FolderAction.hideMask);
+	},
+	onFolderViewClick: function() {},
+	onFolderTaskClick: function() {},
+	onFolderShareClick: function() {
+		$('body').on('click', '.shareFolder',
+		function() {
+			$.FolderAction.hideVisibleModal();
+			$.FolderAction.showMask();
+			$('div.step2 form div.row:gt(1)').remove();
+			$.FolderAction.getTargetModal(this).fadeIn(50);
+		});
+	},
+	onShowFolderInfoClick: function() {
+		$('body').on('click', 'a.showFolderInfo',
+		function(e) {
+			$.FolderAction.hideVisibleModal();
+			$.FolderAction.showMask();
+			$.FolderAction.getTargetModal(this).fadeIn(50);
+		});
+	},
+	init: function() {
+		$.FolderAction.onShowFolderInfoClick();
+		$.FolderAction.onFolderShareClick();
+		$.FolderAction.setMask();
+		$.FolderAction.onMaskClick();
+	}
+};
+$.FolderAction.init();
+
 /**
 *	Cabinet JS (CN)
 */
@@ -142,10 +143,11 @@ var Cabinet = {
 			function(event, data) {
 				var currentFolderId = jQuery.cookie("currentFolderId");
 				var prevNode = $('a#mechild_' + currentFolderId);
-				if(prevNode.is(':visible')) {
-					//prevNode.trigger('click');
+				console.log(currentFolderId);
+				if(currentFolderId) {
+					prevNode.trigger('click');
 				} else {
-					//$("#explorer ul li:first a").trigger("click");
+					$("#explorer a[id^=mechild]:first").trigger("click");
 				}
 				tree.jstree("open_all");
 			});
@@ -155,18 +157,21 @@ var Cabinet = {
 			});
 			tree.bind("move_node.jstree",
 			function(event, data) {
-				var parentId = data.rslt.r.find("a").attr("paramid");
-				var sourceId = data.rslt.o.find("a").attr("paramid");
-				var action = data.rslt.r.attr("class").split(" ");
-				Cabinet.Process.updateTreeOrder(parentId, sourceId, action[0]);
+				var parentId = data.rslt.r.find("a").attr("paramid"),
+				sourceId = data.rslt.o.find("a").attr("paramid");
+				action = data.rslt.r.attr("class").split(" "),
+				isCopy = data.rslt.cy ? 1: 0,
+				newChildName = data.rslt.r.find("a").eq(1).text();
+				Cabinet.Process.updateTreeOrder(parentId, sourceId, action[0], isCopy, newChildName);
 			});
 			tree.bind("select_node.jstree",
 			function(event, data) {
+				var sourceId = data.rslt.obj.find("a").attr("paramid");
+				jQuery.cookie("currentFolderId", sourceId);
+				if(documentMoveActivate) return 0;
 				if ($(".manageFolder").is(":visible") || $("span.loader").is(":visible") || $(".loader.upl").is(":visible")) {
 					return false;
 				}
-				var sourceId = data.rslt.obj.find("a").attr("paramid");
-				jQuery.cookie("currentFolderId", sourceId);
 				Cabinet.Process.setPageHeaders(data);
 				Cabinet.Process.onViewDocuments(sourceId, false);
 			});
@@ -234,18 +239,19 @@ var Cabinet = {
 			function(node, data) {
 				var node = data.rslt.obj,
 				nodeName = node.data('name');
-				node.find('a:first').addClass('no_ellipsis').html(function(i, html) {
+				node.addClass('no_ellipsis').find('a:first').html(function(i, html) {
 					node.data('tempname', html);
 					return '<ins class="jstree-icon">&nbsp;</ins>' + nodeName;
-				});
+				}).css('width', '350px');;
 			}).bind('dehover_node.jstree', 
 			function(node, data) {
 				var node = data.rslt.obj,
 				nodeName = node.data('tempname');
-				node.find('a:first').removeClass('no_ellipsis').html(function(i, html) {
+				node.removeClass('no_ellipsis').find('a:first').html(function(i, html) {
 					node.data('tempname', html);
+					console.log(nodeName)
 					return nodeName;
-				});
+				}).css('width', '200px');
 			});*/
 		},
 		OnEachItem: function() {
@@ -443,53 +449,15 @@ var Cabinet = {
 		currentFolderId: 0,
 		isMultipleUploadActive : 0,
 		/**
-     * Global error checking for ajax process
-     *
-     * @param none
-     * @return void
-     */
-		AjaxSetup: function() {
-			/*
-			$.ajaxSetup({
-				error: function(jqXHR, exception) {
-					if (jqXHR.status === 0) {
-						var message = 'Not connected. Verify Network.';
-						Cabinet.Process.Initialize.UIDialog("Not Connected", message);
-						//window.location.href = _ROOT + "users/dashboard";
-					} else if (jqXHR.status == 404) {
-						var message = 'Requested page not found. [404]';
-						Cabinet.Process.Initialize.UIDialog("404 Not Found", message);
-					} else if (jqXHR.status == 500) {
-						var message = 'Internal Server Error [500].'; //Cabinet.Process.Initialize.UIDialog("500 Server Error", message);
-						//window.location.href = _ROOT + "users/dashboard";
-					} else if (exception === 'parsererror') {
-						var message = 'Requested JSON parse failed.';
-						Cabinet.Process.Initialize.UIDialog("JSON Failed", message);
-					} else if (exception === 'timeout') {
-						var message = 'Time out error.';
-						Cabinet.Process.Initialize.UIDialog("Error", message);
-						//window.location.href = _ROOT + "users/dashboard";
-					} else if (exception === 'abort') {
-						var message = 'Ajax request aborted.';
-						Cabinet.Process.Initialize.UIDialog("Error Aborted", message);
-					} else {
-						var message = 'Uncaught Error:' + jqXHR.responseText; //Cabinet.Process.Initialize.UIDialog("Uncaught Error", message);
-						//window.location.href = _ROOT + "users/dashboard";
-					}
-				}
-			});
-			*/
-		},
-		/**
-     * Should put here all the initialization for jquery plugins
-     *
-     * @param none
-     * @return void
-     */
+		 * Should put here all the initialization for jquery plugins
+		 *
+		 * @param none
+		 * @return void
+		 */
 		Initialize: {
 			FancyBoxUpload : function() {
 				$('.fancyboxUpload').fancybox({
-					width: 600,
+					autoDimensions : true,
 					transitionIn : 'none',
 					transitionOut: 'none',
 					onStart : function(handler) {
@@ -508,6 +476,9 @@ var Cabinet = {
 			FancyBox: function() {
 				var parent = this;
 				var unique = true;
+				/**
+				*	Fancybox for create folder
+				*/
 				$('.fancyboxFolder').fancybox({
 					transitionIn : 'none',
 					transitionOut: 'none',
@@ -533,6 +504,74 @@ var Cabinet = {
 						$("#interactive").css("height", "450px").css("overflow", "hidden");
 					}
 				});
+				
+				/**
+				*	FancyBox for Folder / Document Move link
+				*/
+				
+				/**
+				*	Bind Move button's functionality
+				*/
+				$('body').on('click', '.wrapper_to_move_modal .move_button', function() {
+					var data = $.parseJSON( $.cookie('documentToMove') ),							
+					currentFolderId = parseInt( $.cookie('currentFolderId'), 10);
+					if(Object.keys(data).length) {
+						$('img.loader, button.move_button', '.wrapper_to_move_modal').toggle(0);
+						$.post(
+							_ROOT + 'documents/move_document', 
+							{
+								'document_id' : data.id,
+								'folder_id' : currentFolderId
+							},
+							function(response) {	
+								documentMoveActivate = false;
+								$('img.loader, button.move_button', '.wrapper_to_move_modal').toggle(0);
+								if(response.status == 'y') {
+									$.fancybox.close();
+									$('a#mechild_' + currentFolderId).click();
+								} else {
+									$.fancybox({
+										href: '#fancyAlertBox',
+										width: 300,
+										height: 150,
+										autoDimensions: false,
+										onComplete : function() {
+											$('#fancyAlertBox .alert_message').html('Sorry, Operation failed.');
+										}
+									});
+								}
+							},
+							'json');
+					}
+				});
+				/**
+				*	Initiate Move Modal
+				*/		
+				$('.fancyMoveDoc').fancybox({
+					href: '#explorer',
+					autoDimensions: false,
+					width: 380,
+					height: 492,
+					titleShow : false,
+					transitionIn : 'none',
+					transitionOut: 'none',
+					onComplete : function(handler, index, selectedOpts) {
+						documentMoveActivate = true;
+						var wrapper = '<div class="wrapper_to_move_modal"/>'
+						$('#explorer').wrap(wrapper).before('<h2>Move</h2>').after('<button class="move_button">Move</button><img src="'+ _ROOT +'img/ajax-loader.gif" class="loader"/>');
+						$.cookie('documentToMove', $(handler[index]).closest('div[id^=info]').parent('div.list_view_each_item').addClass('under_move').attr('data-info') );
+					},
+					onClosed : function() {
+						$('button, h2, img', '.wrapper_to_move_modal').remove();
+						$('#explorer').unwrap().unwrap();
+						$('div.list_view_each_item.under_move').attr('data-action', '');
+						$.cookie('documentToMove', '{}');
+					}
+				});
+				
+				/**
+				*	Fancybox for comment
+				*/
 				$('.fancyboxComment').fancybox({
 					autoDimensions: true,
 					width: 600,
@@ -551,6 +590,59 @@ var Cabinet = {
 						handlerToThisComment = handler;
 					}
 				});
+				/**
+				*	Fancybox for show permalink
+				*/
+				$('body').on({
+					click : function() {
+						var type= $(this).attr('data-type'),
+						id= $(this).attr('paramId'),
+						hiddenInput = $(this).parent('li').find('input:hidden.permalink_holder'),
+						has_link = $.trim( hiddenInput.val() ),
+						input = $('input[type="text"].permalink_container'),
+						data = {
+							'data[ShortUrl][original_url]' : _ROOT + type + '/pdownload/' + $('input.auth_user_id:hidden').val() + '/' + id
+						};
+						
+						$.fancybox({
+							href: '#fancyboxPermalink',
+							autoDimensions: false,
+							width: 550,
+							height: 100,
+							titleShow : false,
+							transitionIn : 'none',
+							transitionOut: 'none',
+							onComplete : function() {
+								if(has_link.length) {
+									input.val(has_link);
+									input.focus();
+									input.select();
+								} else {
+									$.post(_ROOT + 'short_urls/short', data, function(response) {
+										if($.trim(response) !== 0) {
+											input.val(response);
+											hiddenInput.val(response);
+											$('input[type="text"], img', '.fancyboxPermalink_wrapper').toggle(0);
+											input.focus();
+											input.select();
+										} else {
+											$.fancybox({
+												href: '#fancyAlertBox',
+												width: 300,
+												height: 150,
+												autoDimensions: false,
+												onComplete : function() {
+													$('#fancyAlertBox .alert_message').html('Sorry, Permalink Generation failed.');
+												}
+											});
+										}
+									});
+								}
+							}
+						});
+					}
+				}, '.fancyboxPermalink');
+		
 				$("body").on("click", "#CommentComment", function(event){ 
 				    if(unique == true){ 
 						$(this).val(''); 
@@ -628,7 +720,6 @@ var Cabinet = {
 			Cabinet.Process.onShareDoc.ready();
 			Cabinet.Process.onManageFolder();
 			Cabinet.Process.SearchDocument.ready();
-			Cabinet.Process.AjaxSetup();
 			Cabinet.Process.onClickImageOverlay();
 			Cabinet.Process.DocumentComments.ready();
 			Cabinet.Process.FolderComments.ready();
@@ -803,7 +894,7 @@ var Cabinet = {
 					folderId: folderId
 				},
 				function(data) {
-					$("#explorer").html(data);
+					$("#explorer, #explorer_for_move_doc").html(data);
 					var currentFolderId = $.cookie('currentFolderId');
 					/*
 					if(currentFolderId) {
@@ -821,13 +912,34 @@ var Cabinet = {
 				$("input.folderId").val('');
 			});
 		},
-		updateTreeOrder: function(parentId, sourceId, action) {
-			$.get(_ROOT + 'cabinets/orders', {
-				parentId: parentId,
-				sourceId: sourceId,
-				action: action
-			},
-			function(data) {});
+		updateTreeOrder: function(parentId, sourceId, action, isCopy, newChildName) {
+			//if(isCopy) {
+				/*
+				$.post(_ROOT + "cabinets/create", {
+					"folder_id": parentId,
+					"title": newChildName,
+				},
+				function(r) {
+					var r = jQuery.parseJSON(r);
+					if (r.status) {
+						$(data.rslt.obj).attr("id", "phtml_" + r.id).attr('data-name', data.rslt.name);
+						$(data.rslt.obj).find("a").attr("id", "mechild_" + r.id).attr('data-fullname', data.rslt.name);
+						$(data.rslt.obj).find("a").attr("paramid", r.id);
+						$.cookie('currentFolderId', r.id);
+					} else {
+						$.jstree.rollback(data.rlbk);
+					}
+					$('a#mechild_' + r.id).click();
+				});*/
+			//} else {
+				$.get(_ROOT + 'cabinets/orders', {
+					parentId: parentId,
+					sourceId: sourceId,
+					action: action,
+					iscopy : isCopy
+				},
+				function(data) {});
+			//}
 		},
 		onClickImageOverlay: function() {
 			$("div.image_overlay_with_title").live("click",
@@ -836,7 +948,7 @@ var Cabinet = {
 			});
 		},
 		onViewDocuments: function(sourceId, limit) {
-		
+			
 			Cabinet.Process.currentFolderId = sourceId;
 			var parent = this;
 			if ($(".manageFolder").is(":visible") || $("span.loader").is(":visible")) {
@@ -1119,7 +1231,7 @@ var Cabinet = {
 				})
 			},
 			highLight: function(elem) {
-				$(elem).closest("li").css("z-index", "1002");
+				//$(elem).closest("li").css("z-index", "1002");
 			},
 			createOverlay: function() {
 				if ($(".overlay-info").length <= 0) {
@@ -1399,8 +1511,6 @@ var Form = {
 	}
 }
 /* Deploying Cabinet Tree Functionality */
-$(document).ready(function() {
-
 	/**
 	*	Display Hover Effect to popup
 	*	on Uploader option for first time visitor 

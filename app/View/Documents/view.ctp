@@ -47,7 +47,7 @@
 		/*
 		*	Crocodoc Viewer
 		*/
-			if( $viewer_info['viewer'] == 'crocodoc') {
+			if( $viewer_info['viewer'] == 'crocodocc' &&  !empty($viewer_info['doc_detail']['Document']['crocodoc_uuid']) ) {
 				$uuid1 = '057d6c6a-1589-4a8a-9e2e-61d873a0a2db';
 				$uuid2 = '82be5a5d-1c85-4d58-9d17-79af97e52b73';
 				$uuid3 = ' ec2cd1b2-ee0d-445c-9290-c34debf80e15';
@@ -83,7 +83,7 @@
 			*	Adeptol Viewer
 			*/
 			$adeptol_key = 'PR9LPQEC68D7EMGKS2D631520WXVBY3K';
-			$url = $this->Html->url('/uploads/user_/' . $auth_id . '/' .  $viewer_info['doc_detail']['Document']['file'], true);
+			$url = $this->Html->url('/uploads/user_' . $auth_id . '/' .  $viewer_info['doc_detail']['Document']['file'], true);
 			$save_button = $is_downloadable? 'Yes' : 'No';
 			$print_button = $is_printable? 'Yes' : 'No';
 			$copy_text_button = $is_readonly ? 'No' : 'Yes';

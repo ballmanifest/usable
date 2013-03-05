@@ -511,7 +511,7 @@ class UsersController extends AppController {
 									);
 			$user_id = $user['User']['id'];
 			$user_role = intval($user['User']['role']);
-
+			
 			if(empty($user)) {
 				$this->Session->setFlash(__('Invalid Login. Please insert email and password correctly.'));
 				$this->redirect($this->Auth->logout());

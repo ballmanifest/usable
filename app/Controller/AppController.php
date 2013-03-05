@@ -20,6 +20,6 @@ class AppController extends Controller {
 	);
 	
 	public function beforeFilter() {		
-		$this->Auth->allow( array('login', 'registration', 'thank', 'activation', 'is_user_exists', 'entry','documents', 'folders', 'view','comments', 'addComment','forgot_password','password_reset', 'change_password', 'validation'));
+		$this->Auth->allow( array('login', 'registration', 'thank', 'activation', 'is_user_exists', 'entry','documents', 'folders', 'view','comments', 'addComment','forgot_password','password_reset', 'change_password', 'validation', 'savedoc', 'forward', 'pdownload'));
 	}
 }

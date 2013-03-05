@@ -39,7 +39,7 @@ class Folder extends AppModel {
 		'Share' => array(
 			'className' => 'Share',
 			'foreignKey' => 'folder_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
@@ -52,7 +52,7 @@ class Folder extends AppModel {
 		'Document' => array(
 			'className' => 'Document',
 			'foreignKey' => 'folder_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
@@ -65,7 +65,7 @@ class Folder extends AppModel {
 		'Subscription' => array(
 			'className' => 'Subscription',
 			'foreignKey' => 'folder_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
@@ -78,7 +78,7 @@ class Folder extends AppModel {
 		'Contact' => array(
 			'className' => 'Contact',
 			'foreignKey' => 'folder_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
@@ -91,7 +91,7 @@ class Folder extends AppModel {
 		'Comment' => array(
 			'className' => 'Comment',
 			'foreignKey' => 'folder_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
@@ -104,7 +104,7 @@ class Folder extends AppModel {
 		'CalendarEvent' => array(
 			'className' => 'CalendarEvent',
 			'foreignKey' => 'folder_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',

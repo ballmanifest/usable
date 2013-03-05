@@ -948,151 +948,160 @@ class API extends REST {
                                 
     }*/
  public function save_pdf() {
-if ($_FILES["Filedata"]["error"] > 0) {
-				echo "No File Selected";
-     } 
-	 else {
-$secret = $_REQUEST['secret'];
-$Space = $_REQUEST['space'];
-//$name = $_REQUEST['name'];
-$convert = $_REQUEST['convert'];
-$folderId = $_REQUEST['folderid'];
-$sqlquery = "SELECT * FROM users WHERE auth_key='$secret'";
- $sqlquery = mysql_query($sqlquery);
+           
+                    $secret = $_REQUEST['secret'];
+                    $Space = $_REQUEST['space'];
+                    //$name = $_REQUEST['name'];
+                    $convert = $_REQUEST['convert'];
+                    $url = NULL;
+                    if($_REQUEST['folderid'])
+                    {
+                    $folderId = $_REQUEST['folderid'];
+                    }
+                    else
+                    {
+                        $folderId = 0;
+                    }
+                    $sqlquery = "SELECT * FROM users WHERE auth_key='$secret'";
+                    $sqlquery = mysql_query($sqlquery);
                     $users_array = mysql_fetch_array($sqlquery);
                     if($users_array > 0){
-                         if (!preg_match('/^\d+$/', $folderId)) {
-            $this->json_error("Invalid Paarent Folder."); // check folder id is valid or invalid 
-            exit;
-        }
-   if ($Space == "shared" && $folderId == 0) { // if  space is  shared and folder is root then cannt create folder 
-            $this->json_error("Sorry Can't create root level folders in shared space.");
-            exit;
-        }
-                      $accessKey = $this->aws_access_key;
-                    $secretKey = $this->aws_secret_key;
-                    $bucket = $this->aws_bucket;
-                    $file_name = $_FILES["Filedata"]["name"];
-                         if($_REQUEST['fname'])
-                             {
-                                 $file_name = $_REQUEST['fname'];
+                            if (!preg_match('/^\d+$/', $folderId)) {
+                                    echo "Invalid Paarent Folder."; // check folder id is valid or invalid 
+                                    exit;
+                            }
+                            if ($Space == "shared" && $folderId == 0) { // if  space is  shared and folder is root then cannt create folder 
+                                    echo "Sorry Can't create root level folders in shared space.";
+                                    exit;
+                            }
+                            $accessKey = $this->aws_access_key;
+                            $secretKey = $this->aws_secret_key;
+                            $bucket = $this->aws_bucket;
+                            $user_id = $users_array['id'];
+                                $crocodoc_uuid = "1";
+                                $version = 1; // assuming for new file
+                                $status = 0;
+                                $created = date("Y-m-d H:i:s");
+                                $username = $users_array['first_name'] . " " . $users_array['last_name'];
+                                $my_company_space = $users_array['company_space_id'];
+                                $my_personal_space = $users_array['my_space_id'];
+                                if ($Space == "company" && $folderId == 0) { // check if company space  and folderid =0 then 
+                                        $folderId = $my_company_space;
                                 }
-                    $Filefilter = explode('.', $file_name);
-                    $name = $Filefilter[0];
-                    $extension = $Filefilter[1];
-                    $file_size = $_FILES["Filedata"]["size"];
-                    //$folderId = $_POST['FolderId'];
-                    $user_id = $users_array['id'];
-                    $crocodoc_uuid = "1";
-                    $version = 1; // assuming for new file
-                    $status = 0;
-                    $created = date("Y-m-d H:i:s");
-                    $username = $users_array['first_name'] . " " . $users_array['last_name'];
-                    $my_personal_space = $users_array['my_space_id'];
-                    $my_personal_space = $users_array['my_space_id'];
-                     if ($Space == "company" && $folderId == 0) { // check if company space  and folderid =0 then 
-                          $folderId = $my_company_space;
-                        }
-                             if ($Space == "personal" && $folderId == 0) {// check if company space  and folderid =0 then
-                                   $folderId = $my_personal_space;
-                         }
-                    $sqlquery = "SELECT * FROM documents WHERE folder_id='$folderId' AND name = '$name'";
-                    $sqlquery = mysql_query($sqlquery);
-                    $result_set = mysql_fetch_array($sqlquery);
-                    if($result_set > 0){
-								$old_fileid = $result_set['id'];
-								$sqlquery = "UPDATE documents SET status='0' WHERE id='$old_fileid'";
-								if (!(mysql_query($sqlquery, $this->db))) {
-										echo "<br/>update operation failed ";
-								}
-								else{
-										$sqlquery = "INSERT INTO documents(name,ext,version,type,size,user_id,folder_id,crocodoc_uuid,created,createdby,modifiedby,modified,status,in_progress) VALUES('$name','$extension','$version','$extension','$file_size','$user_id','$folderId', '$crocodoc_uuid','$created','$username','$username','$created',1,1)";
-										if ((mysql_query($sqlquery, $this->db))) {
-													$document_id = mysql_insert_id();
-												    $tmp_name = $_FILES["Filedata"]["tmp_name"];
-													$new_name = $folderId."-". $document_id;
-													move_uploaded_file($tmp_name, 'swf/'.$new_name.".".$extension);
-													$url = "/var/www/html/app/webroot/rest/swf/".$new_name.".".$extension;
-													$totalPages = intval(shell_exec("identify -format %n '$url'"));
-													$swf_path = "/var/www/html/app/webroot/rest/swf/".$new_name."%.swf";
-													shell_exec("pdf2swf -v -t -T 9 '$url' -o '$swf_path'");
-													$s3 = new S3($accessKey, $secretKey);
-													if ($s3->putObjectFile($url, $bucket, $new_name.".".$extension, S3::ACL_PUBLIC_READ_WRITE)) {
-                                                                   $sqlquery = "UPDATE documents SET file='$new_name.$extension', in_progress='0' WHERE id='$document_id'";
-                                                                   if (!(mysql_query($sqlquery, $this->db))) {
-                                                                                     echo "update operation failed1 ";
+                                if ($Space == "personal" && $folderId == 0) {// check if company space  and folderid =0 then
+                                       $folderId = $my_personal_space;
+                                }
+                            if($_REQUEST['filename'])
+                            {
+                                    $file_name = $_REQUEST['filename'];
+                            }
+                            if(isset($GLOBALS["HTTP_RAW_POST_DATA"]))
+                            {
+                                   if(isset($GLOBALS["HTTP_RAW_POST_DATA"])){
+                                            $pdf = $GLOBALS["HTTP_RAW_POST_DATA"];
+                                            $old_name = $_REQUEST["filename"];
+                                            $url = "/var/www/html/app/webroot/rest/swf/". $old_name;
+                                            file_put_contents($url, $pdf);
+                                            $Filefilter = explode('.', $old_name);
+                                            $name = $Filefilter[0];
+                                            $extension = $Filefilter[1];
+                                            $file_size = filesize($url);
+                                            $sqlquery = "SELECT * FROM documents WHERE folder_id='$folderId' AND name = '$name'";
+                                            $sqlquery = mysql_query($sqlquery);
+                                            $result_set = mysql_fetch_array($sqlquery);
+                                            if($result_set > 0){
+						$old_fileid = $result_set['id'];
+						 $version = $result_set['version'];
+						 $version = $version + 1;
+						$sqlquery = "UPDATE documents SET status='0' WHERE id='$old_fileid'";
+                                               
+												
+						if (!(mysql_query($sqlquery, $this->db))) {
+								echo "update operation failed";
+						}
+                                            }
+                                    } 
+                                    else{
+                                           echo "Sorry Can't create root level folders in shared space.";
+                                           exit;
+                                    }
+                            }
+                            else if($_FILES["Filedata"]["name"])
+                            {
+                                $file_name = $_FILES["Filedata"]["name"];
+                                $Filefilter = explode('.', $file_name);
+                                $name = $Filefilter[0];
+                                $extension = $Filefilter[1];
+                                $file_size = $_FILES["Filedata"]["size"];
+                                  $sqlquery = "SELECT * FROM documents WHERE folder_id='$folderId' AND name = '$name'";
+                                            $sqlquery = mysql_query($sqlquery);
+                                            $result_set = mysql_fetch_array($sqlquery);
+                                            if($result_set > 0){
+						$old_fileid = $result_set['id'];
+						 $version = $result_set['version'];
+						 $version = $version + 1;
+						$sqlquery = "UPDATE documents SET status='0' WHERE id='$old_fileid'";
+                                
+						if (!(mysql_query($sqlquery, $this->db))) {
+								echo "update operation failed";
+						}
+                                            }
+                            }
+                            
+                            else{
+                                 echo "No File Data available";
+                                 exit;
+                            }
+                                //$folderId = $_POST['FolderId'];
+                                                        $sqlquery = "INSERT INTO documents(name,ext,version,type,size,user_id,folder_id,crocodoc_uuid,created,createdby,modifiedby,modified,status,in_progress) VALUES('$name','$extension','$version','$extension','$file_size','$user_id','$folderId', '$crocodoc_uuid','$created','$username','$username','$created',1,1)";
+							if ((mysql_query($sqlquery, $this->db))) {
+														$document_id = mysql_insert_id();
+                                                                                                                $new_name = $folderId."-". $document_id;
+					                if($url == NULL)
+                                                        {
+                                                        $tmp_name = $_FILES["Filedata"]["tmp_name"];
+                                                        move_uploaded_file($tmp_name, 'swf/'.$new_name.".".$extension);
+                                                        $url = "/var/www/html/app/webroot/rest/swf/".$new_name.".".$extension;
+                                                        }
+                                                        $totalPages = intval(shell_exec("identify -format %n '$url'"));
+                                                        $swf_path = "/var/www/html/app/webroot/rest/swf/".$new_name."%.swf";
+                                                        shell_exec("pdf2swf -v -t -T 9 '$url' -o '$swf_path'");
+                                                        $s3 = new S3($accessKey, $secretKey);
+                                                        if ($s3->putObjectFile($url, $bucket, $new_name.".".$extension, S3::ACL_PUBLIC_READ_WRITE)) {
+                                                                     $sqlquery = "UPDATE documents SET file='$new_name.$extension', in_progress='0' WHERE id='$document_id'";
+                                                                     if (!(mysql_query($sqlquery, $this->db))) {
+                                                                           echo "update operation failed";
                                                                      }
-                                                                  else{
-                                                                                  for($i = 1; $i <= $totalPages; $i++){
-                                                                                  $swf_path1 = "/var/www/html/app/webroot/rest/swf/".$new_name.$i.".swf";
-                                                                                  $s3->putObjectFile($swf_path1, $bucket, "swf/".$new_name.$i.".swf", S3::ACL_PUBLIC_READ_WRITE);
-                                                                                  unlink($swf_path1);
-                                                                                  }
-                                                                                   echo $totalPages.",".$new_name;
-										   unlink($url);   
-                                                                                  
-                                                                       }   
+                                                                     else{
+                                                                           for($i = 1; $i <= $totalPages; $i++){
+                                                                                   $swf_path1 = "/var/www/html/app/webroot/rest/swf/".$new_name.$i.".swf";
+                                                                                   $s3->putObjectFile($swf_path1, $bucket, "swf/".$new_name.$i.".swf", S3::ACL_PUBLIC_READ_WRITE);
+                                                                                   unlink($swf_path1);
+                                                                           }
+                                                                           echo $totalPages.",".$new_name;
+                                                                           unlink($url);   
+                                                                     }   
+                                                        }
+                                                        else {
+                                                                echo "Something went wrong while uploading your file";
+                                                        }
                                                 }
-                                              else {
-                                                  echo "<strong>Something went wrong while uploading your file.</strong>";
-                                                  }
-                                        }
-                                        else
-                                         {
-                                             echo "operation failed2";
-                                        }
-                              }
-                    }
-                   else{
-                           $sqlquery = "INSERT INTO documents(name,ext,version,type,size,user_id,folder_id,crocodoc_uuid,created,createdby,modifiedby,modified,status,in_progress) VALUES('$name','$extension','$version','$extension','$file_size','$user_id','$folderId', '$crocodoc_uuid','$created','$username','$username','$created',1,1)";
-            if ((mysql_query($sqlquery, $this->db))) {
-                $document_id = mysql_insert_id();
-               
-            
-            $tmp_name = $_FILES["Filedata"]["tmp_name"];
-            $new_name = $folderId."-". $document_id;
-             move_uploaded_file($tmp_name, 'swf/'.$new_name.".".$extension);
-             $url = "/var/www/html/app/webroot/rest/swf/".$new_name.".".$extension;
-             $totalPages = intval(shell_exec("identify -format %n '$url'"));
-             $swf_path = "/var/www/html/app/webroot/rest/swf/".$new_name."%.swf";
-            shell_exec("pdf2swf -v -t -T 9 '$url' -o '$swf_path'");
-            $s3 = new S3($accessKey, $secretKey);
-            if ($s3->putObjectFile($url, $bucket, $new_name.".".$extension, S3::ACL_PUBLIC_READ_WRITE)) {
-                   $sqlquery = "UPDATE documents SET file='$new_name.$extension', in_progress='0' WHERE id='$document_id'";
-               if (!(mysql_query($sqlquery, $this->db))) {
-            echo "<br/>update operation failed ";
-           }
-           else{
-               for($i = 1; $i <= $totalPages; $i++){
-                        $swf_path1 = "/var/www/html/app/webroot/rest/swf/".$new_name.$i.".swf";
-                        $s3->putObjectFile($swf_path1, $bucket, "swf/".$new_name.$i.".swf", S3::ACL_PUBLIC_READ_WRITE);
-                         unlink($swf_path1);
-           }
-                 echo $totalPages.",".$new_name;
-                  
-                 unlink($url);   
-                
-            }
-            } 
-            }
-           
-         else{
-                echo "operation failed";
-           }
+                                                else
+                                                {
+                                                     echo "Error while inserting into db";
+                                                }
+                                      }
+                     else{
+                       echo "authentication failed";
                    }
-        }
-                  
-                    else{
-                        echo "authentication failed";
-                    }
-                      }
-    }
+       
+ } 
 public function get_swf(){
    $secret = $_REQUEST['secret'];
 $sqlquery = "SELECT * FROM users WHERE auth_key='$secret'";
  $sqlquery = mysql_query($sqlquery);
-                    $users_array = mysql_fetch_array($sqlquery);
-                    if($users_array > 0){
+ $users_array = mysql_fetch_array($sqlquery);
+  if($users_array > 0){
   $filename = $_REQUEST['fname'].".pdf";
   $name = $_REQUEST['fname'];
   $pageno = $_REQUEST['pno'];
@@ -1167,18 +1176,12 @@ $bucket = $this->aws_bucket;
 public function swf_info(){
    $secret = $_REQUEST['secret'];
 $Space = $_REQUEST['space'];
-//$name = $_REQUEST['name'];
 $convert = $_REQUEST['convert'];
 $fileId = $_REQUEST['fileid'];
 $sqlquery = "SELECT * FROM users WHERE auth_key='$secret'";
  $sqlquery = mysql_query($sqlquery);
                     $users_array = mysql_fetch_array($sqlquery);
                     if($users_array > 0){
-                  
-  //$filename = $_REQUEST['fname'];
- // $Filefilter = explode('.', $filename);
-//$name = $Filefilter[0];
-// $extension = $Filefilter[1];
  $sqlquery = "SELECT * FROM documents WHERE id = '$fileId'";
 $sqlquery = mysql_query($sqlquery);
 $result_set = mysql_fetch_array($sqlquery);
@@ -1259,12 +1262,12 @@ $bucket = $this->aws_bucket;
  }
  else
  {
-     echo "no such file exists";
+     echo "no such file exists in s3";
  }
  }
  else{
      
-      echo "no such file exists";
+      echo "no such file exists in db";
  }
                     }
   else{

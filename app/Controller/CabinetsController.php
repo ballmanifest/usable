@@ -162,7 +162,6 @@ class CabinetsController extends AppController {
                 Cache::delete("trees_" . $this->Session->read("Folder.Parent.id"));
             }
         }
-        exit;
     }
 
     /**
@@ -237,6 +236,11 @@ class CabinetsController extends AppController {
             $auth_id = $this->Auth->user('id');
             $role = intval($this->Auth->user('role'));
             $folderId = $this->params->query["sourceId"];
+			/**
+			*	Save current viewing folder_id by user in Session
+			*/
+			$this->Session->write('currentFolderId', $folderId);
+			
             $is_guest = $role == 2 ? true : false;
 
             $folder = $this->Document->Folder->find('first', array('conditions' => array('Folder.id' => $folderId)));
@@ -286,6 +290,7 @@ class CabinetsController extends AppController {
             } else {
                 $arg["conditions"] = array("Document.folder_id" => $folderIds, 'Document.is_latest' => 'Y');
             }
+			$arg["conditions"]["Document.status"] = 1;
             $arg["order"] = array("Document.folder_id" => "ASC");
             $arg['contain'] = array(
                 'User' => array(
@@ -328,7 +333,7 @@ class CabinetsController extends AppController {
             $this->set('currentFolder', $folder);
             $this->set('shared_by', $shared_by);
             $this->set('is_shared', $is_shared);
-            //$this->uploadToS3Initialize();
+            $this->uploadToS3Initialize();
             $this->set('treeFolders', $this->Session->read("Folder.Parent.records"));
             $this->render("ajax_documents", false);
         }
@@ -347,13 +352,105 @@ class CabinetsController extends AppController {
         exit;
     }
 
+	/**
+	*  ///////////////////////////////////////////////////////////  S3 upload methods START ///////////////////////////////////////////////////////////////////
+	*/
+	
+	/**
+    * Before the uploading process begin, S3 Config should be initialized
+    *
+    * @param none
+    * @return void
+    */
+    protected function uploadToS3Initialize() {
+        config('s3');
+        app::import("vendor", "S3/S3");
+
+        if (class_exists('S3_CONFIG')) {
+            $config = new S3_CONFIG();
+        }
+        S3::setAuth($config->default["accessKey"], $config->default["secretKey"]);
+        $bucket = $config->default["bucket"];
+        $path = '';
+        $lifetime = 3600;
+        $maxFileSize = (1024 * 1024 * 50);
+        $metaHeaders = array('uid' => 123);
+        $requestHeaders = array(
+			'Content-Type' => 'application/octet-stream',
+            'Content-Disposition' => 'attachment; filename=${filename}'
+        );
+
+        $params = S3::getHttpUploadPostParams($bucket, $path, S3::ACL_PUBLIC_READ, $lifetime, $maxFileSize, 201, $metaHeaders, $requestHeaders, false);
+        $this->set("params", $params);
+    }
+	
+	/**
+    * And before file was upload to S3, it saves first into database
+    *
+    * @param none
+    * @return integer $newId New ID of a document
+    */
+    private function uploadToS3SaveFile() {
+        $this->loadModel("Document");
+        if ($this->Auth->user("id")) {
+            $this->request->data["folder_id"] = $this->params->query["folderId"];
+            $this->request->data["user_id"] = $this->Auth->user("id");
+        }
+        $this->Document->Behaviors->attach('Image');
+        $this->Document->create();
+        $this->Document->save($this->data);
+
+        $newId = $this->Document->getLastInsertId();
+        $this->Document->id = $newId;
+        $this->set('documents', $this->Document->read());
+        Cache::clear();
+        return $newId;
+    }
+	
     /**
-     * Uploads documents to S3
-     * @link (ajax) http://filocity.com/cabinets/uploadToS3
-     */
+    * Before file was upload to S3, it renames on this function
+    *
+    * @param config $config S3 Config instance
+    * @param integer $folderId The ID of the folder
+    * @param integer $fileId The new ID of the document
+    * @return string $tmpPath . $renamedFile Path and file name of the document
+    */
+    private function uploadToS3RenameFile($config, $folderId, $fileId) {
+        $tmpName = $this->params->data["file"]["tmp_name"];
+        $tmpArray = array_reverse(explode(DS, $tmpName));
+        $tmpPath = str_replace($tmpArray[0], "", $tmpName);
+
+        $fileInfo = $this->params->data["file"]["name"];
+        $file = explode('.', $fileInfo);
+        $ext = array_pop($file);
+        $fileFormat = $config->default["fileFormat"];
+        $version = $config->default["version"];
+        $hash = AuthComponent::password($fileInfo);
+
+        $renamedFile = str_replace("{folder-id}", $folderId, $fileFormat);
+        $renamedFile = str_replace("{file-id}", $fileId, $renamedFile);
+        $renamedFile = str_replace("{ext}", $ext, $renamedFile);
+        //$renamedFile = str_replace("{[version]}",$version, $renamedFile);
+        //$renamedFile = str_replace("{hash}",$hash, $renamedFile);
+
+        rename($this->params->data["file"]["tmp_name"], $tmpPath . $renamedFile);
+        copy($tmpPath . $renamedFile, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->Auth->user('id') . DS . $renamedFile);
+
+        // Upload to Crocodoc
+        if (in_array(strtolower($ext), array('doc', 'docx', 'pdf'))) {
+            $local_url = ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->Auth->user('id') . DS . $renamedFile;
+            $this->_uploadToCrocodoc($local_url, $fileId);
+        }
+        return $tmpPath . $renamedFile;
+    }
+	
+    /**
+    * Uploads documents to S3
+    * @link (ajax) http://filocity.com/cabinets/uploadToS3
+    */
     public function uploadToS3() {
-        if ($this->request->is('ajax') || $this->ieVersion() == 8 || isset($this->request->params["form"]["Filedata"])
-                || isset($this->request->params["form"]["FileBody_0"])) {
+
+        if ($this->request->is('ajax') || $this->ieVersion() == 8 || isset($this->request->params["form"]["Filedata"]) || isset($this->request->params["form"]["FileBody_0"])) {
 
             if (isset($this->request->params["form"]["Filedata"])) {
                 $this->params->data["file"] = $this->request->params["form"]["Filedata"];
@@ -400,43 +497,11 @@ class CabinetsController extends AppController {
             exit;
         }
     }
-
-    /**
-     * Before file was upload to S3, it renames on this function
-     *
-     * @param config $config S3 Config instance
-     * @param integer $folderId The ID of the folder
-     * @param integer $fileId The new ID of the document
-     * @return string $tmpPath . $renamedFile Path and file name of the document
-     */
-    private function uploadToS3RenameFile($config, $folderId, $fileId) {
-        $tmpName = $this->params->data["file"]["tmp_name"];
-        $tmpArray = array_reverse(explode(DS, $tmpName));
-        $tmpPath = str_replace($tmpArray[0], "", $tmpName);
-
-        $fileInfo = $this->params->data["file"]["name"];
-        $file = explode('.', $fileInfo);
-        $ext = array_pop($file);
-        $fileFormat = $config->default["fileFormat"];
-        $version = $config->default["version"];
-        $hash = AuthComponent::password($fileInfo);
-
-        $renamedFile = str_replace("{folder-id}", $folderId, $fileFormat);
-        $renamedFile = str_replace("{file-id}", $fileId, $renamedFile);
-        $renamedFile = str_replace("{ext}", $ext, $renamedFile);
-        //$renamedFile = str_replace("{[version]}",$version, $renamedFile);
-        //$renamedFile = str_replace("{hash}",$hash, $renamedFile);
-
-        rename($this->params->data["file"]["tmp_name"], $tmpPath . $renamedFile);
-        copy($tmpPath . $renamedFile, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'img' . DS . "imagecache" . DS . $renamedFile);
-
-        // Upload to Crocodoc
-        if (in_array(strtolower($ext), array('doc', 'docx', 'pdf'))) {
-            $local_url = ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'img' . DS . "imagecache" . DS . $renamedFile;
-            $this->_uploadToCrocodoc($local_url, $fileId);
-        }
-        return $tmpPath . $renamedFile;
-    }
+	
+	/**
+	*  ///////////////////////////////////////////////////////////  S3 upload methods END ///////////////////////////////////////////////////////////////////
+	*/
+	
 
     /**
      *  Upload a copy of Local File to 
@@ -456,58 +521,6 @@ class CabinetsController extends AppController {
             $this->loadModel('Document');
             $this->Document->updateAll(array('Document.crocodoc_uuid' => '\'' . $response['uuid'] . '\''), array('Document.id' => $document_id));
         }
-    }
-
-    /**
-     * And before file was upload to S3, it saves first into database
-     *
-     * @param none
-     * @return integer $newId New ID of a document
-     */
-    private function uploadToS3SaveFile() {
-        $this->loadModel("Document");
-        if ($this->Auth->user("id")) {
-            $this->request->data["folder_id"] = $this->params->query["folderId"];
-            $this->request->data["user_id"] = $this->Auth->user("id");
-        }
-        $this->Document->Behaviors->attach('Image');
-        $this->Document->create();
-        $this->Document->save($this->data);
-
-        $newId = $this->Document->getLastInsertId();
-        $this->Document->id = $newId;
-        $this->set('documents', $this->Document->read());
-        Cache::clear();
-        return $newId;
-    }
-
-    /**
-     * Before the uploading process begin, S3 Config should be initialized
-     *
-     * @param none
-     * @return void
-     */
-    protected function uploadToS3Initialize() {
-        config('s3');
-        app::import("vendor", "S3/S3");
-
-        if (class_exists('S3_CONFIG')) {
-            $config = new S3_CONFIG();
-        }
-        S3::setAuth($config->default["accessKey"], $config->default["secretKey"]);
-        $bucket = $config->default["bucket"];
-        $path = '';
-        $lifetime = 3600;
-        $maxFileSize = (1024 * 1024 * 50);
-        $metaHeaders = array('uid' => 123);
-        $requestHeaders = array('Content-Type' => 'application/octet-stream',
-            'Content-Disposition' => 'attachment; filename=${filename}'
-        );
-
-        $params = S3::getHttpUploadPostParams(
-                        $bucket, $path, S3::ACL_PUBLIC_READ, $lifetime, $maxFileSize, 201, $metaHeaders, $requestHeaders, false
-        );
-        $this->set("params", $params);
     }
 
     /**
@@ -631,10 +644,6 @@ class CabinetsController extends AppController {
         }
     }
 
-    public function get_folders_for_guest($guest_id = null) {
-        
-    }
-
     /**
      * 	Get Folder permission
      */
@@ -686,7 +695,6 @@ class CabinetsController extends AppController {
      * 	save file by uploader as temp
      */
     public function uploader() {
-
         // HTTP headers for no cache etc
         header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
         header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -799,8 +807,6 @@ class CabinetsController extends AppController {
             // Strip the temp .part suffix off 
             rename("{$filePath}.part", $filePath);
         }
-
-
         // Return JSON-RPC response
         die('{"jsonrpc" : "2.0", "result" : null, "id" : "id"}');
     }
@@ -809,22 +815,23 @@ class CabinetsController extends AppController {
      * 	Save files's info in db and Crocodoc
      */
     public function saveUploadedImage() {
-        if (isset($_POST) && $_POST['uploader_count'] > 0) {
-            $count = $_POST['uploader_count'];
+
+        if (isset($this->request->data) && $this->request->data['uploader_count'] > 0) {
+            $count = $this->request->data['uploader_count'];
             for ($i = 0; $i < $count; $i++) {
                 $data = array();
                 Cache::clear();
                 $status = 'uploader_' . $i . '_status';
                 $name = 'uploader_' . $i . '_name';
-                $name = $_POST[$name];
+                $name = $this->request->data[$name];
                 $tmpname = 'uploader_' . $i . '_tmpname';
-                $tmpname = $_POST[$tmpname];
-                $fileStatus = $_POST[$status];
+                $tmpname = $this->request->data[$tmpname];
+                $fileStatus = $this->request->data[$status];
                 if ($fileStatus == 'done') {
 
                     $this->loadModel("Document");
 
-                    $folderid = $_POST["folder_id"];
+                    $folderid = $this->request->data["folder_id"];
                     $ext = explode('.', $name);
 
                     $ext = (count($ext) > 1 ? $ext[count($ext) - 1] : '');
@@ -859,12 +866,12 @@ class CabinetsController extends AppController {
                     //$newversion=($newversion+1);
                     $data["name"] = $name;
                     $data["folder_id"] = $folderid;
-                    $data["user_id"] = $_POST["user_id"];
+                    $data["user_id"] = $this->request->data["user_id"];
                     $data["version"] = $newversion;
 
                     $data["ext"] = $ext;
-                    $data["size"] = intval(filesize(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname) / 1024);
-                    $data["type"] = $_POST["Content-Type"];
+                    $data["size"] = intval(@filesize(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname) / 1024);
+                    $data["type"] = $this->request->data["Content-Type"];
                     $this->Document->create();
                     $this->Document->save($data);
                     /**
@@ -907,11 +914,11 @@ class CabinetsController extends AppController {
 					if (!file_exists($folderForUser)) @mkdir($folderForUser);
 					
                     //copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'img' . DS . "imagecache" . DS . $renamedFile);
-					copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, $folderForUser . DS . $renamedFile);
+					@copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, $folderForUser . DS . $renamedFile);
 					
                     if (in_array(strtolower($ext), array('doc', 'docx', 'pdf'))) {
-                        $local_url = $folderForUser . DS . $renamedFile;
-                        $this->_uploadToCrocodoc($local_url, $newid);
+                        //$local_url = $folderForUser . DS . $renamedFile;
+                        //$this->_uploadToCrocodoc($local_url, $newid);
                     }
                     @unlink(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname);
                 }

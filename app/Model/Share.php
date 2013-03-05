@@ -383,7 +383,7 @@ class Share extends AppModel {
 		$item_name = '';
 		$quick_note = array_shift($data);
 		$result = 0;
-		
+			
 		foreach($data as $k => $d) {
 			/**
 			*	Keep record of event
@@ -392,6 +392,7 @@ class Share extends AppModel {
 			if($calendar_event_id) {
 				$data[$k]['Share']['calendar_event_id'] = $calendar_event_id;
 			}
+
 			if( array_key_exists('guest_id', $d['Share']) ) {
 				$guest_email = $d['Share']['guest_email'];
 				$item_name = $d['Share']['item_name'];
@@ -404,10 +405,10 @@ class Share extends AppModel {
 				
 				if(!empty($isExists['User'])) {
 					$user = array(
-									'User' => array(
-										'email' => $guest_email,
-										'uuid' => null
-									)
+								'User' => array(
+									'email' => $guest_email,
+									'uuid' => null
+								)
 					);
 					$data[$k]['Share']['user2_id'] = $user_id;
 					
@@ -439,9 +440,10 @@ class Share extends AppModel {
 					/**
 					*	Create Guest User
 					*/
+					$this->User->create();
 					if($this->User->save($guest_as_user, false)) {
-						
 						$new_guest_id = $this->User->id;
+						
 						/**
 						*	Create "My Share" space for
 						*	guest user
@@ -462,7 +464,6 @@ class Share extends AppModel {
 						*	Update Guest user `my_share_id`
 						*	in `users` table
 						*/
-						
 						$this->User->id    = $new_guest_id;
 						$this->User->saveField('my_share_id', $this->Folder->id);
 						
@@ -472,9 +473,9 @@ class Share extends AppModel {
 						*/
 						
 						$guest_data = array('Guest' => array('uuid' => $uuid, 'email' => $guest_email));
-						$user_id = $data[$k]['Share']['guest_id'] = $new_guest_id;
-						$user_id = $data[$k]['Share']['user2_id'] = $new_guest_id;
+						$data[$k]['Share']['user2_id'] = $new_guest_id;
 						
+						$this->Guest->create();
 						if( $this->Guest->save($guest_data) ) {
 							$user = array(
 											'User' => array(
@@ -501,6 +502,7 @@ class Share extends AppModel {
 			}
 			$data[$k]['Share']['user_id'] = CakeSession::read('Auth.User.id');
 		}
+		
 		$arr = $data;
 		if( $this->saveMany($arr) ) {
 			$result = 1;

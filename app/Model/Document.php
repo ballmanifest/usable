@@ -58,7 +58,7 @@ class Document extends AppModel {
 		'Share' => array(
 			'className' => 'Share',
 			'foreignKey' => 'document_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
@@ -71,7 +71,7 @@ class Document extends AppModel {
 		'Subscription' => array(
 			'className' => 'Subscription',
 			'foreignKey' => 'document_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
@@ -84,7 +84,7 @@ class Document extends AppModel {
 		'Comment' => array(
 			'className' => 'Comment',
 			'foreignKey' => 'document_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',
@@ -97,7 +97,7 @@ class Document extends AppModel {
 		'CalendarEvent' => array(
 			'className' => 'CalendarEvent',
 			'foreignKey' => 'document_id',
-			'dependent' => false,
+			'dependent' => true,
 			'conditions' => '',
 			'fields' => '',
 			'order' => '',

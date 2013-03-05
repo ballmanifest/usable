@@ -107,7 +107,7 @@
 				<div class="company_space_pan2">
 					<p><?php echo date('l, F dS, Y: h:ia');?></p>
 					<ul class="company_space_pan3 clearfix">
-						<li><a class="share tool_link fancyboxUpload upload" href="#multipleUpload" style="margin-left:130px;">Upload</a></li>
+						<li><a class="share tool_link fancyboxUpload upload" href="#multipleUpload" style="margin-left:90px;">Upload</a></li>
 						<!--<li><a class="pdf_tool" href="javascript::void(0)">PDF Tools</a></li>-->
 					</ul>
 				</div>	

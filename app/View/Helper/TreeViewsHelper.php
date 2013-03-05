@@ -76,7 +76,7 @@ class TreeViewsHelper extends AppHelper {
 		if($parent) {
 			$class = "parent";
 		}
-        $return = $this->Html->link($item, "javascript:void(0)", array("id"=>"mechild_" . $id, "data-fullname" => $item, "paramid"=>$id, "class"=>$class)); 
+        $return = $this->Html->link($item, "javascript:void(0)", array("title" => $item, "id"=>"mechild_" . $id, "data-fullname" => $item, "paramid"=>$id, "class"=>$class)); 
         return $return; 
     } 
      
