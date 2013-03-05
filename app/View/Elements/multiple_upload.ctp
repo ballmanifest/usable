@@ -118,7 +118,7 @@ echo $this->Html->css('plupload/jquery.ui.plupload.css');
 			
 			<!-- TAB 2:	Advance Uploader -->
 			<div id="tabs-2">
-				<form id="formupload" name="formupload"  onSubmit="return Cabinet.Process.onUploadDocument.javaUpload();" method="post" > 
+				<form id="formupload" name="formupload" method="post">
 					<?php	
 					foreach ($params as $p => $v):
 						echo $this->Form->hidden("{$p}", array("value"=>"{$v}", "name"=>"{$p}"));
@@ -164,7 +164,7 @@ echo $this->Html->css('plupload/jquery.ui.plupload.css');
 						please check <a target="_blank" href="http://java.com/en/download/help/testvm.xml" 
 						title="Check Java applets">additional configurations</a></span>
 					</applet>
-					<button name="submitbtn" onClick="return Cabinet.Process.onUploadDocument.javaUpload();" type="submit" value="Upload"> 
+					<button name="submitbtn" type="submit" value="Upload"> <!-- onClick="return Cabinet.Process.onUploadDocument.javaUpload();"  -->
 						<?php echo $this->Html->image("up_alt.png", array());?> Upload
 					</button>
 				</form>

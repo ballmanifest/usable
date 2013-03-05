@@ -40,7 +40,7 @@ class DocumentsController extends AppController {
 			}
 
 			$ext = $doc_detail['Document']['ext'];
-			if( !empty($ext) && in_array($ext , array('doc', 'docx' ,'pdf', 'ppt', 'pptx')) ) {
+			if( !empty($ext) && in_array($ext , array('doc', 'docx' ,'pdf', 'ppt', 'pptx', 'xls', 'xlsx')) ) {
 				$viewer_info = array(
 									'viewer' => 'crocodoc',
 									'doc_detail'=> $doc_detail

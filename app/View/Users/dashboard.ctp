@@ -167,7 +167,7 @@
 				<!---->
 				<div class="tasks_segment">
 					<div class="header_title map_pan">
-						<h1 class="title">My Top Tasks</h1>
+						<h1 class="title">My Recent Files</h1>
 						<div class="adnew"><?php echo $this->Html->link('<span class="add_new_blue_button add_task_button" data-show-task="0">' . $this->Html->image('new_btn.png') . '</span>', 'javascript::void(0)', array('escape' => false, 'class' => 'add_new_blue_button add_task_button'));?></div>
 						<div class="adnew"><?php echo $this->Html->link($this->Html->image('all_tasks_btn.png'), array('controller' => 'users', 'action' => 'resources'), array('escape' => false, 'class' => 'all_tasks link_selected me_right'));?></div>
 					</div>

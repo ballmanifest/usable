@@ -437,7 +437,7 @@ class CabinetsController extends AppController {
         copy($tmpPath . $renamedFile, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->Auth->user('id') . DS . $renamedFile);
 
         // Upload to Crocodoc
-        if (in_array(strtolower($ext), array('doc', 'docx', 'pdf'))) {
+        if (in_array(strtolower($ext), array('doc', 'docx', 'pdf', 'xls', 'xlsx'))) {
             $local_url = ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->Auth->user('id') . DS . $renamedFile;
             $this->_uploadToCrocodoc($local_url, $fileId);
         }
@@ -574,10 +574,12 @@ class CabinetsController extends AppController {
             } else {
                 $this->Folder->create();
                 $this->Folder->save($data);
+				
                 /**
                  * 	Create a Notice when Admin
                  * 	creates a new Folder
                  */
+				/*
                 $this->loadModel('Notice');
                 $notice = array();
                 $auth_name = $this->Auth->user('first_name') . ' ' . $this->Auth->user('last_name');
@@ -587,7 +589,7 @@ class CabinetsController extends AppController {
                 $notice['Notice']['notice_type'] = 'new_folder_created';
                 $notice['Notice']['short_message'] = htmlspecialchars('<div class="notice_block"><div class="pill new_folder_created">New Folder</div><div class="the_notice"><span class="time"> | ' . $time . '</span><strong>' . $data['name'] . '</strong> By <strong>' . $auth_name . '</strong></div></div>');
                 $this->Notice->create();
-                $this->Notice->save($notice, false);
+                $this->Notice->save($notice, false);*/
                 /**
                  * 	Create Notice block end
                  */
@@ -815,7 +817,7 @@ class CabinetsController extends AppController {
      * 	Save files's info in db and Crocodoc
      */
     public function saveUploadedImage() {
-
+		$this->autoRender = false;
         if (isset($this->request->data) && $this->request->data['uploader_count'] > 0) {
             $count = $this->request->data['uploader_count'];
             for ($i = 0; $i < $count; $i++) {
@@ -840,10 +842,10 @@ class CabinetsController extends AppController {
 
                     $newversion = 1;
                     if (!empty($oldfile)) {
-                        $data["version_document_id"] = $oldfile['Document']['version_document_id'];
+                        $data["version_document_id1"] = $oldfile['Document']['version_document_id1'];
                         $newversion = intval($oldfile['Document']['version']) + 1;
                         //update previous latest 
-                        $this->Document->updateAll(array('is_latest' => "'N'"), array('version_document_id' => $oldfile['Document']['version_document_id']));
+                        $this->Document->updateAll(array('is_latest' => "'N'"), array('version_document_id1' => $oldfile['Document']['version_document_id1']));
 
                         /**
                          * 	Create a Notice when any
@@ -898,7 +900,7 @@ class CabinetsController extends AppController {
                     $renamedFile = $folderid . "-" . $newid . "." . $ext;
                     $data["file"] = $renamedFile;
                     if ($newversion == 1) {
-                        $data["version_document_id"] = $newid;
+                        $data["version_document_id1"] = $newid;
                     }
                     $this->Document->save($data);
 
@@ -916,9 +918,9 @@ class CabinetsController extends AppController {
                     //copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'img' . DS . "imagecache" . DS . $renamedFile);
 					@copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, $folderForUser . DS . $renamedFile);
 					
-                    if (in_array(strtolower($ext), array('doc', 'docx', 'pdf'))) {
-                        //$local_url = $folderForUser . DS . $renamedFile;
-                        //$this->_uploadToCrocodoc($local_url, $newid);
+                    if (in_array(strtolower($ext), array('doc', 'docx', 'pdf', 'xls', 'xlsx'))) {
+                        $local_url = $folderForUser . DS . $renamedFile;
+                        $this->_uploadToCrocodoc($local_url, $newid);
                     }
                     @unlink(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname);
                 }

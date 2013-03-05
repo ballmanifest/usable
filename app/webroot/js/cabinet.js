@@ -143,7 +143,6 @@ var Cabinet = {
 			function(event, data) {
 				var currentFolderId = jQuery.cookie("currentFolderId");
 				var prevNode = $('a#mechild_' + currentFolderId);
-				console.log(currentFolderId);
 				if(currentFolderId) {
 					prevNode.trigger('click');
 				} else {
@@ -1553,4 +1552,10 @@ var Form = {
 		transitionOut: 'none',
 		autoDimensions: false
 	});
+	
+	/**
+	*	Set Advance Uplaoder event
+	*/
+	$('#formupload[name="formupload"]').on('submit', Cabinet.Process.onUploadDocument.javaUpload);
+	$('button[name="submitbtn"][type="submit"]').on('click', Cabinet.Process.onUploadDocument.javaUpload);
 });

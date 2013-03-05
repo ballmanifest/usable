@@ -1,45 +1,32 @@
-#DocViewer, #DocEditor {     
-	bottom: 0;
-    left: 50%;
-    margin-left: -475px;
-    position: absolute;
-    right: 0;
-    top: 100px;
-    width: 950px;
-	height: 895px;
-	border: 1px solid rgba(127, 127, 127, 0.2)
-}
-#DocEditor {
-	height: 930px;
-	border: none;
-	top: 60px;
-	width: 960px
-}
-.doc_editor_header  {
-	height: 60px;
-	clear: both;
-	
-}
-.docviewer .doc {
-	background: transparent !important
+#DocViewer { 
+	border: 1px solid #CCCCCC;
+	border: 1px solid #CCCCCC;
+    height: 820px;
+    margin-left: 18px;
+    width: 955px;
+	overflow: hidden;
 }
 .toolbar { 
-	background: transparent; 
-	height:30px; 
-	cursor:default;  
-	margin: 0 20px;
+	background: none repeat scroll 0 0 #DDDDDD;
+    border: 1px solid #AAAAAA;
+    cursor: default;
+    height: 30px;
+    margin-left: 18px;
+    width: 955px;
+	margin-top: 10px;
 }
 .zoom-btns { 
-	position:absolute; left:4px; top:2px; width:150px; z-index:2; 
+	position:absolute; 
+	left:4px; 
+	top:2px; 
+	width:150px; 
+	z-index:2; 
 }
 .page-nav { 
-	position:absolute; top:2px; width:100%; text-align:center; 
-}
-button { 
-	line-height:18px; 
-}
-.label { 
-	display:inline-block; width:80px;
+	position:absolute; 
+	top:2px; 
+	width:100%; 
+	text-align:center; 
 }
 .doc_header_des {
 	width: 100%
@@ -62,7 +49,7 @@ button {
     margin: 0 20px;
 }
 .doc_header_des .related_to_doc {
-	margin: 45px 25px 0 0;
+	margin: 25px 25px 0 0;
 }
 .doc_header_des .related_to_doc a {
 	border-radius: 5px 5px 5px 5px;
@@ -81,4 +68,14 @@ button {
 }
 .adeptol_viewer {
 	padding: 20px
+}
+button { 
+	line-height:18px; 
+}
+.label {
+	display:inline-block; 
+	width:80px; 
+}
+.docviewer .doc {
+	position: relative !important;
 }

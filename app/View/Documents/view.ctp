@@ -23,7 +23,7 @@
 			<p class="related_to_doc me_right">
 				<?php echo $this->Html->link('Tasks ('. $tasks .')', 'javascript:void(1)', array('class' => 'task_pill green_pill'));?>
 				<?php echo $this->Html->link('Shares ('. $shares .')', 'javascript:void(1)', array('class' => 'share_pill green_pill'));?>
-				<?php echo $this->Html->link('Edit PDF', 'javascript:void(1)', array('class' => 'edit_pdf_pill'));?>
+				<?php //echo $this->Html->link('Edit PDF', 'javascript:void(1)', array('class' => 'edit_pdf_pill'));?>
 				<?php echo $this->Html->link('Comments ('. $comments .')', 'javascript:void(1)', array('class' => 'comment_pill green_pill'));?>
 			</p>
 			<h2>
@@ -43,11 +43,11 @@
 			</p>
 		</div>
 <?php
-		$adeptol = false;
-		/*
-		*	Crocodoc Viewer
-		*/
-			if( $viewer_info['viewer'] == 'crocodocc' &&  !empty($viewer_info['doc_detail']['Document']['crocodoc_uuid']) ) {
+			$adeptol = false;
+			/*
+			*	Crocodoc Viewer
+			*/
+			if( $viewer_info['viewer'] == 'crocodoc' &&  !empty($viewer_info['doc_detail']['Document']['crocodoc_uuid']) ) {
 				$uuid1 = '057d6c6a-1589-4a8a-9e2e-61d873a0a2db';
 				$uuid2 = '82be5a5d-1c85-4d58-9d17-79af97e52b73';
 				$uuid3 = ' ec2cd1b2-ee0d-445c-9290-c34debf80e15';
@@ -57,23 +57,52 @@
 				$status = $this->Crocodoc->setToken('suJGtmrvpCjEVNWfIAy0LXdh')->setUUID($uuid)->getStatus();
 				if($status['viewable'] && strtolower($status['status']) == 'done') {
 					$sessionKey = $this->Crocodoc->setToken('suJGtmrvpCjEVNWfIAy0LXdh')->setUUID($uuid)->createSession(); 
-					echo $this->Html->script( array('crocodoc', '//crocodoc.com/webservice/document.js?session=' . $sessionKey, 'document_view') );
+					echo $this->Html->script( array('crocodoc', '//static-v2.crocodoc.com/core/docviewer.js', '//crocodoc.com/webservice/document.js?session=' . $sessionKey, 'document_view') );
 	?>
 				<!-- Crocodoc Viewer -->
-				<div id="document_viewer_wrapper me_relative">
+				<div id="document_viewer_wrapper">
 					<div class="toolbar me_relative">
-						<div class="zoom-btns me_absolute">
+						<!--zoom-->
+						<div class="zoom-btns">
 						  <button class="zoom-out">-</button>
 						  <button class="zoom-in">+</button>
 						</div>
-						<div class="page-nav me_absolute">
-						  <button class="prev"><</button>
+
+						<!--page navigation-->
+						<div class="page-nav">
+						  <button class="prev">◀</button>
 						  <span class="label">Page <span class="num">1</span>/<span class="numpages">1</span></span>
-						  <button class="next">></button>
+						  <button class="next">▶</button>
 						</div>
 					</div>
 					<div id="DocViewer"></div>
 				</div>
+				<script type="text/javascript">
+					$(function() {
+						var docViewer = new DocViewer({ "id": "DocViewer" });
+						//on docviewer ready
+						docViewer.ready(function(e) {
+							$('.numpages').text(e.numpages);
+						});
+						//toolbar events
+						$('.zoom-in').click(function() {
+							docViewer.zoom('in');
+						});
+						$('.zoom-out').click(function() {
+							docViewer.zoom('out');
+						});
+						$('.prev').click(function() {
+							docViewer.scrollTo('prev');
+						});
+						$('.next').click(function() {
+							docViewer.scrollTo('next');
+						});
+						//docviewer events
+						docViewer.bind('pagechange',function(e) {
+							$('.num').text(e.page);
+						});
+					});
+				</script>	
 <?php 
 			} else $adeptol = true;
 		} else $adeptol = true;
@@ -82,14 +111,18 @@
 			/*
 			*	Adeptol Viewer
 			*/
-			$adeptol_key = 'PR9LPQEC68D7EMGKS2D631520WXVBY3K';
+			$adeptol_key = 'P33R20LOBF1G0J6TQBER709P8TFKMVWN'; //'PR9LPQEC68D7EMGKS2D631520WXVBY3K';
 			$url = $this->Html->url('/uploads/user_' . $auth_id . '/' .  $viewer_info['doc_detail']['Document']['file'], true);
 			$save_button = $is_downloadable? 'Yes' : 'No';
 			$print_button = $is_printable? 'Yes' : 'No';
 			$copy_text_button = $is_readonly ? 'No' : 'Yes';
 ?>
 			<div class="adeptol_viewer">
-				<iframe name="ajaxdocumentviewer" src="//connect.ajaxdocumentviewer.com?key=<?php echo $adeptol_key;?>&document=<?php echo $url;?>&viewerheight=905&viewerwidth=980&copytextButton=<?php echo $copy_text_button;?>&startPage=1&saveButton=<?php echo $save_button;?>&printButton=<?php echo $print_button;?>&quality=high" border="1" height="870" width="940" scrolling="no" align="left" frameborder="0" marginwidth="1" marginheight="1" style="border: 1px solid #ccc;padding:5px;border-radius: 5px;margin-bottom:20px;">Your browser does not support inline frames or is currently configured not to display inline frames.</iframe>
+				<?php
+					$ssl = 'No';
+					if(env('HTTPS')) $ssl = 'Yes';
+				?>
+				<iframe name="ajaxdocumentviewer" src="//connect.ajaxdocumentviewer.com?key=<?php echo $adeptol_key;?>&document=<?php echo $url;?>&viewerheight=905&viewerwidth=980&copytextButton=<?php echo $copy_text_button;?>&startPage=1&saveButton=<?php echo $save_button;?>&printButton=<?php echo $print_button;?>&quality=high&logoimage=<?php echo $this->Html->url('/img/logo.png', true);?>&ssl=<?php echo $ssl;?>" border="1" height="870" width="940" scrolling="no" align="left" frameborder="0" marginwidth="1" marginheight="1" style="border: 1px solid #ccc;padding:5px;border-radius: 5px;margin-bottom:20px;">Your browser does not support inline frames or is currently configured not to display inline frames.</iframe>
 			</div>
 <?php
 		}
