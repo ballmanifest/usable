@@ -6,6 +6,7 @@
 	padding-bottom: 13px;
 	border-bottom: 1px solid #000;
 	margin-bottom: 10px;
+	margin-left: 5px;
 }
 #contact_left_container {
 	padding-right: 10px;
@@ -82,6 +83,8 @@
 	background-color: #fff;
 	color: #000;
 	font-weight: bold;
+	padding: 10px 5px;
+	font-size: 15px;
 }
 .contact_type.selected_contact_type {
 	background-color: #58b1f0 ;
@@ -115,11 +118,11 @@
 }
 #create_group_modal  {
 	background: #fff;
-	width: 395px;
+	width: 380px;
 	height: 395px;
-	padding: 5px;
+	padding: 10px;
 	left: 560px;
-	top: 0
+	top: 0;
 }
 #create_group_modal h2 {
 	padding-bottom: 10px;
@@ -145,4 +148,7 @@ p.success_message {
 	color: green;
 	font-size: 12px;
 	margin: 0 10px;
+}
+.each_contact input[type="checkbox"] {
+	margin-top:2px;
 }

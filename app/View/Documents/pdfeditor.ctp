@@ -45,7 +45,7 @@
 			</p>
 		</div>
 <div class="adeptol_viewer">
-				<iframe name="ajaxdocumentviewer" src="http://www.filocitydev.com/app/webroot/pdfeditor/Main.html?id=<?php echo $file_id;?>&space=<?php echo "company";//echo $space;?>&secret=<?php echo $secret;?>&share=<?php echo  $shares;?>&folder=<?php echo $folder_id;?>" border="1" height="870" width="940" scrolling="no" align="left" frameborder="0" marginwidth="1" marginheight="1" style="border: 1px solid #ccc;padding:5px;border-radius: 5px;margin-bottom:20px;">Your browser does not support inline frames or is currently configured not to display inline frames.</iframe>
+				<iframe name="ajaxdocumentviewer" src="https://secure.filocity.com/app/webroot/pdfeditor/Main.html?id=<?php echo $file_id;?>&space=<?php echo "company";//echo $space;?>&secret=<?php echo $secret;?>&share=<?php echo  $shares;?>&folder=<?php echo $folder_id;?>" border="1" height="870" width="940" scrolling="no" align="left" frameborder="0" marginwidth="1" marginheight="1" style="border: 1px solid #ccc;padding:5px;border-radius: 5px;margin-bottom:20px;">Your browser does not support inline frames or is currently configured not to display inline frames.</iframe>
 </div>
 
 <?php

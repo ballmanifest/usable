@@ -79,3 +79,109 @@ button {
 .docviewer .doc {
 	position: relative !important;
 }
+/*comments*/
+.message:after {
+    clear: both;
+    content: " x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x ";
+    display: block;
+    font-size: xx-large;
+    height: 0 !important;
+    line-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+.message {
+    border-bottom: 1px solid #EAEAEA;
+    color: #555555;
+    margin: 0 0 10px;
+    padding: 0 0 10px;
+	width:98%;
+}
+.message a { color:#40ACD2}
+.message .strong { font-weight:bold}
+.message div.left {
+    width: 16%;
+	padding: 5px;
+	float: left;
+	text-align: center;
+}
+
+.message div.left img { border:1px solid #DDDDDD; display: block; margin: auto; margin-bottom: 10px;}
+.message .ago.small { font-size:11px; color:#999999; display: block; margin-top: 5px;}
+.message div.right {
+    line-height: 14px;
+    margin-bottom: 5px;
+    padding: 5px;
+    width: 80%;
+	float: right;
+}
+.message .inline { margin:0;}
+.posted span.paragraph {
+    font-size: 11px;
+    line-height: 15px;
+}
+.textarea {
+    border: 1px solid #DCE0E3;
+	padding:5px;
+    margin: 0 auto;
+    width: 600px;
+	font-size:11px;
+	resize: none
+}
+.formComments div { padding:10px 0 10px 0}
+/*comment*/
+.comment-wrapper {  overflow:auto; max-height:210px; width:600px; overflow-y: scroll;}
+.add-new-comment { display:block; padding:10px 0 10px 0; color:#666666}
+/*override ui */
+.ui-widget-header {
+    background: url("ui-lightness/images//ui-bg_gloss-wave_35_f6a828_500x100-blue.png") repeat-x scroll 50% 50% #00BAFF;
+	border: 1px solid #00BAFF
+}
+.container_to_comment {
+    padding: 10px;
+}
+.related_to_doc .dcounter {
+	color: #fff;
+	font-weight: bold;
+}
+.hide {
+	display: none !important;
+}
+.btn {
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-top-colors: none;
+    background-color: #F5F5F5;
+    background-image: -moz-linear-gradient(center top , #FFFFFF, #E6E6E6);
+    background-repeat: repeat-x;
+    border-color: #CCCCCC #CCCCCC #B3B3B3;
+    border-image: none;
+    border-radius: 4px 4px 4px 4px;
+    border-style: solid;
+    border-width: 1px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2) inset, 0 1px 2px rgba(0, 0, 0, 0.05);
+    color: #333333;
+    cursor: pointer;
+    display: inline-block;
+    font-size: 14px;
+    line-height: 21px;
+    margin-bottom: 0;
+    padding: 4px 10px;
+    text-align: center;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+    vertical-align: middle;
+}
+.btn-success {
+    background-color: #5BB75B;
+    background-image: -moz-linear-gradient(center top , #62C462, #51A351);
+    background-repeat: repeat-x;
+    border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
+    color: #FFFFFF !important;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+.add_share {
+    font-size: 12px;
+    margin: 0 0 4px 2px;
+    padding: 1px 12px;
+}

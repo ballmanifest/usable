@@ -487,6 +487,23 @@ class Share extends AppModel {
 						}
 						
 						/**
+						*	Add an Guest to User's Contact
+						*/
+						$contact = array();
+						$contact['Contact'] = array(
+							'email' => $guest_email,
+							'company_id' => $this->User->Company->id,
+							'company_name' => 'Guest Company',
+							'user_id' => CakeSession::read('Auth.User.id'),
+							'user_id2' => $new_guest_id,
+							'folder_id' => $this->Folder->id,
+							'contact_type' => 1
+						);
+						App::import('Model', 'Contact');
+						$Contact = new Contact();
+						$Contact->save($contact, false);
+						
+						/**
 						*	send mail to guest 
 						*	for activate account
 						*/

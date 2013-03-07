@@ -63,7 +63,7 @@
 				</li>
 				<?php if($role != 2): ?>
 				<li id="navgear">
-					<a href="javascript::void(0)" class="setting" id="gear"><a/>
+					<a href="javascript::void(0)" class="setting" id="gear"></a>
 					<ul>
 						<div class="shadow">
 							<li>

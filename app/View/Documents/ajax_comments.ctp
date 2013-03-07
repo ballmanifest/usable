@@ -56,7 +56,7 @@
 		</div>
 		<?php echo $this->Form->create('Comment', array('url' => array('controller' => $controller, 'action' => 'addComment'), 'type' => 'post', 'class' => 'formComments'));?>
 			<span class="add-new-comment"><?php echo $this->Html->image('ajax-loader.gif', array('class' => 'loader', 'style' => 'display:none'));?></span>
-			<?php echo $this->Form->textarea("Comment.comment", array("class" => "textarea")); ?>
+			<?php echo $this->Form->textarea("Comment.comment", array("class" => "textarea", "placeholder" => "Add New Comment:")); ?>
 			<input type="hidden" readonly="readonly" value="<?php echo $target_id;?>" name="data[Comment][<?php echo $comment_for;?>]" />
 			<?php if(empty($guest_id)) {?>
 			<input type="hidden" readonly="readonly" value="<?php echo $auth_id;?>" name="data[Comment][user_id]" />

@@ -114,26 +114,28 @@
 					<div class="display_share_permissions">
 						<table style="width: 100%" class="add_share_for_event_modal">	
 							<thead>
-								<th>
-									<h4>Files / Folder Share Permissions<label style="margin-left:5px;"><input type="checkbox" name="select[all]" class="permission_all">Select all</label></h4>
-								</th>
-								<th>
-									View<br>
-									<!--<input type="checkbox" name="select[view]" class="permission_view">-->
-								</th>
-								<th>
-									Edit<br>
-									<!--<input type="checkbox" name="select[edit]" class="permission_edit">-->
-								</th>
-								<th>
-									Download<br>
-									<!--<input type="checkbox" name="select[download]" class="permission_download">-->
-								</th>
-								<th>
-									Print<br>
-									<!--<input type="checkbox" name="select[print]" class="permission_print">-->
-								</th>
-								<th>Remove</th>
+								<tr>
+									<th>
+										<h4>Files / Folder Share Permissions<label style="margin-left:5px;"><input type="checkbox" name="select[all]" class="permission_all">Select all</label></h4>
+									</th>
+									<th>
+										View<br>
+										<!--<input type="checkbox" name="select[view]" class="permission_view">-->
+									</th>
+									<th>
+										Edit<br>
+										<!--<input type="checkbox" name="select[edit]" class="permission_edit">-->
+									</th>
+									<th>
+										Download<br>
+										<!--<input type="checkbox" name="select[download]" class="permission_download">-->
+									</th>
+									<th>
+										Print<br>
+										<!--<input type="checkbox" name="select[print]" class="permission_print">-->
+									</th>
+									<th>Remove</th>
+								</tr>
 							</thead>
 							<tbody>
 								

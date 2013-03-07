@@ -208,7 +208,7 @@ ul.search_result_container {
 ul.search_result_container li {
 	height: 22x;
 	line-height: 20px;
-	padding:5px; 
+	padding:0 5px; 
 	cursor: pointer
 }
 ul.search_result_container li:hover {

@@ -3,7 +3,7 @@
 	echo $this->Html->css( array('ui-lightness/jquery-ui-1.8.23.custom', 'monthcalendar', 'timepicker', 'jquery.mCustomScrollbar.css', 'calendar') );
 	echo $this->Html->css( array('jstree.layout', 'fancybox/jquery.fancybox.css', 'cabinet', 'versions')) ;
 	echo $this->Html->script( array('monthcalendar', 'jquery-ui-1.8.23.custom.min', 'timepicker', 'date', 'eventsList', 'jquery.mousewheel.min', 'jquery.mCustomScrollbar.js'), array('inline' => false) );
-	echo $this->Html->script(array('jquery.hotkeys', 'jquery.cookie', 'jquery.client', 'utils', 'jquery.jstree','jquery.form', 'fancybox/jquery.fancybox', 'multiselect', '../multipowupload/Extra/swfobject.js', 'share_modal', 'common', 'calendar', 'cabinet'), array('inline' => false));
+	echo $this->Html->script(array('jquery.hotkeys', 'jquery.cookie', 'jquery.client', 'utils', 'jquery.jstree','jquery.form', 'fancybox/jquery.fancybox', 'multiselect', '../multipowupload/Extra/swfobject.js', 'common', 'calendar', 'share_modal', 'cabinet'), array('inline' => false));
 	$role = intval($this->Session->read('Auth.User.role'));
 ?>
 <input type="hidden" readonly="readonly" value="<?php echo $this->Session->read('Auth.User.id');?>" class="auth_user_id">
@@ -107,8 +107,8 @@
 				<div class="company_space_pan2">
 					<p><?php echo date('l, F dS, Y: h:ia');?></p>
 					<ul class="company_space_pan3 clearfix">
-						<li><a class="share tool_link fancyboxUpload upload" href="#multipleUpload" style="margin-left:90px;">Upload</a></li>
-						<!--<li><a class="pdf_tool" href="javascript::void(0)">PDF Tools</a></li>-->
+						<li><a class="share tool_link fancyboxUpload upload" href="#multipleUpload" style="margin-left:-40px;">Upload</a></li>
+						<li><a class="pdf_tool" href="javascript::void(0)">PDF Tools</a></li>
 					</ul>
 				</div>	
 			</div>
@@ -138,9 +138,6 @@
 <!-- Dialog -->
 <div id="dialog" title="Dialog" class="dialog hide"><p></p></div>
 
-<!-- Multiple Uploader Container -->
-<?php echo $this->element('multiple_upload', array('params' => $params));?>  
-
 <?php
 	/* minified JS and put them into 1 generated file for faster and optimized page loading*/
 	//$this->loadHelper("Jquery");
@@ -167,3 +164,6 @@
 	</div>
 </div>
 <?php endif;?>
+
+<!-- Multiple Uploader Container -->
+<?php echo $this->element('multiple_upload', array('params' => $params));?>  

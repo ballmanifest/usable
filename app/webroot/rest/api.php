@@ -33,7 +33,8 @@ class API extends REST {
             $this->$func();
         else
             $this->json(array("messgae" => "You cann't access filocity "));
-        // If the method not exist with in this class, response would be "you cannt access filocity".
+        // If the method not exist with in this class, response would be "you cannt access filocity"
+	
     }
 
     // ************************ Authentication ***********************************	

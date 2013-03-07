@@ -7,6 +7,8 @@ class CabinetsController extends AppController {
 
     public $helpers = array('Cache');
     public $components = array();
+	public $auth_id = null;
+	
     /*
       public $cacheAction = array(
       'index'  => 48000
@@ -17,12 +19,14 @@ class CabinetsController extends AppController {
     public function beforeFilter() {
         Cache::clear();
         $this->Auth->allow(array('multipleUpload'));
+		$this->auth_id = $this->Auth->user('id');
     }
 
     /**
      * Checks IE version
      * @return $integer IE version
      */
+	 /*
     private function ieVersion() {
         ereg('MSIE ([0-9].[0-9])', $_SERVER['HTTP_USER_AGENT'], $reg);
         if (!isset($reg[1])) {
@@ -30,7 +34,7 @@ class CabinetsController extends AppController {
         } else {
             return floatval($reg[1]);
         }
-    }
+    }*/
 
     /**
      * Displays tree folders and documents with full ajax functionality
@@ -71,7 +75,7 @@ class CabinetsController extends AppController {
      * @link (ajax) http://filocity.com/cabinets/folders
      */
     public function folders() {
-        if ($this->request->is('ajax') || $this->ieVersion() == 8) {
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/) {
             $auth_id = $this->Auth->user('id');
             $role = intval($this->Auth->user('role'));
             $this->loadModel("Folder");
@@ -106,7 +110,7 @@ class CabinetsController extends AppController {
      * @link (ajax) http://filocity.com/cabinets/orders
      */
     public function orders() {
-        if ($this->request->is('ajax') || $this->ieVersion() == 8) {
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/) {
             $this->loadModel("Folder");
             $parentId = $this->params->query["parentId"];
             if ($this->params->query["action"] == "jstree-leaf") {
@@ -129,7 +133,7 @@ class CabinetsController extends AppController {
      * @link (ajax) http://filocity.com/cabinets/deleteDocument
      */
     public function deleteDocument() {
-        if ($this->request->is('ajax') || $this->ieVersion() == 8) {
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/) {
             $auth_id = $this->Auth->user('id');
             $role = intval($this->Auth->user('role'));
             $this->loadModel("Document");
@@ -152,7 +156,7 @@ class CabinetsController extends AppController {
      * @link (ajax) http://filocity.com/cabinets/delete
      */
     public function delete() {
-        if ($this->request->is('ajax') || $this->ieVersion() == 8) {
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/) {
             $this->loadModel("Folder");
             if ($this->data["folder_id"] != "") {
                 $id = str_replace("phtml_", "", $this->data["folder_id"]);
@@ -169,7 +173,7 @@ class CabinetsController extends AppController {
      * @link (ajax) http://filocity.com/cabinets/rename
      */
     public function rename() {
-        if ($this->request->is('ajax') || $this->ieVersion() == 8) {
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/) {
             $this->loadModel("Folder");
             if ($this->data["title"] != "") {
                 $this->request->data["name"] = $this->data["title"];
@@ -189,7 +193,7 @@ class CabinetsController extends AppController {
      * @link (ajax) http://filocity.com/cabinets/create
      */
     public function create() {
-        if ($this->request->is('ajax') || $this->ieVersion() == 8) {
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/) {
             $this->loadModel("Folder");
             if ($this->data["title"] != "") {
                 $this->request->data["name"] = $this->data["title"];
@@ -230,7 +234,7 @@ class CabinetsController extends AppController {
      */
     public function documents() {
 
-        if ($this->request->is('ajax') || $this->ieVersion() == 8) {
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/) {
             $this->loadModel("Document");
 
             $auth_id = $this->Auth->user('id');
@@ -344,7 +348,7 @@ class CabinetsController extends AppController {
      * @link (ajax) http://filocity.com/cabinets/documents
      */
     public function updateInfo() {
-        if ($this->request->is('ajax') || $this->ieVersion() == 8) {
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/) {
             $this->loadModel("Document");
             $this->Document->save($this->data);
             Cache::clear();
@@ -434,11 +438,11 @@ class CabinetsController extends AppController {
         //$renamedFile = str_replace("{hash}",$hash, $renamedFile);
 
         rename($this->params->data["file"]["tmp_name"], $tmpPath . $renamedFile);
-        copy($tmpPath . $renamedFile, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->Auth->user('id') . DS . $renamedFile);
+        @copy($tmpPath . $renamedFile, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->auth_id . DS . $renamedFile);
 
         // Upload to Crocodoc
         if (in_array(strtolower($ext), array('doc', 'docx', 'pdf', 'xls', 'xlsx'))) {
-            $local_url = ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->Auth->user('id') . DS . $renamedFile;
+            $local_url = ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->auth_id . DS . $renamedFile;
             $this->_uploadToCrocodoc($local_url, $fileId);
         }
         return $tmpPath . $renamedFile;
@@ -450,8 +454,7 @@ class CabinetsController extends AppController {
     */
     public function uploadToS3() {
 
-        if ($this->request->is('ajax') || $this->ieVersion() == 8 || isset($this->request->params["form"]["Filedata"]) || isset($this->request->params["form"]["FileBody_0"])) {
-
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/ || isset($this->request->params["form"]["Filedata"]) || isset($this->request->params["form"]["FileBody_0"])) {
             if (isset($this->request->params["form"]["Filedata"])) {
                 $this->params->data["file"] = $this->request->params["form"]["Filedata"];
                 $this->params->query["folderId"] = $this->data["folder_id"];
@@ -530,7 +533,8 @@ class CabinetsController extends AppController {
      * @return void
      */
     public function multipleUpload() {
-        if (isset($this->request->params["form"]["FileBody_0"])) {
+
+        if(isset($this->request->params["form"]["FileBody_0"])) {
             if (count($this->request->params["form"]) > 0) {
                 $folders = $this->data["folders"];
                 $length = strlen(str_replace(",", "", $folders));
@@ -540,7 +544,7 @@ class CabinetsController extends AppController {
                 $this->loadModel("Folder");
                 $data["user_id"] = $this->data["user_id"];
                 $data["parent_id"] = $this->data["folder_id"];
-
+				
                 foreach ($this->request->params["form"] as $name) {
                     if ($length >= 5) {
                         $folderId = $this->multipleUploadCreateFolders($data, $explode[$i]);
@@ -930,6 +934,7 @@ class CabinetsController extends AppController {
         //$this->redirect('/cabinets?project=' . $folderid);
 		$this->redirect('/cabinets');
     }
+
 }
 
 ?>

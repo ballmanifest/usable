@@ -132,7 +132,6 @@ $(function() {
 						return !!$(this).text().match(pattern);
 					});
 					if(matched.length) {
-						console.log(matched);
 						matched.html(function(index,oldhtml) {
 							return oldhtml.replace(pattern,"<span style='color:#39A2EC'>"+ value +"</span>");
 						}).show(0);
@@ -265,7 +264,12 @@ $(function() {
 				$.post(_ROOT + 'shares/add_share', $('form.submit_shares_form').serialize(), function(response) {
 					if(response.status == 'y') {
 						// update counter
-						var counter = $(handlerToThisShare).prev('.counter');
+						var counter = '';
+						if( $(handlerToThisShare).prev('.counter').length) {
+							counter = $(handlerToThisShare).prev('.counter');
+						} else {
+							counter = $(handlerToThisShare).find('.dcounter');
+						}
 						if(counter.length) {
 							counter.text(function(i, oldText) {
 								var count = parseInt(oldText, 10);

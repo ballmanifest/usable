@@ -351,12 +351,13 @@ class SharesController extends AppController {
 				$sh = $share['Share'];
 				
 				// Get Users
+				/*
 				if(!empty($sh['user2_id'])) {
 					$da = $this->Share->User->find('first', array('recursive' => -1, 'conditions' => array('User.id' => $sh['user2_id']), 'fields' => array('id', 'first_name', 'last_name', 'email')));
 					$target_name =  $da['User']['first_name'] . ' ' .  $da['User']['last_name'];
 					$da_id = $da['User']['id'];
 					$html .= $this->_parepare_share_row_for_modal('user2_id', $sh, $da_id, $shareType, $item_name, $itemId, $target_name);
-				}
+				}*/
 				
 				// Get Emails
 				if(!empty($sh['user2_id'])) {

@@ -12,7 +12,7 @@ class ContactsGroupsController extends AppController {
 		$user_id=$this->Auth->user('id');
 		$company_id=$this->Auth->user('company_id');
 		$result['status'] = 'n';
-		
+
 		if($this->request->is('post') && !empty($this->request->data)) {
 			if($this->ContactsGroup->saveMany($this->request->data, array('validate' => false))) {
 				$result['status'] = 'y';

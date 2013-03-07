@@ -1,4 +1,7 @@
 <?php
+	echo $this->Html->css(array('ui-lightness/jquery-ui-1.8.23.custom', 'fancybox/jquery.fancybox.css'));
+	echo $this->Html->script(array('jquery.cookie', 'jquery.form', 'jquery-ui-1.8.23.custom.min', 'fancybox/jquery.fancybox', 'share_modal', 'doc_view'));
+	
 	if(!empty($viewer_info)) {
 		$auth_id = CakeSession::read('Auth.User.id');
 		echo $this->Html->css( array('document_view') );
@@ -21,10 +24,10 @@
 		<!-- Description About Current Viewing Doc -->
 		<div class="doc_header_des clearfix">
 			<p class="related_to_doc me_right">
-				<?php echo $this->Html->link('Tasks ('. $tasks .')', 'javascript:void(1)', array('class' => 'task_pill green_pill'));?>
-				<?php echo $this->Html->link('Shares ('. $shares .')', 'javascript:void(1)', array('class' => 'share_pill green_pill'));?>
+				<?php echo $this->Html->link('Tasks (<span class="dcounter">'. $tasks .'</span>)', 'javascript:void(1)', array('escape' => false, 'class' => 'task_pill green_pill'));?>
+				<?php echo $this->Html->link('Shares (<span class="dcounter">'. $shares .'</span>)', $this->Html->url(array('controller' => 'shares', 'action' => 'share_modal', 'type' => 'document', 'id' => $viewer_info['doc_detail']['Document']['id']), true), array('paramId' => $viewer_info['doc_detail']['Document']['id'], 'data-sharetype' => 'document', 'escape' => false, 'class' => 'fancyboxShareModal share_pill green_pill'));?>
 				<?php //echo $this->Html->link('Edit PDF', 'javascript:void(1)', array('class' => 'edit_pdf_pill'));?>
-				<?php echo $this->Html->link('Comments ('. $comments .')', 'javascript:void(1)', array('class' => 'comment_pill green_pill'));?>
+				<?php echo $this->Html->link('Comments (<span class="dcounter">'. $comments .'</span>)', array('controller' => 'documents', 'action' => 'comments',  $viewer_info['doc_detail']['Document']['id']), array('escape' => false, 'title' => 'Comment', 'class' => 'fancyboxComment comment_pill green_pill'));?>
 			</p>
 			<h2>
 			<a class="subscription_star" data-subscription="folder_<?php echo $viewer_info['doc_detail']['Document']['id'];?>" title="Subscribe" href="javascript:void(1)">
@@ -38,8 +41,8 @@
 			</h2>
 			<p><span class="version">
 				<strong>Version: <?php echo $version;?></strong></span>,
-				<strong>Created By: <?php echo $created_by;?></strong></span>,
-				<strong>Created on: <?php echo $created;?></strong></span>
+				<strong>Created By: <?php echo $created_by;?></strong>,
+				<strong>Created on: <?php echo $created;?></strong>
 			</p>
 		</div>
 <?php

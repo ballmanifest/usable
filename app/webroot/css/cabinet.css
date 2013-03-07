@@ -1218,3 +1218,11 @@ a.first_visit_placeholders {
 	margin-top: 15px;
 	display: none;
 }
+#tabs-1, #tabs-2 {
+	border: 1px solid #ccc;
+	margin: 3px;
+	padding: 5px;;
+}
+.ui-widget-content {
+	border: none;
+}

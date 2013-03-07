@@ -1,11 +1,17 @@
 /**
 *	Action on Folder(breadcrumb) row hover (AY)
 */
-$(function() {
 var $share_modal_fancybox = null,
 	handlerToThisComment = null,
 	handlerToThisShare = null,
-	documentMoveActivate = false;
+	documentMoveActivate = false,
+	JavaPowUpload = null,
+	isDirectoryStructure, 
+	totalFiles=0,
+	Java=null;
+	
+$(function() {
+JavaPowUpload = document.getElementById("JavaPowUpload");
 $.FolderAction = {
 	setMask: function() {
 		var height = $('#main_container').height() + 10;
@@ -469,6 +475,10 @@ var Cabinet = {
 							$('#tabs ul li:eq(0)').hide(0);
 							$('#tabs ul li:eq(1)').show(0).find('a').click();
 						}
+					},
+					onComplete : function(){
+						JavaPowUpload = document.getElementById('JavaPowUpload');
+						
 					}
 				});
 			},
@@ -567,7 +577,7 @@ var Cabinet = {
 						$.cookie('documentToMove', '{}');
 					}
 				});
-				
+	
 				/**
 				*	Fancybox for comment
 				*/
@@ -583,12 +593,14 @@ var Cabinet = {
 						$("span#ui-dialog-title-dialog").html(title + " - Comments");
 						$("#CommentComment").blur();
 						Cabinet.Process.DocumentComments.autoScrollBottom();
+						/*
 						if(unique == true){ 
 							$("#CommentComment").val("Add new Comment: ").blur(); 
-			            }
+			            }*/
 						handlerToThisComment = handler;
 					}
 				});
+				
 				/**
 				*	Fancybox for show permalink
 				*/
@@ -660,15 +672,18 @@ var Cabinet = {
 						});
 					}
 				});
-				$share_modal_fancybox = $('.fancyboxShareModal').fancybox({
+				/**
+				*	Fancy box Share Modal
+				*/
+				$('.fancyboxShareModal').fancybox({
 					autoDimensions: false,
 					width: 570,
 					height: 395,
 					transitionIn : 'none',
 					transitionOut: 'none',
 					titleShow: false,
-					onStart : function() {
-					
+					onStart : function(handler) {
+						handlerToThisShare = handler;
 					},
 					onComplete: function(handler) {
 						handlerToThisShare = handler;
@@ -1082,18 +1097,16 @@ var Cabinet = {
 				}
 				return true;
 			},
-			javaUpload: function() {
-				var Java;
-				var FormObj = $("#formupload");
-				var FormValues = '';
-				Java = document.getElementById("JavaPowUpload");
+			javaUpload: function(e) {
+				e.preventDefault();
+				/*
 				Java.setParam("Upload.HttpUpload.FormName", "formupload");
 				Java.setParam("Upload.HttpUpload.AddFormValuesToPostFields", "false");
 				Java.setParam("Upload.HttpUpload.AddFormValuesToHeaders", "false");
 				Java.setParam("Upload.HttpUpload.AddFormValuesToQueryString", "false");
-				Java.setParam("Upload.HttpUpload.AddFormValuesToPostFields", "true");
-
-				Java.startUpload();
+				Java.setParam("Upload.HttpUpload.AddFormValuesToPostFields", "true");*/
+				/*alert(JavaPowUploadd);
+				JavaPowUploadd.startUpload();*/
 				return false;
 			}
 		},
@@ -1286,7 +1299,7 @@ var Cabinet = {
 						scrollTop: $("#" + paramId).offset().top - 110
 					},
 					500);
-				})
+				});
 			},
 			onOverlayClick: function() {
 				$(".overlay-info").live("click",
@@ -1421,9 +1434,8 @@ var Cabinet = {
 				$(currentCommentElement).text(parseInt(total) + 1);
 				$(currentCommentElement).parent().addClass("none-opacity").css("opacity", 100);
 				$($form).find(".loader").hide();
-				$($form).before(responseText);
+				$(".comment-wrapper").append(responseText).removeAttr("style");
 				Cabinet.Process.DocumentComments.autoScrollBottom();
-				$(".comment-wrapper").removeAttr("style");
 				$.fancybox.center();
 				// show comment count
 				var counter = $(handlerToThisComment).prev('.counter');
@@ -1556,6 +1568,14 @@ var Form = {
 	/**
 	*	Set Advance Uplaoder event
 	*/
-	$('#formupload[name="formupload"]').on('submit', Cabinet.Process.onUploadDocument.javaUpload);
-	$('button[name="submitbtn"][type="submit"]').on('click', Cabinet.Process.onUploadDocument.javaUpload);
+	$('body').on('submit', '#formupload[name="formupload"]', Cabinet.Process.onUploadDocument.javaUpload);
+	$('body').on('click', 'button[name="submitbtn"][type="submit"]', Cabinet.Process.onUploadDocument.javaUpload);
+	
+	/**
+	*	Prevent Ajax call cache
+	*/
+	$.ajaxSetup({
+		cache: false
+	});
+	
 });

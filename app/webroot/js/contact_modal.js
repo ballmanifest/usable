@@ -10,17 +10,20 @@ $(function() {
 		_r.rowShared = 0;
 		_r.newGroupAdd = false;
 		this.init = function() {
-			_r.setNavigation();
-			_r.onContactLinkClick();
-			_r.getGroups();
-			_r.onGroupLinkClick();
+			if( $.cookie('cotactModalLoad') == 'n') {
+				_r.setNavigation();
+				_r.onContactLinkClick();
+				_r.onGroupLinkClick();
+				_r.createNewGroupLinkOnClick();
+				_r.createGroupCancelButtonClick();
+				_r.contactShareCancelButtonClick();
+				_r.contactShareAddShareButtonClick();
+				_r.createGroupButtonClick();
+				_r.onItemSelection();
+				$.cookie('cotactModalLoad', 'y');
+			}
 			_r.initTrigger();
-			_r.createNewGroupLinkOnClick();
-			_r.createGroupCancelButtonClick();
-			_r.contactShareCancelButtonClick();
-			_r.contactShareAddShareButtonClick();
-			_r.createGroupButtonClick();
-			_r.onItemSelection();
+			_r.getGroups();
 		};
 		this.initTrigger= function() {
 			$('.contact-contact .contact_type:first a').click();
@@ -33,6 +36,7 @@ $(function() {
 			});
 		};
 		this.renderContacts = function(collections) {
+			html = '';
 			$.each(collections, function(i, item) {
 				var key = Object.keys(item)[0];
 				html += '<label class="each_contact"><input type="checkbox" value="1" class="contact-choose" data-email="'+ item[key].email +'" data-id="'+ item[key].id +'" data-type="'+ key +'"><span>'+ item[key].email +'</span></label>';
@@ -61,7 +65,7 @@ $(function() {
 				}
 			});
 		};
-		this.getGroups = function() {
+		this.getGroups = function() {			
 			$.get(_ROOT + 'groups/get_groups', function(response) {
 				var html = '';
 				$.each(response, function(i, item) {
@@ -98,6 +102,7 @@ $(function() {
 					'data[sort]' : 'first_name'
 				}, function(response) {
 					if(filter == 'all-members-contacts') {
+						$('.group-panel').empty();
 						$.each(response.list, function(i, item){
 							var dhtml = _r.renderContacts(item);
 							$('.group-panel').append(dhtml);
@@ -105,7 +110,7 @@ $(function() {
 						});
 					} else {
 						var dhtml = _r.renderContacts(response.list);
-						$('.group-panel').append(dhtml);
+						$('.group-panel').html(dhtml);
 						html = '';
 					}
 					$('.loading_content').removeClass('loading_content');
@@ -113,7 +118,7 @@ $(function() {
 			});
 		};
 		this.createNewGroupLinkOnClick = function() {
-			$('#create_new_group_link').on('click', function() {
+			$('body').on('click', '#create_new_group_link', function() {
 				$('.success_message').empty();
 				$('#contacts_and_groups_container').animate({
 					left: '-560px'
@@ -142,7 +147,7 @@ $(function() {
 			}, 'json');
 		};
 		this.createGroupCancelButtonClick = function() {
-			$('button.cancel_create_group').on('click', function() {
+			$('body').on('click', 'button.cancel_create_group', function() {
 				$('#create_group_modal').addClass('me_hide');
 				$('#contacts_and_groups_container').animate({
 					left: 0
@@ -161,7 +166,7 @@ $(function() {
 			});
 		};
 		this.contactShareCancelButtonClick = function() {
-			$('.contact_share_buttons button.cancel_btn').on('click', function() {
+			$('body').on('click', '.contact_share_buttons button.cancel_btn', function() {
 				$('#contacts_and_groups_container').hide(0, function() {
 					$('#share_modal_container').animate({
 						left: 0
@@ -184,6 +189,7 @@ $(function() {
 				var tr = '',
 				selectedContacts = $('.group-panel input.contact-choose:checked');
 				_r.rowShared = $('.selected_users_list tbody tr').length;
+				console.log(selectedContacts.length);
 				if(selectedContacts.length) {
 					selectedContacts.each(function() {
 						var T = $(this),
@@ -226,7 +232,7 @@ $(function() {
 				}
 			});
 			
-			$('button.create_group').on('click', function() {
+			$('body').on('click', 'button.create_group', function() {
 				value = $.trim(input.val());
 				if(!value.length) {
 					input.css('border-color', '#f00');
@@ -259,7 +265,16 @@ $(function() {
 			});
 		};
 		this.addContactsToGroup = function(group_id) {
-			$.post(_ROOT + 'contacts_groups/save_contacts_groups', $('form.save_contacts_group').serialize(), function(response) {
+			var data = [];
+			$('form.save_contacts_group div.show_contacts_for_create_group label').each(function(i) {
+				if( $('input[type="checkbox"]', this).is(':checked')) {
+					$('input:hidden', this).each(function() {
+						var name = this.name, value = this.value, obj = {'name' : name, 'value' : value};
+						data.push(obj);
+					})
+				}
+			});
+			$.post(_ROOT + 'contacts_groups/save_contacts_groups', data, function(response) {
 				if(response.status == 'y') {
 					$('.success_message').html('Successfull. Thanks!').show();
 					$('button, img', '.create_group_button').toggle();
@@ -271,6 +286,5 @@ $(function() {
 		};
 		this.init();
 	};
-	
 	$.ContactsModal();	
 });

@@ -204,11 +204,11 @@ span.add-on {
 	background-color: #FFFFFF;
 	border: 1px solid #CCCCCC;
 	height: 162px;
-	left: 5px;
+	left: 10px;
 	overflow-y: scroll;
 	position: absolute;
-	top: 226px;
-	width: 511px;
+	top: 190px;
+	width: 492px;
 	max-height: 196px;
 }
 #find_share_panel {
