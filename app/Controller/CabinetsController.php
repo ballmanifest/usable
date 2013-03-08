@@ -834,6 +834,10 @@ class CabinetsController extends AppController {
                 $tmpname = 'uploader_' . $i . '_tmpname';
                 $tmpname = $this->request->data[$tmpname];
                 $fileStatus = $this->request->data[$status];
+
+var_dump($data);
+exit;
+
                 if ($fileStatus == 'done') {
 
                     $this->loadModel("Document");
@@ -881,6 +885,7 @@ class CabinetsController extends AppController {
                     $data["type"] = $this->request->data["Content-Type"];
                     $this->Document->create();
                     $this->Document->save($data);
+
                     /**
                      * 	Create a Notice when New
                      * 	new File added
@@ -923,6 +928,7 @@ class CabinetsController extends AppController {
                     //copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'img' . DS . "imagecache" . DS . $renamedFile);
 
 var_dump(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname);
+var_dump( $folderForUser . DS . $renamedFile);
 					@copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, $folderForUser . DS . $renamedFile);
 					/*
                     if (in_array(strtolower($ext), array('doc', 'docx', 'pdf', 'xls', 'xlsx'))) {
