@@ -8,10 +8,11 @@
 		const DB_USER = "root";        // database username
                 const DB_PASSWORD = "";  // database password
 		const DB = "filocity2";        // database name 
-                protected $aws_access_key="AKIAJV5DHUAR2GGUSHUQ";    // AWS s3 Access key  
-                protected $aws_secret_key="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";  // AWS s3 Secret key
+                protected $aws_access_key="AKIAJWIKQMYOIRHYI6KA";    // AWS s3 Access key  
+                protected $aws_secret_key="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";  // AWS s3 Secret key
                 protected $aws_bucket= 'filocity-files-002';// filocity s3 bucket
                 protected $allowedExn="All";
+  protected $swfpath="/home/www/htdocs/app/webroot/rest/swf/";
 				  //protected $allowedExn="camrec,accdb,avi,mpg,mpeg,mp3,wav,jpg,gif,png,rtf,bmp,doc,docx,dot,dotx,ppt,pptx,potx,pot,txt,pdf,xls,xlsx,xltx,xlt,csv,xps,ods,odt,odp,sxw,html,htm,sxc,tsv,pps,sxi,pub,mp4,m4v,f4v,mov,webm,flv,ogv,aac,m4a,f4a,ogg,oga,aif,avi,bdb,cnt,des,iif,ldb,lmr,lmx,nd,qba,qbb,qbi,qbm,qbw,qbx,qby,qpd,rtp,tdb,tlg,set,v30,1pa,log,usa,qbt,ptb,zip,rar,avi,jpeg,tiff,eps";
                 protected $ShareId = 0;
                 protected $Space = "company";

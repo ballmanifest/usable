@@ -8,6 +8,7 @@ require_once("config.php");
 
 require_once("S3.php");
 
+
 class API extends REST {
 
     public function __construct() {
@@ -33,8 +34,7 @@ class API extends REST {
             $this->$func();
         else
             $this->json(array("messgae" => "You cann't access filocity "));
-        // If the method not exist with in this class, response would be "you cannt access filocity"
-	
+        // If the method not exist with in this class, response would be "you cannt access filocity".
     }
 
     // ************************ Authentication ***********************************	
@@ -949,7 +949,7 @@ class API extends REST {
                                 
     }*/
  public function save_pdf() {
-           
+           $restpath = $this->swfpath;
                     $secret = $_REQUEST['secret'];
                     $Space = $_REQUEST['space'];
                     //$name = $_REQUEST['name'];
@@ -1001,7 +1001,7 @@ class API extends REST {
                                    if(isset($GLOBALS["HTTP_RAW_POST_DATA"])){
                                             $pdf = $GLOBALS["HTTP_RAW_POST_DATA"];
                                             $old_name = $_REQUEST["filename"];
-                                            $url = "/home/www/htdocs/app/webroot/rest/swf/". $old_name;
+                                            $url = $restpath. $old_name;
                                             file_put_contents($url, $pdf);
                                             $Filefilter = explode('.', $old_name);
                                             $name = $Filefilter[0];
@@ -1062,10 +1062,10 @@ class API extends REST {
                                                         {
                                                         $tmp_name = $_FILES["Filedata"]["tmp_name"];
                                                         move_uploaded_file($tmp_name, 'swf/'.$new_name.".".$extension);
-                                                        $url = "/home/www/htdocs/app/webroot/rest/swf/".$new_name.".".$extension;
+                                                        $url = $restpath.$new_name.".".$extension;
                                                         }
                                                         $totalPages = intval(shell_exec("identify -format %n '$url'"));
-                                                        $swf_path = "/home/www/htdocs/app/webroot/rest/swf/".$new_name."%.swf";
+                                                        $swf_path = $restpath.$new_name."%.swf";
                                                         shell_exec("pdf2swf -v -t -T 9 '$url' -o '$swf_path'");
                                                         $s3 = new S3($accessKey, $secretKey);
                                                         if ($s3->putObjectFile($url, $bucket, $new_name.".".$extension, S3::ACL_PUBLIC_READ_WRITE)) {
@@ -1075,7 +1075,7 @@ class API extends REST {
                                                                      }
                                                                      else{
                                                                            for($i = 1; $i <= $totalPages; $i++){
-                                                                                   $swf_path1 = "/home/www/htdocs/app/webroot/rest/swf/".$new_name.$i.".swf";
+                                                                                   $swf_path1 = $restpath.$new_name.$i.".swf";
                                                                                    $s3->putObjectFile($swf_path1, $bucket, "swf/".$new_name.$i.".swf", S3::ACL_PUBLIC_READ_WRITE);
                                                                                    unlink($swf_path1);
                                                                            }
@@ -1098,6 +1098,7 @@ class API extends REST {
        
  } 
 public function get_swf(){
+$restpath = $this->swfpath;
    $secret = $_REQUEST['secret'];
 $sqlquery = "SELECT * FROM users WHERE auth_key='$secret'";
  $sqlquery = mysql_query($sqlquery);
@@ -1129,17 +1130,17 @@ $bucket = $this->aws_bucket;
                     $strtosign = "GET\n\n\n$timestamp\n/$bucket/$filename";
                     $signature = urlencode(base64_encode(hash_hmac("sha1", utf8_encode($strtosign), $secretKey, true)));
                     $file = "http://".$bucket.".s3.amazonaws.com/$filename?AWSAccessKeyId=$accessKey&Expires=$timestamp&Signature=$signature";
-                    $newfile = '/home/www/htdocs/app/webroot/rest/swf/'.$filename;
+                    $newfile = $restpath.$filename;
 
                     if ( copy($file, $newfile) ) {
-                          $swf_path = "/home/www/htdocs/app/webroot/rest/swf/".$name."%.swf";
+                          $swf_path = $restpath.$name."%.swf";
                           shell_exec("pdf2swf -v -t -T 9 '$newfile' -o '$swf_path'");
                              $totalPages = intval(shell_exec("identify -format %n '$newfile'"));
                              if($totalPages >= $pageno)
                              {
                              for($i = 1; $i <= $totalPages; $i++)
                              {
-                                 $swf_path1 = "/home/www/htdocs/app/webroot/rest/swf/".$name.$i.".swf";
+                                 $swf_path1 = $restpath.$name.$i.".swf";
                                 $s3->putObjectFile($swf_path1, $bucket, "swf/".$name.$i.".swf", S3::ACL_PUBLIC_READ_WRITE);
                              }
                        $timestamp = strtotime("+3 days");
@@ -1175,6 +1176,7 @@ $bucket = $this->aws_bucket;
  }
  }
 public function swf_info(){
+$restpath = $this->swfpath;
    $secret = $_REQUEST['secret'];
 $Space = $_REQUEST['space'];
 $convert = $_REQUEST['convert'];
@@ -1208,7 +1210,7 @@ $bucket = $this->aws_bucket;
                     $strtosign = "GET\n\n\n$timestamp\n/$bucket/$filename";
                     $signature = urlencode(base64_encode(hash_hmac("sha1", utf8_encode($strtosign), $secretKey, true)));
                     $file = "http://".$bucket.".s3.amazonaws.com/$filename?AWSAccessKeyId=$accessKey&Expires=$timestamp&Signature=$signature";
-                    $newfile = '/var/www/html/app/webroot/rest/swf/'.$filename;
+                    $newfile = $restpath.$filename;
 
                     if ( copy($file, $newfile) ) {
                            $totalPages = intval(shell_exec("identify -format %n '$newfile'"));
@@ -1226,16 +1228,16 @@ $bucket = $this->aws_bucket;
                     $strtosign = "GET\n\n\n$timestamp\n/$bucket/$filename";
                     $signature = urlencode(base64_encode(hash_hmac("sha1", utf8_encode($strtosign), $secretKey, true)));
                     $file = "http://".$bucket.".s3.amazonaws.com/$filename?AWSAccessKeyId=$accessKey&Expires=$timestamp&Signature=$signature";
-                    $newfile = '/var/www/html/app/webroot/rest/swf/'.$filename;
+                    $newfile = $restpath.$filename;
 
                     if ( copy($file, $newfile) ) {
-                          $swf_path = "/var/www/html/app/webroot/rest/swf/".$name."%.swf";
+                          $swf_path = $restpath.$name."%.swf";
                           shell_exec("pdf2swf -v -t -T 9 '$newfile' -o '$swf_path' ");
                           $totalPages = intval(shell_exec("identify -format %n '$newfile'"));
                           
                              for($i = 1; $i <= $totalPages; $i++)
                              {
-                                 $swf_path1 = "/var/www/html/app/webroot/rest/swf/".$name.$i.".swf";
+                                 $swf_path1 = $restpath.$name.$i.".swf";
                                  $s3->putObjectFile($swf_path1, $bucket, "swf/".$name.$i.".swf", S3::ACL_PUBLIC_READ_WRITE);
                                  unlink($swf_path1);
                   //$timestamp = strtotime("+3 days");

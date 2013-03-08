@@ -168,6 +168,8 @@
 			<script type="text/javascript">
 				JavaPowUpload = document.getElementById('JavaPowUpload');
 				var JavaPowUpload_onServerResponse = function(status, response) {
+					console.log(status);
+					console.log(response); return false;
 					var currentFolderId = jQuery.cookie("currentFolderId");
 					$.fancybox.close();
 					if (currentFolderId) {

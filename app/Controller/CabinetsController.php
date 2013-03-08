@@ -396,10 +396,11 @@ class CabinetsController extends AppController {
     */
     private function uploadToS3SaveFile() {
         $this->loadModel("Document");
-        if ($this->Auth->user("id")) {
+        if ($this->auth_id) {
             $this->request->data["folder_id"] = $this->params->query["folderId"];
-            $this->request->data["user_id"] = $this->Auth->user("id");
+            $this->request->data["user_id"] = $this->auth_id;
         }
+		
         $this->Document->Behaviors->attach('Image');
         $this->Document->create();
         $this->Document->save($this->data);
@@ -476,24 +477,25 @@ class CabinetsController extends AppController {
                 $config = new S3_CONFIG();
             }
             $fileId = $this->uploadToS3SaveFile();
-
+			
             $newFile = $this->uploadToS3RenameFile($config, $this->params->query["folderId"], $fileId);
             $this->params->data["file"]["tmp_name"] = $newFile;
             $url = str_replace("{bucket}", $config->default["bucket"], $config->default["url"]);
 
             $postData = $_POST;
             $postData["file"] = "@" . $this->params->data["file"]["tmp_name"];
-
-            if (!isset($flashJavaUpload)) {
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_VERBOSE, 1);
-                $response = curl_exec($ch);
-                $this->set('treeFolders', $this->Session->read("Folder.Parent.records"));
-                $this->render("ajax_uploads", false);
-            }
+			
+			$ch = curl_init();
+			var_dump($url);
+			curl_setopt($ch, CURLOPT_URL, $url);
+			
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_VERBOSE, 1);
+			$response = curl_exec($ch);
+			var_dump($response);
+			$this->set('treeFolders', $this->Session->read("Folder.Parent.records"));
+			$this->render("ajax_uploads", false);
         } else {
             $msg = array("error" => "Browser doesn't support this method");
             echo json_encode($msg);
