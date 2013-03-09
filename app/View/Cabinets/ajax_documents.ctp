@@ -442,8 +442,7 @@
 		$ext = $document['ext'];
 		
 		if(in_array(strtolower($ext), array('jpg', 'jpeg', 'png', 'gif'))) {
-			$path = WWW_ROOT . DS . 'uploads' . DS . 'user_' . $auth_id . DS . $document["file"];
-			if(file_exists($path)) {
+			$path = FILOCITY_STORE . $document["file"]; //WWW_ROOT . DS . 'uploads' . DS . 'user_' . $auth_id . DS . $document["file"];
 ?>
 		<li class="each_item me_left me_relative t<?php echo $document["id"]?>" data-description="" searchdata="<?php echo $document["name"]?>">
 			<div class="thumb-content">
@@ -451,8 +450,8 @@
 					$size = getimagesize($path);
 					$width = $size[0];
 					$height = $size[1];
-					$thumb = $this->Html->url(array('controller' => 'image', 'action' => 'cabimage', 'thumb', $document["file"], $width, $height, '?' => time()), true);
-					$large = $this->Html->url(array('controller' => 'image', 'action' => 'cabimage', 'large', $document["file"], $width, $height, '?' => time()), true);
+					$thumb = $this->Html->url(array('controller' => 'image', 'action' => 'cabimage', 'thumb', $document['file']), true);
+					$large = $this->Html->url(array('controller' => 'image', 'action' => 'cabimage', 'large', $document["file"]), true);
 					
 					$img = $this->Html->image($thumb, array('class' => 'my_thumb', 'escape' => false));
 					echo $this->Html->link($img, $large ,array("class"=>"fancybox img_" . $document["id"],"escape"=>false,"rel"=>"gallery")); 
@@ -468,7 +467,6 @@
 			<input type="hidden" value="<?php echo $document["id"]?>" >
 		</li>
 	<?php 
-			}
 		}
 	?>
 <?php endforeach; ?>   
@@ -483,6 +481,7 @@
 		?>
 		<form class="formUpload" accept-charset="utf-8" method="post" enctype="multipart/form-data" action="<?php echo $url?>">
 			<?php	
+				
 				foreach ($params as $p => $v):
 					echo $this->Form->hidden("{$p}", array("value"=>"{$v}", "name"=>"{$p}"));
 				endforeach;
@@ -491,7 +490,7 @@
 				echo $this->Html->tag("span", "", array("class"=>"ajaxTarget hide me_hide"));
 				echo $this->Form->submit("Upload", array("class"=>"hide me_hide", "div" => "me_hide"));
 			 ?>
-			<span class="loader upl"><?php echo $this->Html->image('ajax-loader-transparent.gif');?> Uploading...</span>
+			<span class="loader upl me_hide"><?php echo $this->Html->image('ajax-loader.gif');?> Uploading...</span>
 		</form>
 	</li>
 </ul>

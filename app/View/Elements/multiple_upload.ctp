@@ -168,23 +168,9 @@
 			<script type="text/javascript">
 				JavaPowUpload = document.getElementById('JavaPowUpload');
 				var JavaPowUpload_onServerResponse = function(status, response) {
-					console.log(status);
-					console.log(response); return false;
 					var currentFolderId = jQuery.cookie("currentFolderId");
 					$.fancybox.close();
-					if (currentFolderId) {
-						var t = $("#directory_dd a").text();
-						var r = t.replace(" ", "");
-						var f = r.toLowerCase();
-						if (isDirectoryStructure && f.length) {
-							$('li.' + f).find("a").trigger("click");
-							$(".dd_selected").trigger("click");
-						} else {
-							$("a#mechild_" + currentFolderId).trigger("click");
-						}
-					} else {
-						location.reload(true);
-					}
+					location.reload(true);
 				}
 
 				var JavaPowUpload_onUploadStart = function(up) {

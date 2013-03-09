@@ -368,7 +368,7 @@ class Share extends AppModel {
 		//$html .= '<p>In order to access the share, please click '. $permalink .'</p>';
 		//$html .= '<p>If you can not see the link, please copy/paste following URL in your browser\'s address and press enter.</p>';
 		//$html .= '<p>' . $activation_url . '</p>';
-		
+		unset($user['User']['password']);
 		$Mandrill = new Mandrill($apiKey);
 		$result = $Mandrill->prepareAndSendEmail($activation_url, $user, $html, $subject);
 		return true;

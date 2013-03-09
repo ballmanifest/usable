@@ -147,13 +147,6 @@ var Cabinet = {
 			var tree = this.InitializeTree();
 			tree.bind("loaded.jstree",
 			function(event, data) {
-				var currentFolderId = jQuery.cookie("currentFolderId");
-				var prevNode = $('a#mechild_' + currentFolderId);
-				if(currentFolderId) {
-					prevNode.trigger('click');
-				} else {
-					$("#explorer a[id^=mechild]:first").trigger("click");
-				}
 				tree.jstree("open_all");
 			});
 			tree.bind("refresh.jstree",
@@ -258,6 +251,10 @@ var Cabinet = {
 					return nodeName;
 				}).css('width', '200px');
 			});*/
+			//$("#explorer").jstree("select_node", "#mechild_" + $.cookie('currentFolderId'));
+			setTimeout(function() {
+				$("#mechild_" + $.cookie('currentFolderId')).click();
+			},200);
 		},
 		OnEachItem: function() {
 			$('.each_item').on({
@@ -397,8 +394,9 @@ var Cabinet = {
 			function() {
 				var target = $(this).data('target'),
 				toHide = $(this).data('hide');
-				$('#' + toHide).hide();
-				$('#' + target).show();
+				if($(this).hasClass('current_view')) return 0;
+				$('#' + toHide).hide(0);
+				$('#' + target).show(0);
 				$(this).add('.current_view').toggleClass('current_view');
 				var type = $(this).attr("class");
 				var splits = type.split(" ");
@@ -825,7 +823,7 @@ var Cabinet = {
 		triggerSpaceClick: function() {
 			var location = window.location.href,
 			queryParts = location.split('#'),
-			sourceId = 0,
+			sourceId = $.cookie('parentFolderId'),
 			projectId = 0;
 			Cabinet.Process.isMultipleUploadActive = queryParts[1] === 'multipleUpload' ? 1 : 0;
 			if(queryParts[0].indexOf('?') >= 0) {
@@ -839,6 +837,10 @@ var Cabinet = {
 				$("#directory_dd_options a[data-projfldr=" + sourceId + "]").trigger("click");
 			} else {
 				$("#directory_dd_options").find("li").first().find("a").trigger("click");
+			}
+			
+			if($('#directory_dd_options li:has(a)').length == 1) {
+				$("#directory_dd_options li:first a").trigger("click");
 			}
 			$("span.dd_pointer_up").trigger("click");
 		},
@@ -904,23 +906,21 @@ var Cabinet = {
 				$("#explorer").html('<span class="loader"><img src="' + _ROOT + 'img/ajax-loader.gif" /> Loading...</span>');
 				var parent = this;
 				var folderId = $(this).next().val();
+				
+				if($.cookie('parentFolderId') != folderId) {
+					$.cookie('parentFolderId', folderId);
+					$.cookie('currentFolderId', folderId);
+				} else {
+					if(!$.cookie('currentFolderId')) {
+						$.cookie('currentFolderId', folderId);
+					}
+				}
+				
 				$.get(_ROOT + 'cabinets/folders', {
 					folderId: folderId
 				},
 				function(data) {
 					$("#explorer, #explorer_for_move_doc").html(data);
-					var currentFolderId = $.cookie('currentFolderId');
-					/*
-					if(currentFolderId) {
-						$('a#mechild_' + currentFolderId).click();
-						return 1;
-					}*/
-					/*
-					if($("#explorer").find("ul").find("li:first").find("a.parent").length) {
-						$("#explorer").find("ul").find("li:first").find("a.parent").trigger("click");
-					} else {
-						$("#explorer").find("ul").find("li:first").find("a").trigger("click");
-					}*/
 					Cabinet.Tree.Bind();
 				});
 				$("input.folderId").val('');
@@ -962,13 +962,13 @@ var Cabinet = {
 			});
 		},
 		onViewDocuments: function(sourceId, limit) {
-			
 			Cabinet.Process.currentFolderId = sourceId;
 			var parent = this;
 			if ($(".manageFolder").is(":visible") || $("span.loader").is(":visible")) {
 				Cabinet.Process.onManageFolderProcess.prepareFolderId(sourceId);
 				return true;
 			}
+			
 			/*hide gallery to prevent mess*/
 			$("#gallery_item_container").empty();
 			if ($("#gallery_item_container").prev("span.loader").length <= 0) {
@@ -1016,6 +1016,11 @@ var Cabinet = {
 					theme:"dark-thin"
 				});
 				jQuery.cookie("currentFolderId", sourceId);
+				/**
+				*	Set the view type ie. Thumb view / list view
+				*/
+				var currentView = $.cookie('viewType') ? parseInt($.cookie('viewType'), 10) : 1;
+				$('span.view_change_icon.' + ['list_view', 'thumbnail_view'][currentView-1]).click();
 				if (Cabinet.Process.isMultipleUploadActive) {
 					$('.fancyboxUpload').trigger('click');
 					jQuery.cookie("autoActiveMultiUpload", 1);
@@ -1539,7 +1544,6 @@ var Form = {
 		});
 	}
 	
-	//$.cookie('currentFolderId','');
 	Cabinet.Tree.Ready();
 	Cabinet.Process.Ready();
 	$.ShareModal().init();

@@ -29,9 +29,9 @@ if(! defined('MEMORY_LIMIT') )				define ('MEMORY_LIMIT', '30M');							// Set P
 if(! defined('BLOCK_EXTERNAL_LEECHERS') ) 	define ('BLOCK_EXTERNAL_LEECHERS', false);				// If the image or webshot is being loaded on an external site, display a red "No Hotlinking" gif.
 
 //Image fetching and caching
-if(! defined('ALLOW_EXTERNAL') )			define ('ALLOW_EXTERNAL', false);						// Allow image fetching from external websites. Will check against ALLOWED_SITES if ALLOW_ALL_EXTERNAL_SITES is false
+if(! defined('ALLOW_EXTERNAL') )			define ('ALLOW_EXTERNAL', true);						// Allow image fetching from external websites. Will check against ALLOWED_SITES if ALLOW_ALL_EXTERNAL_SITES is false
 if(! defined('ALLOW_ALL_EXTERNAL_SITES') ) 	define ('ALLOW_ALL_EXTERNAL_SITES', false);				// Less secure. 
-if(! defined('FILE_CACHE_ENABLED') ) 		define ('FILE_CACHE_ENABLED', false);					// Should we store resized/modified images on disk to speed things up?
+if(! defined('FILE_CACHE_ENABLED') ) 		define ('FILE_CACHE_ENABLED', true);					// Should we store resized/modified images on disk to speed things up?
 if(! defined('FILE_CACHE_TIME_BETWEEN_CLEANS'))	define ('FILE_CACHE_TIME_BETWEEN_CLEANS', 86400);	// How often the cache is cleaned 
 
 if(! defined('FILE_CACHE_MAX_FILE_AGE') ) 	define ('FILE_CACHE_MAX_FILE_AGE', 86400);				// How old does a file have to be to be deleted from the cache
@@ -124,15 +124,7 @@ if(! defined('WEBSHOT_XVFB_RUNNING') )	define ('WEBSHOT_XVFB_RUNNING', false);		
 // If ALLOW_EXTERNAL is true and ALLOW_ALL_EXTERNAL_SITES is false, then external images will only be fetched from these domains and their subdomains. 
 if(! isset($ALLOWED_SITES)){
 	$ALLOWED_SITES = array (
-		'flickr.com',
-		'staticflickr.com',
-		'picasa.com',
-		'img.youtube.com',
-		'upload.wikimedia.org',
-		'photobucket.com',
-		'imgur.com',
-		'imageshack.us',
-		'tinypic.com',
+		'filocity-files-002.s3.amazonaws.com'
 	);
 }
 // -------------------------------------------------------------
@@ -181,6 +173,7 @@ class timthumb {
 	}
 	public function __construct(){
 		global $ALLOWED_SITES;
+		$ALLOWED_SITES = array('filocity-files-002.s3.amazonaws.com');
 		$this->startTime = microtime(true);
 		date_default_timezone_set('UTC');
 		$this->debug(1, "Starting new request from " . $this->getIP() . " to " . $_SERVER['REQUEST_URI']);
@@ -207,10 +200,10 @@ class timthumb {
 		$this->cleanCache();
 		
 		$this->myHost = preg_replace('/^www\./i', '', $_SERVER['HTTP_HOST']);
+		
 		$this->src = $this->param('src');
 		$this->url = parse_url($this->src);
 		$this->src = preg_replace('/https?:\/\/(?:www\.)?' . $this->myHost . '/i', '', $this->src);
-		
 		if(strlen($this->src) <= 3){
 			$this->error("No image specified");
 			return false;
@@ -238,6 +231,7 @@ class timthumb {
 			$this->error("You are not allowed to fetch images from an external website.");
 			return false;
 		}
+		
 		if($this->isURL){
 			if(ALLOW_ALL_EXTERNAL_SITES){
 				$this->debug(2, "Fetching from all external sites is enabled.");
@@ -285,6 +279,7 @@ class timthumb {
 		}
 	}
 	public function run(){
+		
 		if($this->isURL){
 			if(! ALLOW_EXTERNAL){
 				$this->debug(1, "Got a request for an external image but ALLOW_EXTERNAL is disabled so returning error msg.");
@@ -302,7 +297,6 @@ class timthumb {
 			} else {
 				$this->debug(3, "webshot is NOT set so we're going to try to fetch a regular image.");
 				$this->serveExternalImage();
-
 			}
 		} else {
 			$this->debug(3, "Got request for internal image. Starting serveInternalImage()");

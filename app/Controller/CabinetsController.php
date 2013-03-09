@@ -8,6 +8,7 @@ class CabinetsController extends AppController {
     public $helpers = array('Cache');
     public $components = array();
 	public $auth_id = null;
+	public $awsparams;
 	
     /*
       public $cacheAction = array(
@@ -337,7 +338,8 @@ class CabinetsController extends AppController {
             $this->set('currentFolder', $folder);
             $this->set('shared_by', $shared_by);
             $this->set('is_shared', $is_shared);
-            //$this->uploadToS3Initialize();
+			//$this->set('params', $this->awsparams);
+            $this->uploadToS3Initialize();
             $this->set('treeFolders', $this->Session->read("Folder.Parent.records"));
             $this->render("ajax_documents", false);
         }
@@ -356,149 +358,18 @@ class CabinetsController extends AppController {
         exit;
     }
 
-
-    /**
-     * Uploads documents to S3
-     * @link (ajax) http://filocity.com/cabinets/uploadToS3
-     */
-    public function uploadToS3() {
-        if($this->request->is('ajax') /*|| $this->ieVersion()==8 */|| isset($this->request->params["form"]["Filedata"])
-            || isset($this->request->params["form"]["FileBody_0"])) {
-
-            if(isset($this->request->params["form"]["Filedata"])) {
-                $this->params->data["file"]  = $this->request->params["form"]["Filedata"];
-                $this->params->query["folderId"] = $this->data["folder_id"];
-                $this->Session->id($this->data["session_id"]);
-                $flashJavaUpload = true;
-            }
-
-            if(isset($this->request->params["form"]["FileBody_0"])) {
-                $this->params->data["file"]  = $this->request->params["form"]["FileBody_0"];
-                $this->params->query["folderId"] = $this->data["folder_id"];
-                $this->Session->id($this->data["session_id"]);
-                $flashJavaUpload = true;
-            }
-
-            ini_set('max_execution_time', 1234568910);
-
-            config('s3');
-            if (class_exists('S3_CONFIG')) { $config = new S3_CONFIG();}
-            $fileId = $this->uploadToS3SaveFile();
-
-            $newFile = $this->uploadToS3RenameFile($config, $this->params->query["folderId"], $fileId);
-            $this->params->data["file"]["tmp_name"] = $newFile;
-            $url = str_replace("{bucket}",$config->default["bucket"], $config->default["url"]);
-
-            $postData = $_POST;
-            $postData["file"] = "@" . $this->params->data["file"]["tmp_name"];
-
-            if(!isset($flashJavaUpload)){
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, $url);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-                curl_setopt($ch, CURLOPT_VERBOSE, 1);
-                $response = curl_exec($ch);
-                $this->set('treeFolders', $this->Session->read("Folder.Parent.records"));
-                $this->render("ajax_uploads", false);
-            }
-
-       } else {
-           $msg = array("error"=>"Browser doesn't support this method");
-           echo json_encode($msg);
-           exit;
-       }
-    }
-
-    /**
-     * Before file was upload to S3, it renames on this function
-     *
-     * @param config $config S3 Config instance
-     * @param integer $folderId The ID of the folder
-     * @param integer $fileId The new ID of the document
-     * @return string $tmpPath . $renamedFile Path and file name of the document
-     */
-    private function uploadToS3RenameFile($config, $folderId, $fileId) {
-        $tmpName = $this->params->data["file"]["tmp_name"];
-        $tmpArray = array_reverse(explode(DS, $tmpName));
-        $tmpPath = str_replace($tmpArray[0],"", $tmpName);
-
-        $fileInfo = $this->params->data["file"]["name"];
-        $file = explode('.', $fileInfo);
-        $ext = array_pop($file);
-        $fileFormat = $config->default["fileFormat"];
-        $version = $config->default["version"];
-        $hash = AuthComponent::password($fileInfo);
-
-        $renamedFile = str_replace("{folder-id}",$folderId, $fileFormat);
-        $renamedFile = str_replace("{file-id}",$fileId, $renamedFile);
-        $renamedFile = str_replace("{ext}",$ext, $renamedFile);
-        //$renamedFile = str_replace("{[version]}",$version, $renamedFile);
-        //$renamedFile = str_replace("{hash}",$hash, $renamedFile);
-
-        rename($this->params->data["file"]["tmp_name"],  $tmpPath . $renamedFile);
-        copy($tmpPath . $renamedFile, ROOT.DS.APP_DIR.DS.WEBROOT_DIR.DS.'img'.DS . "imagecache" .DS .  $renamedFile);
-		
-		// Upload to Crocodoc
-		if(in_array(strtolower($ext), array('doc', 'docx', 'pdf'))) {
-			$local_url = ROOT.DS.APP_DIR.DS.WEBROOT_DIR.DS.'img'.DS . "imagecache" .DS .  $renamedFile;
-			$this->_uploadToCrocodoc($local_url, $fileId);
-		}
-        return  $tmpPath . $renamedFile;
-    }
- 
 	/**
-	 *  Upload a copy of Local File to 
-	 *	Crocodoc, for Crocodoc view
-	 *	doc, docx and pdf Extensions only
-	 *
-	 *	@params local path to file
-	 *	@return Crocodoc UUID
-	 */
-
-	private function _uploadToCrocodoc($local_url, $document_id) {
-		$this->autoRender = false;
-		App::import('Helper', 'Crocodoc');
-		
-		$Crocodoc = new CrocodocHelper();
-		$response = $Crocodoc->setToken('E7ub1x3TqgeZAVy6C5FdIKMN')->setURL($local_url)->uploadFile();
-		if(isset($response['status']) && strtolower($response['status']) == 'ok') {
-			$this->loadModel('Document');
-			$this->Document->updateAll(array('Document.crocodoc_uuid' => '\''. $response['uuid'].'\''), array('Document.id' => $document_id));
-		}
-	}
+	*  ///////////////////////////////////////////////////////////  S3 upload methods START ///////////////////////////////////////////////////////////////////
+	*/
 	
-    /**
-     * And before file was upload to S3, it saves first into database
-     *
-     * @param none
-     * @return integer $newId New ID of a document
-     */
-    private function uploadToS3SaveFile() {
-        $this->loadModel("Document");
-        if($this->Auth->user("id")) {
-            $this->request->data["folder_id"] = $this->params->query["folderId"];
-            $this->request->data["user_id"] = $this->Auth->user("id");
-        }
-        $this->Document->Behaviors->attach('Image');
-        $this->Document->create();
-        $this->Document->save($this->data);
-
-        $newId = $this->Document->getLastInsertId();
-        $this->Document->id = $newId;
-        $this->set('documents',  $this->Document->read());
-        Cache::clear();
-        return $newId;
-    }
-
-    /**
-     * Before the uploading process begin, S3 Config should be initialized
-     *
-     * @param none
-     * @return void
-     */
+	/**
+    * Before the uploading process begin, S3 Config should be initialized
+    *
+    * @param none
+    * @return void
+    */
     protected function uploadToS3Initialize() {
-        config('s3');
+		config('s3');
         app::import("vendor", "S3/S3");
 
         if (class_exists('S3_CONFIG')) {
@@ -510,71 +381,220 @@ class CabinetsController extends AppController {
         $lifetime = 3600;
         $maxFileSize = (1024 * 1024 * 50);
         $metaHeaders = array('uid' => 123);
-        $requestHeaders = array('Content-Type' => 'application/octet-stream',
+        $requestHeaders = array(
+			'Content-Type' => 'application/octet-stream',
             'Content-Disposition' => 'attachment; filename=${filename}'
         );
 
-        $params = S3::getHttpUploadPostParams(
-            $bucket,
-            $path,
-            S3::ACL_PUBLIC_READ,
-            $lifetime,
-            $maxFileSize,
-            201,
-            $metaHeaders,
-            $requestHeaders,
-            false
-        );
+        $params = S3::getHttpUploadPostParams($bucket, $path, S3::ACL_PUBLIC_READ, $lifetime, $maxFileSize, 201, $metaHeaders, $requestHeaders, false);
+		$this->awsparams = $params;
         $this->set("params", $params);
     }
 	
 	/**
+    * And before file was upload to S3, it saves first into database
+    *
+    * @param none
+    * @return integer $newId New ID of a document
+    */
+    private function uploadToS3SaveFile() {
+        $this->loadModel("Document");
+        if ($this->auth_id) {
+            $this->request->data["folder_id"] = isset($this->params->query["folderId"]) ? $this->params->query["folderId"] : $this->request->data['folder_id'];
+            $this->request->data["user_id"] = $this->auth_id;
+        }
+		
+        $this->Document->Behaviors->attach('Image');
+        $this->Document->create();
+        $this->Document->save($this->data);
+
+        $newId = $this->Document->getLastInsertId();
+        $this->Document->id = $newId;
+        $this->set('documents', $this->Document->read());
+        Cache::clear();
+        return $newId;
+    }
+	
+    /**
+    * Before file was upload to S3, it renames on this function
+    *
+    * @param config $config S3 Config instance
+    * @param integer $folderId The ID of the folder
+    * @param integer $fileId The new ID of the document
+    * @return string $tmpPath . $renamedFile Path and file name of the document
+    */
+    private function uploadToS3RenameFile($config, $folderId, $fileId) {
+	
+        $tmpName = $this->params->data["file"]["tmp_name"];
+        $tmpArray = array_reverse(explode(DS, $tmpName));
+        $tmpPath = str_replace($tmpArray[0], "", $tmpName);
+
+        $fileInfo = $this->params->data["file"]["name"];
+        $file = explode('.', $fileInfo);
+        $ext = array_pop($file);
+        $fileFormat = $config->default["fileFormat"];
+        $version = $config->default["version"];
+        $hash = AuthComponent::password($fileInfo);
+
+        $renamedFile = str_replace("{folder-id}", $folderId, $fileFormat);
+        $renamedFile = str_replace("{file-id}", $fileId, $renamedFile);
+        $renamedFile = str_replace("{ext}", $ext, $renamedFile);
+        //$renamedFile = str_replace("{[version]}",$version, $renamedFile);
+        //$renamedFile = str_replace("{hash}",$hash, $renamedFile);
+		
+        rename($this->params->data["file"]["tmp_name"], $tmpPath . $renamedFile);
+        @copy($tmpPath . $renamedFile, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->auth_id . DS . $renamedFile);
+
+        // Upload to Crocodoc
+        if (in_array(strtolower($ext), array('doc', 'docx', 'pdf', 'xls', 'xlsx'))) {
+            $local_url = ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . "user_" . $this->auth_id . DS . $renamedFile;
+            $this->_uploadToCrocodoc($local_url, $fileId);
+        }
+        return $tmpPath . $renamedFile;
+    }
+	
+    /**
+    * Uploads documents to S3
+    * @link (ajax) http://filocity.com/cabinets/uploadToS3
+    */
+    public function uploadToS3() {
+
+        if ($this->request->is('ajax') /*|| $this->ieVersion() == 8*/ || isset($this->request->params["form"]["Filedata"]) || isset($this->request->params["form"]["FileBody_0"]) || isset($this->request->data['uploader_0_tmpname'])) {
+            if (isset($this->request->params["form"]["Filedata"])) {
+                $this->params->data["file"] = $this->request->params["form"]["Filedata"];
+                $this->params->query["folderId"] = $this->data["folder_id"];
+                $this->Session->id($this->data["session_id"]);
+                $flashJavaUpload = true;
+            }
+
+            if (isset($this->request->params["form"]["FileBody_0"])) {
+                $this->params->data["file"] = $this->request->params["form"]["FileBody_0"];
+                $this->params->query["folderId"] = $this->data["folder_id"];
+                $this->Session->id($this->data["session_id"]);
+                $flashJavaUpload = true;
+            }
+			
+			if(isset($this->request->data["uploader_0_tmpname"])) {
+				
+			}
+
+            ini_set('max_execution_time', 1234568910);
+            $fileId = $this->uploadToS3SaveFile();
+			
+			config('s3');
+            if (class_exists('S3_CONFIG')) {
+                $config = new S3_CONFIG();
+            }
+			$folder_id = isset($this->params->query["folderId"]) ? $this->params->query["folderId"] : $this->request->data['folder_id'];
+			$newFile = $this->uploadToS3RenameFile($config, $folder_id, $fileId);
+            $this->params->data["file"]["tmp_name"] = $newFile;
+            $url = str_replace("{bucket}", $config->default["bucket"], $config->default["url"]);
+
+            $postData = $_POST;
+            $postData["file"] = "@" . $this->params->data["file"]["tmp_name"];
+			
+			$data = array(
+				'AWSAccessKeyId' => $postData['AWSAccessKeyId'],
+				'key' => $postData['key'],
+				'acl' => $postData['acl'],
+				'policy' => $postData['policy'],
+				'signature' => $postData['signature'],
+				'success_action_status' => $postData['success_action_status'],
+				'Content-Type' => $postData['Content-Type'],
+				'Content-Disposition' => $postData['Content-Disposition'],
+				'uid' => $postData['uid'],
+				'file' => $postData['file'],
+			);
+
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_VERBOSE, 1);
+			$response = curl_exec($ch);
+			
+			$this->set('treeFolders', $this->Session->read("Folder.Parent.records"));
+			$this->render("ajax_uploads", false);
+        } else {
+            $msg = array("error" => "Browser doesn't support this method");
+            echo json_encode($msg);
+            exit;
+        }
+    }
+	
+	/**
+	*  ///////////////////////////////////////////////////////////  S3 upload methods END ///////////////////////////////////////////////////////////////////
+	*/
+	
+
+    /**
+     *  Upload a copy of Local File to 
+     * 	Crocodoc, for Crocodoc view
+     * 	doc, docx and pdf Extensions only
+     *
+     * 	@params local path to file
+     * 	@return Crocodoc UUID
+     */
+    private function _uploadToCrocodoc($local_url, $document_id) {
+        $this->autoRender = false;
+        App::import('Helper', 'Crocodoc');
+
+        $Crocodoc = new CrocodocHelper();
+        $response = $Crocodoc->setToken('suJGtmrvpCjEVNWfIAy0LXdh')->setURL($local_url)->uploadFile();
+        if (isset($response['status']) && strtolower($response['status']) == 'ok') {
+            $this->loadModel('Document');
+            $this->Document->updateAll(array('Document.crocodoc_uuid' => '\'' . $response['uuid'] . '\''), array('Document.id' => $document_id));
+        }
+    }
+
+    /**
      * Multiple upload
      *
      * @param none
      * @return void
      */
     public function multipleUpload() {
-        if( isset($this->request->params["form"]["FileBody_0"])) {
-            if(count($this->request->params["form"]) > 0){
+        if(isset($this->request->params["form"]["FileBody_0"])) {
+            if (count($this->request->params["form"]) > 0) {
                 $folders = $this->data["folders"];
-                $length = strlen(str_replace(",","", $folders));
+                $length = strlen(str_replace(",", "", $folders));
                 $explode = explode(",", $folders);
 
                 $i = 0;
                 $this->loadModel("Folder");
                 $data["user_id"] = $this->data["user_id"];
                 $data["parent_id"] = $this->data["folder_id"];
-
-                foreach($this->request->params["form"] as $name){
-                    if($length>=5) {
-                       $folderId = $this->multipleUploadCreateFolders($data,$explode[$i]);
-                       $this->request->data["folder_id"] = $folderId;
-                       ++$i;
+				
+                foreach ($this->request->params["form"] as $name) {
+                    if ($length >= 5) {
+                        $folderId = $this->multipleUploadCreateFolders($data, $explode[$i]);
+                        $this->request->data["folder_id"] = $folderId;
+                        ++$i;
                     }
-                    $this->log("1","debug");
+                    $this->log("1", "debug");
                     $this->request->params["form"]["FileBody_0"] = $name;
                     $this->uploadToS3();
                 }
             }
         } else {
-           $this->uploadToS3();
+            $this->uploadToS3();
         }
         exit;
     }
 
     private $records = array();
+
     protected function multipleUploadCreateFolders($data, $path) {
         $filter = array();
-        $exp = explode("\\",$path);
+        $exp = explode("\\", $path);
         $filter = array_filter($exp);
 
-        foreach($filter as $folder) {
+        foreach ($filter as $folder) {
             $data["name"] = Sanitize::paranoid($folder);
             $key = array_search($folder, $this->records);
-            if($key >= 1) {
+            if ($key >= 1) {
                 //$this->request->data["folder_id"] = $key;
-               $lastId =  $key;
+                $lastId = $key;
             } else {
                 $this->Folder->create();
                 $this->Folder->save($data);
@@ -834,10 +854,6 @@ class CabinetsController extends AppController {
                 $tmpname = 'uploader_' . $i . '_tmpname';
                 $tmpname = $this->request->data[$tmpname];
                 $fileStatus = $this->request->data[$status];
-
-var_dump($data);
-exit;
-
                 if ($fileStatus == 'done') {
 
                     $this->loadModel("Document");
@@ -885,7 +901,6 @@ exit;
                     $data["type"] = $this->request->data["Content-Type"];
                     $this->Document->create();
                     $this->Document->save($data);
-
                     /**
                      * 	Create a Notice when New
                      * 	new File added
@@ -924,11 +939,8 @@ exit;
 					
 					$folderForUser = $targetDir . DS . 'user_' . $auth_id;
 					if (!file_exists($folderForUser)) @mkdir($folderForUser);
-					 
+					
                     //copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'img' . DS . "imagecache" . DS . $renamedFile);
-
-var_dump(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname);
-var_dump( $folderForUser . DS . $renamedFile);
 					@copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, $folderForUser . DS . $renamedFile);
 					/*
                     if (in_array(strtolower($ext), array('doc', 'docx', 'pdf', 'xls', 'xlsx'))) {
@@ -937,23 +949,36 @@ var_dump( $folderForUser . DS . $renamedFile);
                     }
 					*/
 					// Upload to s3
-					$this->request->data['file'] = '@' . $folderForUser . DS . $renamedFile	;
-					
+					$this->request->data['file'] = '@' . $folderForUser . DS . $renamedFile;
+					$this->request->data['folders'] = DS;
 					config('s3');
 					if (class_exists('S3_CONFIG')) {
 						$config = new S3_CONFIG();
 					}
 					$url = str_replace("{bucket}", $config->default["bucket"], $config->default["url"]);
 					$postData = $this->request->data;
-					var_dump($postData);
+					$data = array(
+						'AWSAccessKeyId' => $postData['AWSAccessKeyId'],
+						'key' => $postData['key'],
+						'acl' => $postData['acl'],
+						'policy' => $postData['policy'],
+						'signature' => $postData['signature'],
+						'success_action_status' => $postData['success_action_status'],
+						'Content-Type' => $postData['Content-Type'],
+						'Content-Disposition' => $postData['Content-Disposition'],
+						'uid' => $postData['uid'],
+						'file' => $postData['file'],
+					);
+					
 					$ch = curl_init();					
 					curl_setopt($ch, CURLOPT_URL, $url);
-					curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+					
+					curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($ch, CURLOPT_VERBOSE, 1);
 					$response = curl_exec($ch);
-					var_dump($response); exit;
                     @unlink(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname);
+					@unlink($folderForUser . DS . $renamedFile);
                 }
             }
         }

@@ -26,7 +26,7 @@ class ImageController extends AppController {
 		
 		$_GET['src']= DS.'img'.DS.'filocity_img'.DS.'user_'.$user_id.DS.'profile.jpg';
 		if(!file_exists(WWW_ROOT.$_GET['src'])){
-			$_GET['src']=DS.'img'.DS.'prof_img.jpg';
+			$_GET['src']= DS.'img'.DS.'prof_img.jpg';
 		}
 		
 		define('LOCAL_FILE_BASE_DIRECTORY', WWW_ROOT);
@@ -37,15 +37,16 @@ class ImageController extends AppController {
 		$this->autoRender = false;
 		$_GET =array();
 		if($size == 'thumb') {
-			$_GET['h'] = 170;
+			$_GET['w'] = 160;
+			$_GET['h'] = 160;
 		} elseif($size == 'large') {
 			$_GET['w'] = $width;
 			$_GET['h'] = $height;
 		}
 		$userId = $this->Auth->user('id');
-		$_GET['src'] =  DS . 'uploads' . DS . 'user_' . $userId . DS . $file_name;
-		define('LOCAL_FILE_BASE_DIRECTORY', WWW_ROOT);
+		$_GET['src'] =  FILOCITY_STORE . $file_name; //DS . 'uploads' . DS . 'user_' . $userId . DS . $file_name;
 		require(WWW_ROOT.'/../Lib/timthumb.php');
+		//define('ALLOW_ALL_EXTERNAL_SITES', true);
 	}
 	
 	public function temp() {
