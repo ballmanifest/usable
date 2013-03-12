@@ -7,7 +7,7 @@ class Folder extends AppModel {
      * Holds private assigned $threaded records
      * @var array
      */
-    private $threaded = array();
+    public $threaded = array();
 
     /**
      * Association
@@ -123,8 +123,8 @@ class Folder extends AppModel {
      * @param integer $depth An integer that holds deep level on an array
      * @return array $threaded
      */
-    public function findThreaded($id = 1, $depth = 0, $auth_id=null) {
-	
+    public function findThreaded($id = 1, $depth = 0, $auth_id=null, $level=-1){
+		
 		$is_owner = 0;
 		$is_shared = 0;
 		$folder_type = null;
@@ -146,29 +146,32 @@ class Folder extends AppModel {
 				$idx = am($id, $shared_folder_idx);
 			}
 		}
-		
 		if(count($is_owner) > 0  || $is_shared) {
 			foreach($idx as $id) {
 				$arg["conditions"] = array("Folder.id"=>$id);
+				$arg["order"] = array("Folder.name" => "asc");
 				$results = $this->find("all",$arg);
 				$this->threaded = $this->threaded + $this->make($results[0]["Folder"], $depth);
-				if(count($results[0]["Children"]) > 0) {
+				if(!empty($results[0]["Children"]) && count($results[0]["Children"]) > 0) {
 					++$depth;
 				} else {
 					$depth = 1;
 				}
-				
-				foreach($results[0]["Children"] as $result) {
-					$this->threaded = $this->threaded + $this->make($result, $depth);
-					$arg["conditions"] = array("parent_id"=>$result["id"]);
-					$childrenArray = $this->find("all",$arg);
-					if(count($childrenArray)>=1) {
-						$counter = $depth+1;
-						foreach($childrenArray as $children) {
-							$this->findThreaded($children["Folder"]["id"], $counter, $auth_id);
+				if(!empty($results[0]["Children"])) {
+					$results[0]["Children"] = Set::sort($results[0]["Children"], '{n}.name', 'asc');
+					foreach($results[0]["Children"] as $result) {
+						$this->threaded = $this->threaded + $this->make($result, $depth);
+						$arg["conditions"] = array("parent_id"=>$result["id"]);
+						$arg["order"] = array("Folder.name" => "asc");
+						$childrenArray = $this->find("all",$arg);
+						if(count($childrenArray)>=1 && $level != 1) {
+							$counter = $depth+1;
+							foreach($childrenArray as $children) {
+								$this->findThreaded($children["Folder"]["id"], $counter, $auth_id, $level);
+							}
+						} else {
+							$counter = $depth-1;
 						}
-					} else {
-						$counter = $depth-1;
 					}
 				}
 			}
@@ -198,7 +201,7 @@ class Folder extends AppModel {
      * @param boolean $isParent Boolean indicator for parent records
      * @return array $this->threaded
      */
-    public function getChildrenId($folderId, $isParent = true, $auth_id, $user_type='') {
+    public function getChildrenId($folderId, $isParent = true, $auth_id, $level=-1) {
         $merge = array();
         $id = array();
 		$args = array("conditions"=>array("Folder.id"=>$folderId)); // , "Folder.user_id" => $auth_id
@@ -225,20 +228,26 @@ class Folder extends AppModel {
 		
 		$this->Behaviors->attach('Containable');
 		$args['contain'] = array('Document', 'Children');
+		$args['order'] = array('Folder.name' => 'asc');
 		$results = $this->find("all",$args);
+		
 		
 		if(!empty($results)){
 			if($isParent){
 			   $id[] = $results[0]["Folder"]["id"];
 			   $this->threaded = $id;
 			}
-			if(isset($results[0]["Children"])) {
+			
+			if(isset($results[0]["Children"]) && !empty($results[0]["Children"])) {
+				$results[0]["Children"] = Set::sort($results[0]["Children"], '{n}.name', 'asc');
+				$this->threaded = array_merge($id, Set::extract('/id', $results[0]['Children']));
+				/*
 				foreach($results[0]["Children"] as $result) {
 					$folderId = $result["id"];
 					$id[] = $folderId;
 					$ids = $this->getChildrenId($folderId, $isParent = false, $auth_id);
 					$this->threaded = array_merge($id, $ids);
-				}
+				}*/
 			}
 		}
 		

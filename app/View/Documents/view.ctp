@@ -115,7 +115,7 @@
 			*	Adeptol Viewer
 			*/
 			$adeptol_key = 'P33R20LOBF1G0J6TQBER709P8TFKMVWN'; //'PR9LPQEC68D7EMGKS2D631520WXVBY3K';
-			$url = $this->Html->url('/uploads/user_' . $auth_id . '/' .  $viewer_info['doc_detail']['Document']['file'], true);
+			$url = FILOCITY_STORE .  $viewer_info['doc_detail']['Document']['file']; //$this->Html->url('/uploads/user_' . $auth_id . '/' .  $viewer_info['doc_detail']['Document']['file'], true);
 			$save_button = $is_downloadable? 'Yes' : 'No';
 			$print_button = $is_printable? 'Yes' : 'No';
 			$copy_text_button = $is_readonly ? 'No' : 'Yes';

@@ -241,6 +241,11 @@ class CabinetsController extends AppController {
             $auth_id = $this->Auth->user('id');
             $role = intval($this->Auth->user('role'));
             $folderId = $this->params->query["sourceId"];
+			
+			// Get all folders
+			$allFolders = $this->myfolders($folderId);			
+			$this->Document->Folder->threaded = array(); // reset the thread var
+			
 			/**
 			*	Save current viewing folder_id by user in Session
 			*/
@@ -251,8 +256,9 @@ class CabinetsController extends AppController {
             $folder = $this->Document->Folder->find('first', array('conditions' => array('Folder.id' => $folderId)));
             $folder_name = $folder['Folder']['name'];
             $folder_type = $folder['Folder']['folder_type'];
-            $folderIds = $this->Document->Folder->getChildrenId($folderId, true, $auth_id);
-
+			
+            $folderIds = $this->Document->Folder->getChildrenId($folderId, true, $auth_id, $level=1);
+			
             $limit = $this->params->query["limit"];
 
             $arg = array();
@@ -325,9 +331,8 @@ class CabinetsController extends AppController {
                     )
                 )
             );
+			$results = $this->Document->find("all", $arg);
 			
-            $results = $this->Document->find("all", $arg);
-
             /* store current folder id - for caching purposes */
             $this->Session->write("Folder.id", $this->params->query["sourceId"]);
             $this->set('documents', $results);
@@ -339,6 +344,7 @@ class CabinetsController extends AppController {
             $this->set('shared_by', $shared_by);
             $this->set('is_shared', $is_shared);
 			//$this->set('params', $this->awsparams);
+			$this->set('allFolders', $allFolders);
             $this->uploadToS3Initialize();
             $this->set('treeFolders', $this->Session->read("Folder.Parent.records"));
             $this->render("ajax_documents", false);
@@ -408,8 +414,7 @@ class CabinetsController extends AppController {
         $this->Document->create();
         $this->Document->save($this->data);
 
-        $newId = $this->Document->getLastInsertId();
-        $this->Document->id = $newId;
+        $newId = $this->Document->getLastInsertId();$this->Document->id = $newId;
         $this->set('documents', $this->Document->read());
         Cache::clear();
         return $newId;
@@ -474,10 +479,6 @@ class CabinetsController extends AppController {
                 $flashJavaUpload = true;
             }
 			
-			if(isset($this->request->data["uploader_0_tmpname"])) {
-				
-			}
-
             ini_set('max_execution_time', 1234568910);
             $fileId = $this->uploadToS3SaveFile();
 			
@@ -512,6 +513,7 @@ class CabinetsController extends AppController {
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($ch, CURLOPT_VERBOSE, 1);
 			$response = curl_exec($ch);
+			@unlink($this->params->data["file"]["tmp_name"]);
 			
 			$this->set('treeFolders', $this->Session->read("Folder.Parent.records"));
 			$this->render("ajax_uploads", false);
@@ -721,6 +723,7 @@ class CabinetsController extends AppController {
      * 	save file by uploader as temp
      */
     public function uploader() {
+
         // HTTP headers for no cache etc
         header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
         header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
@@ -729,8 +732,8 @@ class CabinetsController extends AppController {
         header("Pragma: no-cache");
         // Settings
 
-        $targetDir = ROOT . DS . APP_DIR . DS . 'tmp';
 
+		$targetDir = ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads' . DS . 'user_' . $this->auth_id;
         $cleanupTargetDir = true; // Remove old files
         $maxFileAge = 5 * 3600; // Temp file age in seconds
         // 5 minutes execution time
@@ -747,19 +750,19 @@ class CabinetsController extends AppController {
         $fileName = preg_replace('/[^\w\._]+/', '_', $fileName);
 
         // Make sure the fileName is unique but only if chunking is disabled
-        if ($chunks < 2 && file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
+        if ($chunks < 2 && file_exists($targetDir . DS . $fileName)) {
             $ext = strrpos($fileName, '.');
             $fileName_a = substr($fileName, 0, $ext);
             $fileName_b = substr($fileName, $ext);
 
             $count = 1;
-            while (file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName_a . '_' . $count . $fileName_b))
+            while (file_exists($targetDir . DS . $fileName_a . '_' . $count . $fileName_b))
                 $count++;
 
             $fileName = $fileName_a . '_' . $count . $fileName_b;
         }
 
-        $filePath = $targetDir . DIRECTORY_SEPARATOR . $fileName;
+        $filePath = $targetDir . DS . $fileName;
 
         // Create target dir
         if (!file_exists($targetDir))
@@ -768,7 +771,7 @@ class CabinetsController extends AppController {
         // Remove old temp files	
         if ($cleanupTargetDir && is_dir($targetDir) && ($dir = opendir($targetDir))) {
             while (($file = readdir($dir)) !== false) {
-                $tmpfilePath = $targetDir . DIRECTORY_SEPARATOR . $file;
+                $tmpfilePath = $targetDir . DS . $file;
 
                 // Remove temp file if it is older than the max age and is not the current file
                 if (preg_match('/\.part$/', $file) && (filemtime($tmpfilePath) < time() - $maxFileAge) && ($tmpfilePath != "{$filePath}.part")) {
@@ -841,8 +844,12 @@ class CabinetsController extends AppController {
      * 	Save files's info in db and Crocodoc
      */
     public function saveUploadedImage() {
-		
 		$this->autoRender = false;
+		
+		$targetDir = ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads';
+		$auth_id = $this->Auth->user('id');
+		$folderForUser = $targetDir . DS . 'user_' . $auth_id;
+		
         if (isset($this->request->data) && $this->request->data['uploader_count'] > 0) {
             $count = $this->request->data['uploader_count'];
             for ($i = 0; $i < $count; $i++) {
@@ -855,22 +862,22 @@ class CabinetsController extends AppController {
                 $tmpname = $this->request->data[$tmpname];
                 $fileStatus = $this->request->data[$status];
                 if ($fileStatus == 'done') {
-
                     $this->loadModel("Document");
-
                     $folderid = $this->request->data["folder_id"];
                     $ext = explode('.', $name);
-
                     $ext = (count($ext) > 1 ? $ext[count($ext) - 1] : '');
                     $name = str_replace('.' . $ext, '', $name);
                     $oldfile = $this->Document->find('first', array('conditions' => array('Document.folder_id' => $folderid, 'Document.name' => $name, 'Document.is_latest' => 'Y')));
-
                     $newversion = 1;
+					
+					/**
+					*	Update Version and create notice
+					*/
                     if (!empty($oldfile)) {
-                        $data["version_document_id1"] = $oldfile['Document']['version_document_id1'];
+                        $data["version_document_id"] = $oldfile['Document']['version_document_id'];
                         $newversion = intval($oldfile['Document']['version']) + 1;
                         //update previous latest 
-                        $this->Document->updateAll(array('is_latest' => "'N'"), array('version_document_id1' => $oldfile['Document']['version_document_id1']));
+                        $this->Document->updateAll(array('is_latest' => "'N'"), array('version_document_id' => $oldfile['Document']['version_document_id']));
 
                         /**
                          * 	Create a Notice when any
@@ -890,14 +897,14 @@ class CabinetsController extends AppController {
                          * 	Create Notice block end
                          */
                     }
-                    //$newversion=($newversion+1);
+                    
                     $data["name"] = $name;
                     $data["folder_id"] = $folderid;
                     $data["user_id"] = $this->request->data["user_id"];
                     $data["version"] = $newversion;
 
                     $data["ext"] = $ext;
-                    $data["size"] = intval(@filesize(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname) / 1024);
+                    $data["size"] = intval(@filesize($folderForUser . DS . $tmpname) / 1024);
                     $data["type"] = $this->request->data["Content-Type"];
                     $this->Document->create();
                     $this->Document->save($data);
@@ -919,35 +926,35 @@ class CabinetsController extends AppController {
                     /**
                      * 	Create Notice block end
                      */
+					 
+					/**
+					*	Update File name to original and update version for new file
+					*/
                     $newid = $this->Document->getLastInsertId();
                     $this->Document->id = $newid;
-                    	
+                    
                     $renamedFile = $folderid . "-" . $newid . "." . $ext;
                     $data["file"] = $renamedFile;
                     if ($newversion == 1) {
-                        $data["version_document_id1"] = $newid;
+                        $data["version_document_id"] = $newid;
                     }
                     $this->Document->save($data);
-
                     $this->set('documents', $this->Document->read());
 					
 					/**
 					*	Save the uploaded files
 					*/
-					$targetDir = ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'uploads';
-					$auth_id = $this->Auth->user('id');
-					
-					$folderForUser = $targetDir . DS . 'user_' . $auth_id;
 					if (!file_exists($folderForUser)) @mkdir($folderForUser);
+					@rename($folderForUser . DS . $tmpname, $folderForUser . DS . $renamedFile);
 					
-                    //copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, ROOT . DS . APP_DIR . DS . WEBROOT_DIR . DS . 'img' . DS . "imagecache" . DS . $renamedFile);
-					@copy(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname, $folderForUser . DS . $renamedFile);
-					/*
+					/**
+					*	Upload to Crocodoc
+					*/
                     if (in_array(strtolower($ext), array('doc', 'docx', 'pdf', 'xls', 'xlsx'))) {
                         $local_url = $folderForUser . DS . $renamedFile;
                         $this->_uploadToCrocodoc($local_url, $newid);
                     }
-					*/
+					
 					// Upload to s3
 					$this->request->data['file'] = '@' . $folderForUser . DS . $renamedFile;
 					$this->request->data['folders'] = DS;
@@ -977,7 +984,6 @@ class CabinetsController extends AppController {
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($ch, CURLOPT_VERBOSE, 1);
 					$response = curl_exec($ch);
-                    @unlink(ROOT . DS . APP_DIR . DS . 'tmp' . DS . $tmpname);
 					@unlink($folderForUser . DS . $renamedFile);
                 }
             }
@@ -986,6 +992,69 @@ class CabinetsController extends AppController {
         //$this->redirect('/cabinets?project=' . $folderid);
 		$this->redirect('/cabinets');
     }
+	
+	public function myfolders($folderId=null, $level = 1, $depth=0) {	
+		$this->autoRender = 0;
+		
+		$auth_id = $this->Auth->user('id');
+		$contain = array(
+			'User' => array(
+				'fields' => array('User.id', 'User.first_name', 'User.last_name')
+			),
+			'Share',
+			'Comment' => array(
+				'fields' => array('id')
+			),
+			'Subscription' => array(
+				'fields' => array('Subscription.id')
+			),
+			'CalendarEvent' => array(
+				'fields' => array('CalendarEvent.id')
+			),
+			'Document' => array(
+				'User' => array(
+					'fields' => array('User.id', 'User.first_name', 'User.last_name')
+				),
+				'Share',
+				'Comment' => array(
+					'fields' => array('id')
+				),
+				'Subscription' => array(
+					'fields' => array('Subscription.id')
+				),
+				'CalendarEvent' => array(
+					'fields' => array('CalendarEvent.id')
+				)
+			)
+		);
+		
+		$this->loadModel('Folder');
+		$allChildren = $this->Folder->findThreaded($folderId, $depth, $auth_id, 1);
+		$folder_idx = array_keys($allChildren);
+		$this->Folder->recursive =1;
+		$this->Folder->Behaviors->attach('Containable');
+		$parentId = $folder_idx[0];
+		$children =  $this->Folder->find('all',
+										array(
+											'conditions' => array('Folder.id' => $folder_idx, 'Folder.parent_id' => $parentId),
+											'order' => array('Folder.name' => 'asc'),
+											'contain' => $contain
+										)
+									);
+		
+		$parent = $this->Folder->find('first',
+										array(
+											'conditions' => array('Folder.id' => $folder_idx),
+											'contain' => $contain
+										)
+									);
+		array_unshift($children, $parent);
+		$folders = $children;
+		if($this->request->pass) {
+			debug($folders);
+		}
+		return $folders;
+	}
 
 }
 

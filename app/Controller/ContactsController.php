@@ -352,4 +352,40 @@ class ContactsController extends AppController {
 	public function contact_modal() {
 		$this->render('contact_modal');
 	}
+	
+	public function import() {
+		$this->autoRender = false;
+		$result['status'] = 'n';
+		if($this->request->is('ajax') && $this->request->is('post') && !empty($this->request->data['Contact'])) {
+			// thi line is important.  this will work just like import in core php 
+			App::import('Vendor', 'openinviter', array('file' => 'openinviter'.DS.'openinviter.php')); 
+				 
+			$inviter = new OpenInviter(); 
+
+			$oi_services = $inviter->getPlugins(); 
+			
+			$inviter->startPlugin($this->request->data['Contact']['contact_type']);  
+			// supply a file name with ought .php in the parameter. you will fine the files in the "vendors/openinviter/plugins/" In the Plugins you will find all the files which communicate with the respected services to fatch data. you will pass google, yahoo etc.
+
+			// it will return error if any 
+			$internal = $inviter->getInternalError(); 	
+			
+			// this is use for login in to services just like gmail.com account 1st. parameter take login id and 2nd. parameter takes password
+			$inviter->login($this->request->data['Contact']['email'], $this->request->data['Contact']['password']); 
+			
+			
+			// this will return the array which contain all the email address from the account you want to fetch. 
+			$contacts = $inviter->getMyContacts(); 
+			$data = array();
+			$counter = 0;
+			foreach($contacts as $email => $contact) {
+				$data[$counter]['Contact'] = array('email' => $email, 'user_id' => $this->Auth->user('id'));
+				$counter++;
+			}
+			if($this->Contact->saveMany($data)) {
+				$result['status'] = 'y';
+				echo json_encode($result);
+			}
+		}
+	}
 }

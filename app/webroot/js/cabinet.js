@@ -110,7 +110,7 @@ var Cabinet = {
         * @return void
         */
 		InitializeTree: function() {
-			var currentFolderId = jQuery.cookie("currentFolderId");
+			var currentFolderId = $.cookie("currentFolderId");
 			$.jstree._themes = _ROOT + "js/themes/";
 			var tree = $("#explorer").jstree({
 				"dnd": {
@@ -165,7 +165,8 @@ var Cabinet = {
 			tree.bind("select_node.jstree",
 			function(event, data) {
 				var sourceId = data.rslt.obj.find("a").attr("paramid");
-				jQuery.cookie("currentFolderId", sourceId);
+				$.cookie("currentFolderId", sourceId);
+				
 				if(documentMoveActivate) return 0;
 				if ($(".manageFolder").is(":visible") || $("span.loader").is(":visible") || $(".loader.upl").is(":visible")) {
 					return false;
@@ -189,10 +190,10 @@ var Cabinet = {
 						$(data.rslt.obj).find("a").attr("id", "mechild_" + r.id).attr('data-fullname', data.rslt.name);
 						$(data.rslt.obj).find("a").attr("paramid", r.id);
 						$.cookie('currentFolderId', r.id);
+						$('a#mechild_' + r.id).click();
 					} else {
 						$.jstree.rollback(data.rlbk);
 					}
-					$('a#mechild_' + r.id).click();
 				});
 			}).bind("remove.jstree",
 			function(e, data) {
@@ -233,28 +234,18 @@ var Cabinet = {
 						$(data.rslt.obj).find('a').attr('data-fullname', data.rslt.new_name).trigger('click');
 					}
 				});
-			});/*.bind('hover_node.jstree', 
-			function(node, data) {
-				var node = data.rslt.obj,
-				nodeName = node.data('name');
-				node.addClass('no_ellipsis').find('a:first').html(function(i, html) {
-					node.data('tempname', html);
-					return '<ins class="jstree-icon">&nbsp;</ins>' + nodeName;
-				}).css('width', '350px');;
-			}).bind('dehover_node.jstree', 
-			function(node, data) {
-				var node = data.rslt.obj,
-				nodeName = node.data('tempname');
-				node.removeClass('no_ellipsis').find('a:first').html(function(i, html) {
-					node.data('tempname', html);
-					console.log(nodeName)
-					return nodeName;
-				}).css('width', '200px');
-			});*/
-			//$("#explorer").jstree("select_node", "#mechild_" + $.cookie('currentFolderId'));
+			});	
+			/**
+			*	Initiate Trigger
+			*/
 			setTimeout(function() {
-				$("#mechild_" + $.cookie('currentFolderId')).click();
-			},200);
+				var child = $.cookie('currentFolderId');
+				if(child && $("#mechild_" + child).length) {
+					$("#mechild_" + child).click();
+				} else {
+					$("[id^=mechild_]:first" ).click();
+				}			
+			}, 200);
 		},
 		OnEachItem: function() {
 			$('.each_item').on({
@@ -833,10 +824,10 @@ var Cabinet = {
 				projectId = params[0].replace('project_','');
 				jQuery.cookie('projectId', projectId);
 			}
-			if(sourceId) {
+			if(sourceId && $("#directory_dd_options a[data-projfldr=" + sourceId + "]").length) {
 				$("#directory_dd_options a[data-projfldr=" + sourceId + "]").trigger("click");
 			} else {
-				$("#directory_dd_options").find("li").first().find("a").trigger("click");
+				$("#directory_dd_options li a").trigger("click");
 			}
 			
 			if($('#directory_dd_options li:has(a)').length == 1) {
@@ -901,12 +892,11 @@ var Cabinet = {
 			});
 		},
 		onSelectParentFolder: function() {
-			$('#directory_dd_container').find("li").find("a").live('click',
+			$('#directory_dd_container li a').live('click',
 			function() {
 				$("#explorer").html('<span class="loader"><img src="' + _ROOT + 'img/ajax-loader.gif" /> Loading...</span>');
 				var parent = this;
 				var folderId = $(this).next().val();
-				
 				if($.cookie('parentFolderId') != folderId) {
 					$.cookie('parentFolderId', folderId);
 					$.cookie('currentFolderId', folderId);
@@ -1015,7 +1005,7 @@ var Cabinet = {
 				$('#gallery_item_listview').mCustomScrollbar({
 					theme:"dark-thin"
 				});
-				jQuery.cookie("currentFolderId", sourceId);
+				$.cookie("currentFolderId", sourceId);
 				/**
 				*	Set the view type ie. Thumb view / list view
 				*/
@@ -1023,7 +1013,7 @@ var Cabinet = {
 				$('span.view_change_icon.' + ['list_view', 'thumbnail_view'][currentView-1]).click();
 				if (Cabinet.Process.isMultipleUploadActive) {
 					$('.fancyboxUpload').trigger('click');
-					jQuery.cookie("autoActiveMultiUpload", 1);
+					$.cookie("autoActiveMultiUpload", 1);
 				}
 			});
 		},

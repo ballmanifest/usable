@@ -2,9 +2,6 @@
 	$this->loadHelper("Time");
 	$this->loadHelper("Number");
 	$this->loadHelper("Cabinet");
-	if(!isset($documents[0])):
-		echo $this->Html->tag("div", "No Documents Found", array("class"=>"alert not-found"));
-	endif;
 	$count = 0;
 	$auth_id = $this->Session->read('Auth.User.id');
 ?>
@@ -13,36 +10,18 @@
 <div id="gallery_item_listview" style="padding-bottom: 30px">
 <?php 
 	$folderId = "";
-	
-	foreach ($documents as $results):
-	
-	 	$document = $results["Document"];
-		$user = $results["User"];
-		$folder = $results["Folder"];
-		$doc_shares = $results["Share"];
-		
-		$auth_id = $this->Session->read('Auth.User.id');
-		
-		$doc_comments = $results["Comment"];
-		$folder_comments = $folder["Comment"];
-		$folder_shares= $folder["Share"];
-		
-		$documentCalendarEvent = $results['CalendarEvent'];
-		$folderCalendarEvent = $folder['CalendarEvent'];
-		$ext = $document['ext'];
-		
-		$folder_subscription = !empty($folder['Subscription']) ? 1 : 0;
-		$document_subscription = !empty($results['Subscription']) ? 1 : 0;
-		
-		$size = $this->Number->toReadableSize($document["size"]);
-		$view = "../img/?img=/imagecache/".$document["file"]."&height=800";
-	
-		$documentComments  = count($doc_comments);
-		$documentShares = count(Set::extract('/Share[user_id='. $auth_id .']', $results));
+
+	foreach($allFolders as $myfolder):
+		$folder = $myfolder['Folder'];
+		$folderId = $folder['id'];
+		$folder_comments = $myfolder["Comment"];
+		$folder_shares= $myfolder["Share"];
+		$folderCalendarEvent = $myfolder['CalendarEvent'];
+		$folder_subscription = !empty($myfolder['Subscription']) ? 1 : 0;
 		$folderComments = count($folder_comments);
-		$documentCalendarEventCount = count($documentCalendarEvent);
 		$folderCalendarEventCount = count($folderCalendarEvent);
-		$folderShares = count(Set::extract('/Share[user_id='. $auth_id .']', $folder));
+		$folderShares = count(Set::extract('/Share[user_id='. $auth_id .']', $myfolder));
+		$user = $myfolder['User'];
 		
 		if(($role == 2 || $role == 0) && !empty($folder_shares)) {
 			/**
@@ -56,12 +35,8 @@
 		} else {
 			$is_downloadable = $is_readonly = $is_writable = $is_printable = 1;
 		}
-		$condition = $folderId != $document["folder_id"];
-		if($folderId != '' && ($folder_type == 'share' || $role == 2)) {
-			$condition = false;
-		}
-		if($condition):
 ?>
+
 	<div class="breadcrumbs sharing_projects_pan me_relative">
 		<div class="folder_item_block clearfix">
 			
@@ -101,7 +76,7 @@
 				<!-- Author and created date for folder -->
 				<ul class="title">
 					<li><?php echo $user['first_name'] . ' ' . $user['last_name'];?></li> 
-					<li><?php echo date('m/d/Y', strtotime($document['created']));?></li>
+					<li><?php echo date('m/d/Y', strtotime($folder['created']));?></li>
 				</ul>
 				
 				<!-- action icons for folder -->
@@ -121,7 +96,7 @@
 							<?php if($folderShares > 0): ?><a class="counter"><?php echo $folderShares;?></a> <?php endif;?>
 							<a title="Share" class="fancyboxShareModal" href="<?php echo $this->Html->url(array('controller' => 'shares', 'action' => 'share_modal', 'type' => 'folder', 'id' => $folder['id']), true)?>"  paramId="<?php echo $folder["id"]?>" data-sharetype="folder"><?php echo $this->Html->image('share2.png');?></a>
 						<?php } else { 
-							echo $this->Html->link($this->Html->image('sahre2.png'), 'javascript::void(0)', array('escape' => false));
+							echo $this->Html->link($this->Html->image('share2.png'), 'javascript::void(0)', array('escape' => false));
 						} ?>
 					</li>
 					<li>
@@ -192,11 +167,33 @@
 			</ul>
 		</div>
 	</div> 
-	
-	<!-- Documents Container of selected Folder -->
-	<div class="docs_listing">
-	<?php 
-		endif;
+
+	<!-- Document List start herer -->
+	<?php
+		$count = count($myfolder['Document']);
+		$height = $count == 0 ? '30px' : 'auto';
+	?>
+	<div class="docs_listing" style="height:<?php echo $height;?>;">
+<?php
+	if($count == 0) :
+?>
+	<div class="alert not-found">
+		 No Documents Found
+	</div>
+<?php
+	else:
+	foreach ($myfolder['Document'] as $results):
+	 	$document = $results;
+		$user = $results["User"];
+		$doc_shares = $results["Share"];
+		$doc_comments = $results["Comment"];		
+		$documentCalendarEvent = $results['CalendarEvent'];
+		$ext = $document['ext'];
+		$document_subscription = !empty($results['Subscription']) ? 1 : 0;		
+		$size = $this->Number->toReadableSize($document["size"]);
+		$documentComments  = count($doc_comments);
+		$documentShares = count(Set::extract('/Share[user_id='. $auth_id .']', $results));
+		$documentCalendarEventCount = count($documentCalendarEvent);
 		$folderId = $document["folder_id"];
 		$the_share = array();
 		$the_share = Set::extract('/Share[user2_id='. $auth_id .']', $results);
@@ -209,8 +206,8 @@
 		} else {
 			$is_downloadable = $is_readonly =$is_writable = $is_printable = 1;
 		}
-	?>  
-	
+?>	
+
 		<div class="list_view_each_item sharing_pan clearfix" searchdata="<?php echo $document["name"]?>" data-info='{"id":<?php echo $document['id']?>,"type":"document","parent_id":<?php echo $folderId?>}'>
 		
 			<!-- Docuement Row Left Panel -->
@@ -428,9 +425,13 @@
 			</div>
 		</div>
 <?php 
-	endforeach; 
+		endforeach; 
+	endif;
 ?>
 	</div>
+<?php
+	endforeach;
+?>
 </div>
 
 <!-- Thumb view -->

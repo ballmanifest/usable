@@ -1076,11 +1076,37 @@ var newFilocityImportContactsDialog=function(){
 	
 	
 	$('#'+dialog_id+' .save-button').click(function(){
-		if($('#'+dialog_id+' .provider_box').val()=='outlook_csv'){
+		var self = this;
+		var choosedContact = $('#'+dialog_id+' .provider_box').val();
+		if(choosedContact =='outlook_csv'){
 			if(uploader_file!=undefined){
 				uploader.start();
 				$('#'+dialog_id).dialogAttachLoadingIndicator('Uploading CSV...');
 			}
+		} else {
+			var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/,
+				email = $.trim( $('input[name="email_box"].email_box:visible').val() ),
+				pass = $.trim( $('input[name="password_box"].password_box:visible').val()) ;
+			if(!email || !pass) {
+				alert('Please, enter valid email and password.');
+				return 0;
+			} else {
+				if(!regex.test(email)) {
+					alert('Not a valid mail address');
+				} else {
+					var data = {
+						'data[Contact][contact_type]': choosedContact,
+						'data[Contact][email]': email,
+						'data[Contact][password]': pass,
+					}
+					$.post(_ROOT+'contacts/import', data, function(response) {
+						if(response.status == 'y') {
+							$('a.ui-dialog-titlebar-close').click();
+							$('a#all_contacts_group_link').click();
+						}
+					}, 'json');
+				}
+			} 
 		}
 	});
 	
