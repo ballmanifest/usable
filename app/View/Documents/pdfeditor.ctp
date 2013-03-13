@@ -41,7 +41,7 @@
 <div class="adeptol_viewer">
 				<iframe name="ajaxdocumentviewer" src="https://secure.filocity.com/app/webroot/pdfeditor/Main.html?id=<?php echo $file_id;?>&space=<?php echo "company";//echo $space;?>&secret=<?php echo $secret;?>&share=<?php echo  $shares;?>&folder=<?php echo $folder_id;?>" border="1" height="870" width="940" scrolling="no" align="left" frameborder="0" marginwidth="1" marginheight="1" style="border: 1px solid #ccc;padding:5px;border-radius: 5px;margin-bottom:20px;">Your browser does not support inline frames or is currently configured not to display inline frames.</iframe>
 </div>
-<?php } elseif($mytmp == 1) { ?>
+<?php } elseif($mytmp == 0) { ?>
 <div class="doc_header_des clearfix">
 			<p class="related_to_doc me_right">
 				<?php echo $this->Html->link('Tasks ('. $tasks .')', 'javascript:void(1)', array('class' => 'task_pill green_pill'));?>

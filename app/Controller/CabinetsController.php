@@ -99,7 +99,6 @@ class CabinetsController extends AppController {
                     $treeFolders[$folder['Folder']['id']] = '_' . $folder['Folder']['name'];
                 }
             }
-
             $this->set('treeFolders', $treeFolders);
             $this->Session->write("Folder.Parent.records", $treeFolders);
             $this->render("ajax_folders", false);
@@ -984,7 +983,7 @@ class CabinetsController extends AppController {
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 					curl_setopt($ch, CURLOPT_VERBOSE, 1);
 					$response = curl_exec($ch);
-					@unlink($folderForUser . DS . $renamedFile);
+					unlink($folderForUser . DS . $renamedFile);
                 }
             }
         }
@@ -995,8 +994,11 @@ class CabinetsController extends AppController {
 	
 	public function myfolders($folderId=null, $level = 1, $depth=0) {	
 		$this->autoRender = 0;
-		
 		$auth_id = $this->Auth->user('id');
+		$this->loadModel('Folder');
+		$folder = $this->Folder->find('first', array('conditions' => array('Folder.id' => $folderId, 'Folder.user_id' => $auth_id)));
+		$folder_type = $folder['Folder']['folder_type'];
+		
 		$contain = array(
 			'User' => array(
 				'fields' => array('User.id', 'User.first_name', 'User.last_name')
@@ -1028,31 +1030,69 @@ class CabinetsController extends AppController {
 			)
 		);
 		
-		$this->loadModel('Folder');
-		$allChildren = $this->Folder->findThreaded($folderId, $depth, $auth_id, 1);
-		$folder_idx = array_keys($allChildren);
+		$folder_idx = array();
+		$parentId = 0;
+		$conditions = array();
+		$shared_documents = array();
+		
+		if($folder_type == 'share') {
+			$this->loadModel('Share');
+			$shared = $this->Share->find('all',array('recursive' => -1, 'conditions' => array('Share.user2_id' => $auth_id)));
+			$folder_idx = Set::extract('/Share/folder_id', $shared);
+			$document_idx = array();
+			$document_idx = Set::extract('/Share/document_id', $shared);
+			$parentId = $folderId;
+			$doc_contain = array(
+				'User' => array(
+					'fields' => array('User.id', 'User.first_name', 'User.last_name')
+				),
+				'Share',
+				'Comment' => array(
+					'fields' => array('id')
+				),
+				'Subscription' => array(
+					'fields' => array('Subscription.id')
+				),
+				'CalendarEvent' => array(
+					'fields' => array('CalendarEvent.id')
+				)
+			);
+			$this->Share->Document->Behaviors->attach('Containable');
+			$shared_documents = $this->Share->Document->find('all',array('conditions' => array('Document.id' => $document_idx), 'contain' => $doc_contain));
+		} else {
+			$allChildren = $this->Folder->findThreaded($folderId, $depth, $auth_id, 1);
+			$folder_idx = array_keys($allChildren);
+			$parentId = $folder_idx[0];
+			$conditions['Folder.parent_id'] = $parentId;
+		}
+		$conditions['Folder.id'] = $folder_idx;
 		$this->Folder->recursive =1;
 		$this->Folder->Behaviors->attach('Containable');
-		$parentId = $folder_idx[0];
 		$children =  $this->Folder->find('all',
 										array(
-											'conditions' => array('Folder.id' => $folder_idx, 'Folder.parent_id' => $parentId),
+											'conditions' => $conditions,
 											'order' => array('Folder.name' => 'asc'),
 											'contain' => $contain
 										)
 									);
-		
 		$parent = $this->Folder->find('first',
 										array(
-											'conditions' => array('Folder.id' => $folder_idx),
+											'conditions' => array('Folder.id' => $parentId),
 											'contain' => $contain
 										)
 									);
+		if($folder_type == 'share') {
+			foreach($shared_documents as $key => $doc) {
+				$parent['Document'][$key] = $doc['Document'];
+				$parent['Document'][$key]['User'] = $doc['User'];
+				$parent['Document'][$key]['Share'] = $doc['Share'];
+				$parent['Document'][$key]['Comment'] = $doc['Comment'];
+				$parent['Document'][$key]['Subscription'] = $doc['Subscription'];
+				$parent['Document'][$key]['CalendarEvent'] = $doc['CalendarEvent'];
+			}
+		}
 		array_unshift($children, $parent);
 		$folders = $children;
-		if($this->request->pass) {
-			debug($folders);
-		}
 		return $folders;
 	}
 
