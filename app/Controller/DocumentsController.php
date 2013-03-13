@@ -272,11 +272,26 @@ class DocumentsController extends AppController {
             $this->render("ajax_comments", false);
         }
     }
-     public function pdfeditor() {
+      public function pdfeditor() {
 		$viewer_info = array();
 		if(!empty($this->request->params['named'])) {
 			$params = $this->request->params['named'];
 			$doc_id = $params['id'];
+			if ($doc_id == NULL)
+			{
+			$viewer_info = array();
+			$share_info = array();
+			$auth_id = $this->Auth->user('id');
+			$role = intval($this->Auth->user('role'));
+			$auth_key =  $this->Auth->user('auth_key');
+			
+		    $viewer_info = array(
+								'auth_key'=> $auth_key
+								);
+			$this->set(compact('viewer_info', 'share_info'));
+			}
+			else
+			{
 			$viewer_info = array();
 			$doc_info = array();
 			$auth_id = $this->Auth->user('id');
@@ -299,9 +314,17 @@ class DocumentsController extends AppController {
 				$this->Session->setFlash(__('Not permitted to see this document.'));
 				return false;
 			}
-			$viewer_info = array('doc_detail'=> $doc_detail);			
+
+		
+			
+				$viewer_info = array(
+								'doc_detail'=> $doc_detail
+								);
+			
 			$this->set(compact('viewer_info', 'share_info'));
-		}
+			
+                }
+			}
 	}
 	
 	/**

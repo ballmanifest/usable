@@ -108,7 +108,7 @@
 					<p><?php echo date('l, F dS, Y: h:ia');?></p>
 					<ul class="company_space_pan3 clearfix">
 						<li><a class="share tool_link fancyboxUpload upload" href="#multipleUpload" style="margin-left:-40px;">Upload</a></li>
-						<li><a class="pdf_tool" href=<?php echo FULL_BASE_URL . '/documents/pdfeditor/Main.html';?>>PDF Tools</a></li>
+						<li><a class="pdf_tool" href=<?php echo FULL_BASE_URL . '/documents/pdfeditor/id:';?>>PDF Tools</a></li>
 					</ul>
 				</div>	
 			</div>
