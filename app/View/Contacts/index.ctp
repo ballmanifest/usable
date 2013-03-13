@@ -1,6 +1,6 @@
 <?php
-echo $this->Html->css(array('jquery.mCustomScrollbar.css', 'contacts'));
-echo $this->Html->script(array('jquery-ui-1.8.23.custom.min', 'jquery.mousewheel.min.js', 'jquery.mCustomScrollbar.js', 'plupload.full.js', 'jquery.jstree.js', 'contacts'), array('inline' => false));
+echo $this->Html->css(array('jquery.mCustomScrollbar.css', 'contacts', 'fancybox/jquery.fancybox'));
+echo $this->Html->script(array('jquery-ui-1.8.23.custom.min', 'jquery.mousewheel.min.js', 'jquery.mCustomScrollbar.js', 'plupload.full.js', 'jquery.jstree.js', 'fancybox/jquery.fancybox', 'contacts'), array('inline' => false));
 ?>
 <div id="contact_actions_container">
 	<a href="#" id="add_contact_link">Add Contact</a>
@@ -529,3 +529,10 @@ echo $this->Html->script(array('jquery-ui-1.8.23.custom.min', 'jquery.mousewheel
 	</div>
 </div>
 
+<!-- Alert Box -->
+<div class="me_hide">
+	<div id="fancyAlertBox" class="fancyAlertBox">
+		<h5>Message</h5>
+		<div class="alert_message"></div>
+	</div>
+</div>

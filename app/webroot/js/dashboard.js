@@ -219,7 +219,7 @@ $(function() {
 	*	Set nice scroll bar to 
 	*	dashboard activity feed
 	*/
-	$('.notices_container').mCustomScrollbar();
+	$('.notices_container, .tasks_list_container').mCustomScrollbar();
 	
 	/**
 	*	Link to change profile thumb

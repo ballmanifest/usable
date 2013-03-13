@@ -31,7 +31,7 @@
 				<li class="a_menu_item <?php echo ($controller == 'cabinets' && $action == 'index') ? $activeClass : ''; ?>">
 				<?php echo $this->Html->link('File Cabinet', array('controller' => 'cabinets', 'action' => 'index')); ?>
 				</li>
-				<?php if($role != 2): ?>
+				<?php if($role == 22): //if($role != 2):?>
 				<li class="a_menu_item <?php echo ($controller == 'projects' && $action == 'view') ? $activeClass : ''; ?>">
 				<?php echo $this->Html->link('Projects', array('controller' => 'projects', 'action' => 'view')); ?>
 				</li>
@@ -46,7 +46,7 @@
 				<?php echo $this->Html->link('Calendar', array('controller' => 'calendars', 'action' => 'index')); ?>
 				</li>
 				<?php endif;?>
-				<?php if($role != 2): ?>
+				<?php if($role == 22): //if($role != 2): ?>
 				<li class="a_menu_item <?php echo ($controller == 'users' && $action == 'resources') ? $activeClass : ''; ?>">
 				<?php echo $this->Html->link('Task Tracker', array('controller' => 'users', 'action' => 'resources')); ?>
 				</li>

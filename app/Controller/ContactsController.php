@@ -355,7 +355,7 @@ class ContactsController extends AppController {
 	
 	public function import() {
 		$this->autoRender = false;
-		$result['status'] = 'n';
+		$result['message'] = 'Sorry, Contact Import Failed';
 		if($this->request->is('ajax') && $this->request->is('post') && !empty($this->request->data['Contact'])) {
 			// thi line is important.  this will work just like import in core php 
 			App::import('Vendor', 'openinviter', array('file' => 'openinviter'.DS.'openinviter.php')); 
@@ -378,14 +378,18 @@ class ContactsController extends AppController {
 			$contacts = $inviter->getMyContacts(); 
 			$data = array();
 			$counter = 0;
-			foreach($contacts as $email => $contact) {
-				$data[$counter]['Contact'] = array('email' => $email, 'user_id' => $this->Auth->user('id'));
-				$counter++;
-			}
-			if($this->Contact->saveMany($data)) {
-				$result['status'] = 'y';
-				echo json_encode($result);
+			if(!empty($contacts)) {
+				foreach($contacts as $email => $contact) {
+					$data[$counter]['Contact'] = array('email' => $email, 'user_id' => $this->Auth->user('id'));
+					$counter++;
+				}
+				if($this->Contact->saveMany($data)) {
+					$result['message'] = 'Contact Imported Successfully.';
+				}
+			} else {
+				$result['message'] = 'No Contact to import.';
 			}
 		}
+		echo json_encode($result);
 	}
 }

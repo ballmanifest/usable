@@ -433,3 +433,6 @@ margin-top:6px;
 {
 color:black;
 }
+.provider_box {
+	padding: 0 !important;
+}

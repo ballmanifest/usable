@@ -97,6 +97,7 @@
 				</div>
 			</div>
 			<div id="project_files_members_and_budget" class="me_right me_relative">
+				<?php if(1 == 2):?>
 				<div class="files_segment">
 					<div class="header_title map_pan">
 						<h1 class="title">My Active Projects</h1>
@@ -136,7 +137,9 @@
 						?>
 					</div>
 				</div>
+				<?php endif;?>
 				<!---->
+				<?php if(1==2):?>
 				<div class="tasks_segment">
 					<div class="header_title map_pan">
 						<h1 class="title">My Top Tasks</h1>
@@ -164,6 +167,7 @@
 				<?php endif; ?>
 					</div>
 				</div>
+				<?php endif;?>
 				<!---->
 				<div class="tasks_segment">
 					<div class="header_title map_pan">
@@ -171,14 +175,14 @@
 						<div class="adnew"><?php echo $this->Html->link('<span class="add_new_blue_button add_task_button" data-show-task="0">' . $this->Html->image('new_btn.png') . '</span>', 'javascript::void(0)', array('escape' => false, 'class' => 'add_new_blue_button add_task_button'));?></div>
 						<div class="adnew"><?php echo $this->Html->link($this->Html->image('all_tasks_btn.png'), array('controller' => 'users', 'action' => 'resources'), array('escape' => false, 'class' => 'all_tasks link_selected me_right'));?></div>
 					</div>
-					<div class="tasks_list_container db_body2_map  db_body2_map_last">
+					<div class="tasks_list_container db_body2_map  db_body2_map_last" style="height:750px;overflow-y:hidden;overflow-x:auto;padding-left:5px;">
 					<?php
 					if (!empty($recent_documents)):
 						foreach ($recent_documents as $document) {
 						$file_name = $document['Document']['name'];
 						$file_ext = $document['Document']['ext'];
 						$file_created = $document['Document']['created'];
-						$view = "../img/?img=/imagecache/" . $document['Document']["file"] . "&height=800";
+						
 						$file_modified = $document['Document']['modified'];
 						if (!empty($file_ext)) {
 							// not display files without extension
@@ -190,26 +194,22 @@
 									<?php
 									$ext = $document['Document']["ext"];
 									if (in_array(strtolower($ext), array('jpg', 'jpeg', 'png', 'gif'))) {
-										$img = $this->Html->image("?img=/imagecache/" . $document['Document']["file"] . "&height=28&cropratio=2:2", array());
-										echo $this->Html->link($img, array('action' => $view), array("class" => "fancybox", "escape" => false));
-									} elseif (in_array(strtolower($ext), array('doc', 'docx', 'pdf', 'txt'))) {
-										$img = $this->Html->image($ext . ".png", array());
-										echo $this->Html->link($img, array("controller" => "documents", "action" => "view", "id" => $document['Document']["id"]), array("target" => "_blank", "class" => "fancybox", "escape" => false));
+										$small = $this->Html->url(array('controller' => 'image', 'action' => 'cabimage', 'small', $document['Document']['file']), true);
+										$large = $this->Html->url(array('controller' => 'image', 'action' => 'cabimage', 'large', $document['Document']['file']), true);
+										$img = $this->Html->image($small, array('class' => 'my_thumb', 'escape' => false));
+										echo $this->Html->link($img, $large, array("class" => "fancybox", "escape" => false));
+									} else {
+										if(file_exists(WWW_ROOT . 'img' . DS . 'icons' . DS . $ext . '.png')) {
+											$img = $this->Html->image('icons/' . $ext . ".png", array());
+										} else {
+											$img = $this->Html->image('default-image-icon.png');
+										}
+										echo $this->Html->link($img, array("controller" => "documents", "action" => "view", "id" => $document['Document']["id"]), array("target" => "_blank", "escape" => false));
 									}
 									?>
 									</span>
 								</div>
 								<div class="end_task_text md10">
-									<?php
-									$conf = array();
-									$action = array();
-									if (in_array(strtolower($ext), array('jpg', 'jpeg', 'png', 'gif'))) {
-									$action = array('action' => $view);
-									} elseif (in_array(strtolower($ext), array('doc', 'docx', 'pdf', 'txt'))) {
-									$action = array("controller" => "documents", "action" => "view", "id" => $document['Document']["id"]);
-									$conf = array("target" => "_blank");
-									}
-									?>
 									<h4><?php echo Sanitize::html($file_name); ?></h4>
 									<p>Added on <?php echo date('M. jS', $this->Time->toUnix($file_created)); ?>, Updated on <?php echo date('M. jS', $this->Time->toUnix($file_modified)); ?></p>
 								</div>

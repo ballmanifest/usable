@@ -42,6 +42,9 @@ class ImageController extends AppController {
 		} elseif($size == 'large') {
 			$_GET['w'] = $width;
 			$_GET['h'] = $height;
+		} elseif($size == 'small') {
+			$_GET['w'] = 32;
+			$_GET['h'] = 32;
 		}
 		$userId = $this->Auth->user('id');
 		$_GET['src'] =  FILOCITY_STORE . $file_name; //DS . 'uploads' . DS . 'user_' . $userId . DS . $file_name;

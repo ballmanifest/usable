@@ -144,9 +144,8 @@
 }
 .db_body2_map2 {
     border-bottom: 1px dashed #D2E9F0;
-    margin: 0 0 6px;
+    height: 45px;
     overflow: hidden;
-    padding: 0 9px 8px;
 }
 .db_body2_map2 .md8 {
     float: left;
@@ -661,7 +660,7 @@
 }
 .tasks_segment{
     clear:both;
-	margin-top: 12px;
+	margin-top: 0px;
 }
 .task_completion{
     color:#7c99ac;
@@ -705,7 +704,7 @@
     display: block
 }
 .end_task_panel{
-    width:285px;
+    width:280px;
     margin-top: 5px;
 }
 .end_task_text{

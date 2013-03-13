@@ -1100,10 +1100,19 @@ var newFilocityImportContactsDialog=function(){
 						'data[Contact][password]': pass,
 					}
 					$.post(_ROOT+'contacts/import', data, function(response) {
-						if(response.status == 'y') {
-							$('a.ui-dialog-titlebar-close').click();
-							$('a#all_contacts_group_link').click();
-						}
+						$('a.ui-dialog-titlebar-close').click();
+						$.fancybox({
+							href: '#fancyAlertBox',
+							width: 300,
+							height: 150,
+							autoDimensions: false,
+							onComplete : function() {
+								$('#fancyAlertBox .alert_message').html(response.message);
+							},
+							onClosed : function() {
+								$('a#all_contacts_group_link').click();
+							}
+						});
 					}, 'json');
 				}
 			} 
